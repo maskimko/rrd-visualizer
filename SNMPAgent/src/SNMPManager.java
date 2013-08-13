@@ -25,15 +25,17 @@ public class SNMPManager {
 	}
 	
 	public static  void main(String[] args) throws IOException{
-		SNMPManager client = new SNMPManager("udp:10.1.20.101/161");
+		//SNMPManager client = new SNMPManager("udp:10.1.20.101/161");
+		SNMPManager client = new SNMPManager("udp:127.0.0.1/2013");
 		client.start();
 		String sysDescr = client.getAsString(new OID(".1.3.6.1.2.1.1.1.0"));
+		//String sysDescr = client.getAsString( new OID(".1.3.6.1.4.1.2006.1.1"));
 		System.out.println(sysDescr);
 		
 	}
 	
 	
-	private void start() throws IOException {
+	protected void start() throws IOException {
 		TransportMapping transport = new DefaultUdpTransportMapping();
 		snmp = new Snmp(transport);
 		transport.listen();

@@ -18,11 +18,14 @@
   _##  
   _##########################################################################*/
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -119,73 +122,86 @@ public class AgentTwo implements VariableProvider {
 	protected Properties tableSizeLimits;
 
 	public AgentTwo(Map args) {
-    configFile = (String)((List)args.get("c")).get(0);
-    bootCounterFile = new File((String)((List)args.get("bc")).get(0));
-    String tlsVersions = null;
-    try {
-    tlsVersions = (String)((List)args.get("tls-version")).get(0);
-    } catch (NullPointerException npe) {
-    if (tlsVersions != null) {
-      System.setProperty(SnmpConfigurator.P_TLS_VERSION, tlsVersions);
-    }
-    }
+		configFile = (String) ((List) args.get("c")).get(0);
+		bootCounterFile = new File((String) ((List) args.get("bc")).get(0));
+		String tlsVersions = null;
+		try {
+			tlsVersions = (String) ((List) args.get("tls-version")).get(0);
+		} catch (NullPointerException npe) {
+			if (tlsVersions != null) {
+				System.setProperty(SnmpConfigurator.P_TLS_VERSION, tlsVersions);
+			}
+		}
 
-    server = new DefaultMOServer();
-    MOServer[] moServers = new MOServer[] { server };
-    
-   InputStream configInputStream = AgentTwo.class.getResourceAsStream("SampleAgentConfig.properties");
-    	
-    if (args.containsKey("cfg")) {
-      try {
-        configInputStream =
-            new FileInputStream((String) ArgumentParser.getValue(args, "cfg", 0));
-      }
-      catch (FileNotFoundException ex1) {
-        ex1.printStackTrace();
-      }
-    }
-    final Properties props = new Properties();
-    try {
-      props.load(configInputStream);
-    }
-    catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    MOInputFactory configurationFactory = new MOInputFactory() {
-      public MOInput createMOInput() {
-        return new PropertyMOInput(props, AgentTwo.this);
-      }
-    };
-    InputStream tableSizeLimitsInputStream =
-        AgentTwo.class.getResourceAsStream("SampleAgentTableSizeLimits.properties");
-    if (args.containsKey("ts")) {
-      try {
-        tableSizeLimitsInputStream =
-            new FileInputStream((String) ArgumentParser.getValue(args, "ts", 0));
-      }
-      catch (FileNotFoundException ex1) {
-        ex1.printStackTrace();
-      }
-    }
-    tableSizeLimits = new Properties();
-    try {
-      tableSizeLimits.load(tableSizeLimitsInputStream);
-    }
-    catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    MessageDispatcher messageDispatcher = new MessageDispatcherImpl();
-    addListenAddresses(messageDispatcher, (List)args.get("address"));
-    agent = new AgentConfigManager(new OctetString(MPv3.createLocalEngineID()),
-                                   messageDispatcher,
-                                   null,
-                                   moServers,
-                                   ThreadPool.create("SampleAgent", 3),
-                                   configurationFactory,
-                                   new DefaultMOPersistenceProvider(moServers,
-                                                                    configFile),
-                                   new EngineBootsCounterFile(bootCounterFile));
-  }
+		server = new DefaultMOServer();
+		MOServer[] moServers = new MOServer[] { server };
+
+		/* File propertiesFile = new File("D:\\EclipsePortable\\Data\\workspace\\rrd-visualizer\\SNMPAgent\\SampleAgentConfig.properties");
+		try {
+		if (!propertiesFile.canRead()) {
+			System.out.println("Can't read properties file!");
+		} else {
+			String line = null;
+			BufferedReader br  = new BufferedReader(new FileReader(propertiesFile));
+			do {
+				line = br.readLine();
+				System.out.println(line);
+			} while (line != null);
+		}} catch (FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		} catch (IOException ie) {
+			ie.printStackTrace();
+		}
+		*/
+		InputStream configInputStream = AgentTwo.class
+				.getResourceAsStream("D:\\EclipsePortable\\Data\\workspace\\rrd-visualizer\\SNMPAgent\\SampleAgentConfig.properties");
+
+		if (args.containsKey("cfg")) {
+			try {
+				configInputStream = new FileInputStream(
+						(String) ArgumentParser.getValue(args, "cfg", 0));
+			} catch (FileNotFoundException ex1) {
+				ex1.printStackTrace();
+			}
+		}
+		final Properties props = new Properties();
+		try {
+			props.load(configInputStream);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} catch (NullPointerException npe) {
+			npe.printStackTrace();
+		}
+		MOInputFactory configurationFactory = new MOInputFactory() {
+			public MOInput createMOInput() {
+				return new PropertyMOInput(props, AgentTwo.this);
+			}
+		};
+		InputStream tableSizeLimitsInputStream = AgentTwo.class
+				.getResourceAsStream("SampleAgentTableSizeLimits.properties");
+		if (args.containsKey("ts")) {
+			try {
+				tableSizeLimitsInputStream = new FileInputStream(
+						(String) ArgumentParser.getValue(args, "ts", 0));
+			} catch (FileNotFoundException ex1) {
+				ex1.printStackTrace();
+			}
+		}
+		tableSizeLimits = new Properties();
+		try {
+			tableSizeLimits.load(tableSizeLimitsInputStream);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		MessageDispatcher messageDispatcher = new MessageDispatcherImpl();
+		addListenAddresses(messageDispatcher, (List) args.get("address"));
+		agent = new AgentConfigManager(new OctetString(
+				MPv3.createLocalEngineID()), messageDispatcher, null,
+				moServers, ThreadPool.create("SampleAgent", 3),
+				configurationFactory, new DefaultMOPersistenceProvider(
+						moServers, configFile), new EngineBootsCounterFile(
+						bootCounterFile));
+	}
 
 	protected void addListenAddresses(MessageDispatcher md,
 			List<String> addresses) {

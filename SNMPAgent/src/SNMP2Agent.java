@@ -1,5 +1,3 @@
-package com.jayway.snmpblogg;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -31,15 +29,11 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
 
+   // package and imports removed
 /**
- * This Agent contains mimimal functionality for running a version 2c snmp
- * agent.
- * 
- * 
- * @author johanrask
- * 
+ * This Agent contains mimimal functionality for running a version 2c snmp agent.
  */
-public class Agent extends BaseAgent {
+public class SNMP2Agent extends BaseAgent {
 
 	// not needed but very useful of course
 	static {
@@ -48,7 +42,7 @@ public class Agent extends BaseAgent {
 
 	private String address;
 
-	public Agent(String address) throws IOException {
+	public SNMP2Agent(String address) throws IOException {
 
 		// These files does not exist and are not used but has to be specified
 		// Read snmp4j docs for more info
@@ -76,7 +70,7 @@ public class Agent extends BaseAgent {
 			throw new RuntimeException(ex);
 		}
 	}
-	
+
 	public void unregisterManagedObject(MOGroup moGroup) {
 		moGroup.unregisterMOs(server, getContext(moGroup));
 	}
@@ -91,7 +85,7 @@ public class Agent extends BaseAgent {
 
 	/**
 	 * Minimal View based Access Control
-	 * 
+	 *
 	 * http://www.faqs.org/rfcs/rfc2575.html
 	 */
 	@Override
@@ -100,22 +94,25 @@ public class Agent extends BaseAgent {
 		vacm.addGroup(SecurityModel.SECURITY_MODEL_SNMPv2c, new OctetString(
 				"cpublic"), new OctetString("v1v2group"),
 				StorageType.nonVolatile);
+		
 
-		vacm.addAccess(new OctetString("v1v2group"), new OctetString("public"),
+		vacm.addAccess(new OctetString("v1v2group"), new OctetString("public_context"),
 				SecurityModel.SECURITY_MODEL_ANY, SecurityLevel.NOAUTH_NOPRIV,
 				MutableVACM.VACM_MATCH_EXACT, new OctetString("fullReadView"),
 				new OctetString("fullWriteView"), new OctetString(
 						"fullNotifyView"), StorageType.nonVolatile);
+		
 
 		vacm.addViewTreeFamily(new OctetString("fullReadView"), new OID("1.3"),
 				new OctetString(), VacmMIB.vacmViewIncluded,
 				StorageType.nonVolatile);
+		
 	}
 
 	/**
 	 * User based Security Model, only applicable to
 	 * SNMP v.3
-	 * 
+	 *
 	 */
 	protected void addUsmUser(USM usm) {
 	}
@@ -138,16 +135,14 @@ public class Agent extends BaseAgent {
 		init();
 		// This method reads some old config from a file and causes
 		// unexpected behavior.
-		// loadConfig(ImportModes.REPLACE_CREATE); 
+		// loadConfig(ImportModes.REPLACE_CREATE);
 		addShutdownHook();
-		getServer().addContext(new OctetString("public"));
+		getServer().addContext(new OctetString("public_context"));
 		finishInit();
 		run();
 		sendColdStartNotification();
 	}
-	
 
-	
 	protected void unregisterManagedObjects() {
 		// here we should unregister those objects previously registered...
 	}
@@ -155,15 +150,15 @@ public class Agent extends BaseAgent {
 	/**
 	 * The table of community strings configured in the SNMP
 	 * engine's Local Configuration Datastore (LCD).
-	 * 
+	 *
 	 * We only configure one, "public".
 	 */
 	protected void addCommunities(SnmpCommunityMIB communityMIB) {
-		Variable[] com2sec = new Variable[] { 
+		Variable[] com2sec = new Variable[] {
 				new OctetString("public"), // community name
 				new OctetString("cpublic"), // security name
 				getAgent().getContextEngineID(), // local engine ID
-				new OctetString("public"), // default context name
+				new OctetString("public_context"), // default context name
 				new OctetString(), // transport tag
 				new Integer32(StorageType.nonVolatile), // storage type
 				new Integer32(RowStatus.active) // row status
@@ -171,14 +166,5 @@ public class Agent extends BaseAgent {
 		MOTableRow row = communityMIB.getSnmpCommunityEntry().createRow(
 				new OctetString("public2public").toSubIndex(true), com2sec);
 		communityMIB.getSnmpCommunityEntry().addRow(row);
-	}
-
-	public static void main(String[] args) throws IOException, InterruptedException {
-		Agent agent = new Agent("0.0.0.0/2001");
-		agent.start();
-		while(true) {
-			System.out.println("Agent running...");
-			Thread.sleep(5000);
-		}
 	}
 }

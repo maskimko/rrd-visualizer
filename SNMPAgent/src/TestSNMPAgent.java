@@ -1,42 +1,59 @@
+
+
 import java.io.IOException;
 
-import org.snmp4j.agent.mo.MOAccessImpl;
-import org.snmp4j.agent.mo.MOScalar;
-import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
+
 
 
 public class TestSNMPAgent {
 
 	static final OID sysDescr = new OID(".1.3.6.1.2.1.1.1.0");
-	
-	public static void main(String[] args) throws IOException, InterruptedException{
+
+	public static void main(String[] args) throws IOException {
 		TestSNMPAgent client = new TestSNMPAgent("udp:127.0.0.1/161");
 		client.init();
 	}
-	
-	SNMPAgent agent = null;
-	//SNMPManager client = null;
+
+	//SNMPAgent agent = null;
+	SNMP2Agent agent = null;
+	/**
+	 * This is the client which we have created earlier
+	 */
+	SNMPManager client = null;
+
 	String address = null;
-	
-	public TestSNMPAgent(String add){
+
+	/**
+	 * Constructor
+	 *
+	 * @param add
+	 */
+	public TestSNMPAgent(String add) {
 		address = add;
 	}
-	
-	private void init() throws IOException, InterruptedException{
-		agent = new SNMPAgent("0.0.0.0/2013");
+
+	private void init() throws IOException {
+		//agent = new SNMPAgent("0.0.0.0/2001");
+		agent = new SNMP2Agent("127.0.0.1/2001");
 		agent.start();
+
+		// Since BaseAgent registers some MIBs by default we need to unregister
+		// one before we register our own sysDescr. Normally you would
+		// override that method and register the MIBs that you need
 		agent.unregisterManagedObject(agent.getSnmpv2MIB());
+
+		// Register a system description, use one from you product environment
+		// to test with
+		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr,
+				"This Description is not null"));
+
 		
-		agent.registerManagedObject(new MOScalar(new OID(".1.3.6.1.4.1.2006.1.1"), MOAccessImpl.ACCESS_READ_ONLY, new Integer32(1989)));
-		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr, "You've got this descrition"));
-		//client = new SNMPManager("udp:127.0.0.1/2013");
-		while (true) {
-			System.out.println("Agent is running...");
-			Thread.sleep(5000);
-		}
+		// Setup the client to use our newly started agent
+		client = new SNMPManager("udp:127.0.0.1/2001");
+		client.start();
+		// Get back Value which is set
+		System.out.println(client.getAsString(sysDescr));
 	}
-	
-			
-			
+
 }
