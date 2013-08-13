@@ -96,7 +96,7 @@ public class SNMP2Agent extends BaseAgent {
 				StorageType.nonVolatile);
 		
 
-		vacm.addAccess(new OctetString("v1v2group"), new OctetString("public_context"),
+		vacm.addAccess(new OctetString("v1v2group"), new OctetString("public"),
 				SecurityModel.SECURITY_MODEL_ANY, SecurityLevel.NOAUTH_NOPRIV,
 				MutableVACM.VACM_MATCH_EXACT, new OctetString("fullReadView"),
 				new OctetString("fullWriteView"), new OctetString(
@@ -137,7 +137,7 @@ public class SNMP2Agent extends BaseAgent {
 		// unexpected behavior.
 		// loadConfig(ImportModes.REPLACE_CREATE);
 		addShutdownHook();
-		getServer().addContext(new OctetString("public_context"));
+		getServer().addContext(new OctetString("public"));
 		finishInit();
 		run();
 		sendColdStartNotification();
@@ -158,7 +158,7 @@ public class SNMP2Agent extends BaseAgent {
 				new OctetString("public"), // community name
 				new OctetString("cpublic"), // security name
 				getAgent().getContextEngineID(), // local engine ID
-				new OctetString("public_context"), // default context name
+				new OctetString("public"), // default context name
 				new OctetString(), // transport tag
 				new Integer32(StorageType.nonVolatile), // storage type
 				new Integer32(RowStatus.active) // row status

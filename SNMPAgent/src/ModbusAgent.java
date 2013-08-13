@@ -128,7 +128,7 @@ public class ModbusAgent implements VariableProvider {
 				System.setProperty(SnmpConfigurator.P_TLS_VERSION, tlsVersions);
 			}
 		} catch (NullPointerException npe) {
-
+			System.out.println("Seems we will not use TLS");
 		}
 
 		server = new DefaultMOServer();

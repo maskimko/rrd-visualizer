@@ -17,6 +17,7 @@ public class TestSNMPAgent {
 
 	//SNMPAgent agent = null;
 	SNMP2Agent agent = null;
+	//SimpleAgent agent = null;
 	/**
 	 * This is the client which we have created earlier
 	 */
@@ -36,6 +37,7 @@ public class TestSNMPAgent {
 	private void init() throws IOException {
 		//agent = new SNMPAgent("0.0.0.0/2001");
 		agent = new SNMP2Agent("127.0.0.1/2001");
+		//agent = new SimpleAgent("udp:0.0.0.0/2013");
 		agent.start();
 
 		// Since BaseAgent registers some MIBs by default we need to unregister
@@ -45,15 +47,21 @@ public class TestSNMPAgent {
 
 		// Register a system description, use one from you product environment
 		// to test with
-		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr,
-				"This Description is not null"));
+		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr, "This Description is not null"));
 
-		
+		agent.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "Hello world!"));
 		// Setup the client to use our newly started agent
-		client = new SNMPManager("udp:127.0.0.1/2001");
+		client = new SNMPManager("udp:127.0.0.1/2013");
 		client.start();
-		// Get back Value which is set
 		System.out.println(client.getAsString(sysDescr));
+		System.out.println(client.getAsString(new OID(".1.3.6.1.4.1.2006.1.1")));
+		try {
+		Thread.sleep(100 * 1000);
+		} catch (InterruptedException ie) {
+			
+		}
+		// Get back Value which is set
+		//System.out.println(client.getAsString(sysDescr));
 	}
 
 }
