@@ -1,5 +1,8 @@
 import java.io.IOException;
 
+import org.snmp4j.agent.mo.MOAccessImpl;
+import org.snmp4j.agent.mo.MOScalar;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 
 
@@ -24,6 +27,8 @@ public class TestSNMPAgent {
 		agent = new SNMPAgent("0.0.0.0/2013");
 		agent.start();
 		agent.unregisterManagedObject(agent.getSnmpv2MIB());
+		
+		agent.registerManagedObject(new MOScalar(new OID(".1.3.6.1.4.1.2006.1.1"), MOAccessImpl.ACCESS_READ_ONLY, new Integer32(1989)));
 		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr, "You've got this descrition"));
 		//client = new SNMPManager("udp:127.0.0.1/2013");
 		while (true) {
