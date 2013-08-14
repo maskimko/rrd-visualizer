@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 
+import org.apache.log4j.BasicConfigurator;
 import org.snmp4j.smi.OID;
 
 
@@ -15,8 +16,8 @@ public class TestSNMPAgent {
 		client.init();
 	}
 
-	//SNMPAgent agent = null;
-	SNMP2Agent agent = null;
+	ModbusAgent agent = null;
+	//SNMP2Agent agent = null;
 	//SimpleAgent agent = null;
 	/**
 	 * This is the client which we have created earlier
@@ -35,19 +36,21 @@ public class TestSNMPAgent {
 	}
 
 	private void init() throws IOException {
-		//agent = new SNMPAgent("0.0.0.0/2001");
-		agent = new SNMP2Agent("127.0.0.1/2001");
+		
+		BasicConfigurator.configure();
+		agent = new ModbusAgent("0.0.0.0/2013");
+		//agent = new SNMP2Agent("127.0.0.1/2001");
 		//agent = new SimpleAgent("udp:0.0.0.0/2013");
 		agent.start();
 
 		// Since BaseAgent registers some MIBs by default we need to unregister
 		// one before we register our own sysDescr. Normally you would
 		// override that method and register the MIBs that you need
-		agent.unregisterManagedObject(agent.getSnmpv2MIB());
+		//agent.unregisterManagedObject(agent.getSnmpv2MIB());
 
 		// Register a system description, use one from you product environment
 		// to test with
-		agent.registerManagedObject(MOCreator.createReadOnly(sysDescr, "This Description is not null"));
+		//agent.registerManagedObject(MOCreator.createReadOnly(sysDescr, "This Description is not null"));
 
 		agent.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "Hello world!"));
 		// Setup the client to use our newly started agent
