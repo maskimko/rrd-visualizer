@@ -19,7 +19,6 @@ import org.snmp4j.agent.mo.snmp.SnmpNotificationMIB;
 import org.snmp4j.agent.mo.snmp.SnmpTargetMIB;
 import org.snmp4j.agent.mo.snmp.StorageType;
 import org.snmp4j.agent.mo.snmp.VacmMIB;
-import org.snmp4j.agent.request.SubRequest;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.log.LogFactory;
@@ -142,7 +141,7 @@ public class ModbusAgent extends BaseAgent {
 			ModbusAgent ma = new ModbusAgent(new File("bc"), new File("cnf"));
 			ma.address = address;
 			ma.init();
-			ma.loadConfig(ImportModes.REPLACE_CREATE);
+			//ma.loadConfig(ImportModes.REPLACE_CREATE);
 			ma.addShutdownHook();
 			ma.getServer().addContext(new OctetString("public"));
 			ma.finishInit();

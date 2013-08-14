@@ -18,24 +18,40 @@
   _##  
   _##########################################################################*/
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
-import org.apache.log4j.*;
-import org.snmp4j.*;
-import org.snmp4j.agent.*;
-import org.snmp4j.agent.mo.*;
-import org.snmp4j.agent.mo.snmp.*;
-import org.snmp4j.mp.*;
-import org.snmp4j.security.*;
-import org.snmp4j.smi.*;
-import org.snmp4j.transport.*;
+import org.apache.log4j.BasicConfigurator;
+//import org.apache.log4j.*;
+import org.snmp4j.TransportMapping;
+import org.snmp4j.agent.BaseAgent;
+import org.snmp4j.agent.CommandProcessor;
+import org.snmp4j.agent.DuplicateRegistrationException;
+import org.snmp4j.agent.MOGroup;
+import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.io.ImportModes;
-import org.snmp4j.util.ThreadPool;
+import org.snmp4j.agent.mo.MOTableRow;
+import org.snmp4j.agent.mo.snmp.RowStatus;
+import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB;
+import org.snmp4j.agent.mo.snmp.SnmpNotificationMIB;
+import org.snmp4j.agent.mo.snmp.SnmpTargetMIB;
+import org.snmp4j.agent.mo.snmp.StorageType;
+import org.snmp4j.agent.mo.snmp.VacmMIB;
+import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.log.LogFactory;
-import org.snmp4j.agent.mo.snmp4j.example.Snmp4jHeartbeatMib;
-import org.snmp4j.agent.security.MutableVACM;
-import org.snmp4j.agent.mo.ext.AgentppSimulationMib;
+import org.snmp4j.mp.MPv3;
+import org.snmp4j.security.SecurityLevel;
+import org.snmp4j.security.SecurityModel;
+import org.snmp4j.security.USM;
+import org.snmp4j.smi.Address;
+import org.snmp4j.smi.GenericAddress;
+import org.snmp4j.smi.Integer32;
+import org.snmp4j.smi.OID;
+import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.Variable;
+import org.snmp4j.transport.TransportMappings;
+import org.snmp4j.util.ThreadPool;
 
 /**
  * The <code>TestAgent</code> is a sample SNMP agent implementation of all

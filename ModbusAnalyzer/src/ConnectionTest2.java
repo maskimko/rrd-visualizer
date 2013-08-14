@@ -73,6 +73,7 @@ public class ConnectionTest2 {
 				break;
 			case 15:
 				key = "Power Factor = ";
+				System.out.println(Integer.toHexString(value));
 				break;
 
 			}

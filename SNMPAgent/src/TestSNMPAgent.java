@@ -3,6 +3,7 @@
 import java.io.IOException;
 
 import org.apache.log4j.BasicConfigurator;
+//import org.apache.log4j.BasicConfigurator;
 import org.snmp4j.smi.OID;
 
 
