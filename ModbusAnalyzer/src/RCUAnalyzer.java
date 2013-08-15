@@ -95,7 +95,7 @@ public class ConnectionTest2 {
 	}
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
 		String host = "10.192.20.122";
 		int port = 502;
 		int devicePort = 2;
@@ -107,76 +107,12 @@ public class ConnectionTest2 {
 				ArrayList<Integer> output = new ArrayList<Integer>();
 				mtm.readMultipleRegisters(devicePort, 768, replyIUP.length, 0, replyIUP);
 				mtm.readMultipleRegisters(devicePort, 870, replyPF.length, 0, replyPF);
-				/*
-				 * for (int i = 0; i < reply.length; i++) { //if (i % 2 == 0)
-				 * System.out.print(Integer.toBinaryString(reply[i] << 16) + " "
-				 * + Integer.toHexString((reply[i] << 16) + reply[i+1]) + " ");
-				 * 
-				 * //System.out.print(Integer.toBinaryString(reply[i]) + " ");
-				 * //System.out.print(Integer.toOctalString(reply[i]) + " ");
-				 * System.out.println(Integer.toHexString(reply[i]));
-				 * 
-				 * //System.out.println(reply[i]); }
-				 */
-				
-				//int[] result = get64BitWords(reply);
-				
+			
 				joiner(output, replyIUP);
 				joiner(output, replyPF);
-				hexDebug(replyIUP);
-				hexDebug(replyPF);
-				for (int vl : output){
-					System.out.print(vl + " ");
-				}
-				System.out.println();
-				//System.out.println("showing values of Power Factor " + Integer.toHexString(replyPF[0]) + " " + Integer.toHexString(replyPF[1]) );
+				//hexDebug(replyIUP);
+				//hexDebug(replyPF);
 				
-				/*
-				for (int i = 0; i < result.length; i++) {
-					String key = null;
-					// System.out.println(Integer.toHexString(result[i]) + " " +
-					// result[i]);
-					switch (i) {
-					case 0:
-						key = "I1 = ";
-						break;
-					case 1:
-						key = "I2 = ";
-						break;
-					case 2:
-						key = "I3 = ";
-						break;
-					case 3:
-						key = "IN = ";
-						break;
-					case 4:
-						key = "U12 = ";
-						break;
-					case 5:
-						key = "U23 = ";
-						break;
-					case 6:
-						key = "U32 = ";
-						break;
-					case 10:
-						key = "Freq = ";
-						break;
-					case 11:
-						key = "P = ";
-						break;
-					case 12:
-						key = "Q = ";
-						break;
-					case 13:
-						key = "S = ";
-						break;
-
-					}
-
-					if (key != null) System.out.println(key + result[i]);
-				}
-				
-				*/
 				
 				showOutput(output);
 				
