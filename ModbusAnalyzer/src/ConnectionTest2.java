@@ -98,7 +98,7 @@ public class ConnectionTest2 {
 		// TODO Auto-generated method stub
 		String host = "10.192.20.122";
 		int port = 502;
-		int devicePort = 2;
+		int devicePort = 3;
 		try {
 			ModbusTCPMaster mtm = new ModbusTCPMaster(host, port);
 			int[] replyIUP = new int[28];

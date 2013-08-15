@@ -1,7 +1,10 @@
+import java.util.ArrayList;
+
 public class RCUPacket {
 
 	private float i1, i2, i3, in, u12, u23, u31, u1n, u2n, u3n, freq, p, q, s,
 			powerFactor;
+	private static final short units = 15;
 
 	/**
 	 * This constructor is intended to accept row data from modbus PDU in
@@ -35,60 +38,155 @@ public class RCUPacket {
 
 	public RCUPacket(int[] modbusResponseResult)
 			throws IllegalArgumentException {
-		if (modbusResponseResult.length != 15) {
+		if (modbusResponseResult.length != units) {
 			throw new IllegalArgumentException("Array length have to be 15");
 		} else {
 			for (int i = 0; i < modbusResponseResult.length; i++) {
 
-				switch (i) {
-				case 0:
-					i1 = modbusResponseResult[i] / 1000;
-					break;
-				case 1:
-					i2 = modbusResponseResult[i] / 1000;
-					break;
-				case 2:
-					i3 = modbusResponseResult[i] / 1000;
-					break;
-				case 3:
-					in = modbusResponseResult[i] / 1000;
-					break;
-				case 4:
-					u12 = modbusResponseResult[i] / 100;
-					break;
-				case 5:
-					u23 = modbusResponseResult[i] / 100;
-					break;
-				case 6:
-					u31 = modbusResponseResult[i] / 100;
-					break;
-				case 7:
-					u1n = modbusResponseResult[i] / 100;
-					break;
-				case 8:
-					u2n = modbusResponseResult[i] / 100;
-					break;
-				case 9:
-					u3n = modbusResponseResult[i] / 100;
-					break;
-				case 10:
-					freq = modbusResponseResult[i] / 100;
-					break;
-				case 11:
-					p = modbusResponseResult[i] / 100;
-					break;
-				case 12:
-					q = modbusResponseResult[i] / 100;
-					break;
-				case 13:
-					s = modbusResponseResult[i] / 100;
-					break;
-				case 14:
-					powerFactor = modbusResponseResult[i] / 1000;
-				}
+				switcher(i, modbusResponseResult[i]);
 
 			}
 		}
+	}
+
+	public RCUPacket(ArrayList<Integer> modbusResponseResult) {
+
+		int counter = 0;
+		for (int val : modbusResponseResult) {
+			switcher(counter, val);
+			counter++;
+		}
+
+	}
+
+	private void switcher(int i, int value) {
+		switch (i) {
+		case 0:
+			this.i1 = (float) value / 1000;
+			break;
+		case 1:
+			this.i2 = (float) value / 1000;
+			break;
+		case 2:
+			this.i3 = (float) value / 1000;
+			break;
+		case 3:
+			this.in = (float) value / 1000;
+			break;
+		case 4:
+			this.u12 = (float) value / 100;
+			break;
+		case 5:
+			this.u23 = (float) value / 100;
+			break;
+		case 6:
+			this.u31 = (float) value / 100;
+			break;
+		case 7:
+			this.u1n = (float) value / 100;
+			break;
+		case 8:
+			this.u2n = value / 100;
+			break;
+		case 9:
+			this.u3n = (float) value / 100;
+			break;
+		case 10:
+			this.freq = (float) value / 100;
+			break;
+		case 11:
+			this.p = (float) value / 100;
+			break;
+		case 12:
+			this.q = (float) value / 100;
+			break;
+		case 13:
+			this.s = (float) value / 100;
+			break;
+		case 14:
+			this.powerFactor = (float) value / 1000;
+			break;
+		}
+	}
+
+	public float getI1() {
+		return i1;
+	}
+
+	public float getI2() {
+		return i2;
+	}
+
+	public float getI3() {
+		return i3;
+	}
+
+	public float getIN() {
+		return in;
+	}
+
+	public float getU12() {
+		return u12;
+	}
+
+	public float getU23() {
+		return u23;
+	}
+
+	public float getU31() {
+		return u31;
+	}
+
+	public float getU1N() {
+		return u1n;
+	}
+
+	public float getU2N() {
+		return u2n;
+	}
+
+	public float getU3N() {
+		return u3n;
+	}
+
+	public float getFreq() {
+		return freq;
+	}
+
+	public float getP() {
+		return p;
+	}
+
+	public float getQ() {
+		return q;
+	}
+
+	public float getS() {
+		return s;
+	}
+
+	public float getPowerFactor() {
+		return powerFactor;
+	}
+
+	/**
+	 * The methods getAll returns values in the described above order
+	 * 
+	 * @return
+	 */
+
+	public float[] getAll() {
+		float[] retArray = { i1, i2, i3, in, u12, u23, u31, u1n, u2n, u3n,
+				freq, p, q, s, powerFactor };
+		return retArray;
+	}
+
+	public String toString() {
+		return new String("I1=" + i1 + " I2=" + i2 + " I3=" + i3 + " IN=" + in
+				+ "\nU12=" + u12 + " U23=" + u23 + " U31=" + u31 + " U1N="
+				+ u1n + " U2N=" + u2n + " U3N=" + u3n + "\nFreq=" + freq
+				+ " P=" + p + " Q=" + q + " S=" + s + " PowerFactor="
+				+ powerFactor);
 	}
 
 }
