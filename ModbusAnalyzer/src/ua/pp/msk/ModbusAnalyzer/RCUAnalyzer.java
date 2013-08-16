@@ -1,3 +1,5 @@
+package ua.pp.msk.ModbusAnalyzer;
+
 import java.util.ArrayList;
 
 import net.sourceforge.jmodbus.ModbusTCPMaster;

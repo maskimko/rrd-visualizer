@@ -1,3 +1,4 @@
+package ua.pp.msk.SNMPAgent;
 
 
 import org.snmp4j.agent.mo.MOAccessImpl;

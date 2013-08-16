@@ -6,6 +6,9 @@ import org.apache.log4j.BasicConfigurator;
 //import org.apache.log4j.BasicConfigurator;
 import org.snmp4j.smi.OID;
 
+import ua.pp.msk.SNMPAgent.MOCreator;
+import ua.pp.msk.SNMPAgent.ModbusAgent;
+
 
 
 public class TestSNMPAgent {

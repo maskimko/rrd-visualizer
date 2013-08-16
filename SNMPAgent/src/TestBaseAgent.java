@@ -53,6 +53,8 @@ import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
 import org.snmp4j.util.ThreadPool;
 
+import ua.pp.msk.SNMPAgent.MOCreator;
+
 /**
  * The <code>TestAgent</code> is a sample SNMP agent implementation of all
  * features (MIB implementations) provided by the SNMP4J-Agent framework. The
