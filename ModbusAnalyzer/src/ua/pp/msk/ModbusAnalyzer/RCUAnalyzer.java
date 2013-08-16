@@ -7,14 +7,12 @@ import net.sourceforge.jmodbus.ModbusTCPMaster;
 public class RCUAnalyzer {
 
 	public static final short RCUInput = 0;
-	private String host = "127.0.0.1";
-	private int port = 502;
+	private ModbusTCPMaster mbTCP = null;
 	private short device = 1;
 	private short deviceType = 0;
 
 	public RCUAnalyzer(String host, int port, short device, short type) {
-		this.host = host;
-		this.port = port;
+		this.mbTCP = new ModbusTCPMaster(host, port);
 		this.device = device;
 		this.deviceType = type;
 	}
@@ -133,9 +131,22 @@ public class RCUAnalyzer {
 		showOutputFloat(toShow);
 	}
 
-	private static void fit2RCU(ArrayList<Integer> output) {
+	private static boolean fallChecker(ArrayList<Integer> arr){
+		boolean isFalled = true;
+		int fallVal = 256;
+		for (int val : arr ){
+			if (val != fallVal) {
+				return false;
+			}
+		}
+		return isFalled;
+	}
+	
+	private static void fit2RCU(ArrayList<Integer> output) throws Exception{
 		int counter = 0;
+		
 		for (int value : output) {
+			if (!fallChecker(output)) {
 			switch (counter) {
 			case 11:
 				value -= 0x100;
@@ -143,6 +154,9 @@ public class RCUAnalyzer {
 			case 12:
 				value -= 0x100;
 				break;
+			}
+			} else {
+				throw new Exception("Cannot get an answer");
 			}
 			counter++;
 		}
@@ -159,8 +173,8 @@ public class RCUAnalyzer {
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         about polled device
 	 */
-	private RCUPacket askRCUInputDevice(String host, int port, short device) {
-		ModbusTCPMaster mtm = new ModbusTCPMaster(host, port);
+	private RCUPacket askRCUInputDevice(ModbusTCPMaster mtm, short device) throws Exception {
+		
 		int[] replyIUP = new int[28];
 		int[] replyPF = new int[2];
 
@@ -172,13 +186,16 @@ public class RCUAnalyzer {
 
 		joiner(output, replyIUP);
 		joiner(output, replyPF);
+		
 		fit2RCU(output);
+		
 		RCUPacket rcup = new RCUPacket(output);
+		
 		return rcup;
 	}
 
-	public RCUPacket askDevice() {
-		return this.askDevice(this.host, this.port, this.device,
+	public RCUPacket askDevice() throws Exception {
+		return this.askDevice(mbTCP,  this.device,
 				this.deviceType);
 	}
 
@@ -195,15 +212,13 @@ public class RCUAnalyzer {
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         about polled device
 	 */
-	public RCUPacket askDevice(String host, int port, short device,
-			short deviceType) throws IllegalArgumentException {
-		this.host = host;
-		this.port = port;
+	public RCUPacket askDevice(ModbusTCPMaster mtm, short device,
+			short deviceType) throws IllegalArgumentException, Exception {
 		if (deviceType != this.RCUInput) {
 			throw new IllegalArgumentException("There is no such device type");
 		} else {
 			this.device = device;
-			return askRCUInputDevice(host, port, device);
+			return askRCUInputDevice(mtm, device);
 		}
 	}
 
@@ -241,6 +256,8 @@ public class RCUAnalyzer {
 			 }
 		} catch (InterruptedException ie) {
 			ie.printStackTrace();
+		} catch (Exception e) {
+			System.err.println(e.getMessage() + " from host " + hostname + ":" + port + " device " + dev);
 		}
 
 	}
