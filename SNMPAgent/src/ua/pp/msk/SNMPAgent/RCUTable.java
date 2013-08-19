@@ -19,9 +19,11 @@ import ua.pp.msk.ModbusAnalyzer.RCUPacket;
 public class RCUTable extends DefaultMOTable {
 
 	private static boolean canUpdate = true;
-
-	public RCUTable(OID oid, MOTableIndex mti, MOColumn[] cols) {
+	RCUAnalyzer rcua = null;
+	
+	public RCUTable(OID oid, MOTableIndex mti, MOColumn[] cols, RCUAnalyzer rcua) {
 		super(oid, mti, cols);
+		this.rcua = rcua;
 	}
 
 	private static Variable[] toVar(int[] array) {
@@ -45,7 +47,7 @@ public class RCUTable extends DefaultMOTable {
 			Runnable judje = new UpdateJudje();
 			Thread updThread = new Thread(judje);
 			updThread.start();
-			RCUAnalyzer rcua = new RCUAnalyzer("10.192.20.122", 502, (short) 2);
+			
 			try {
 				RCUPacket rcup = rcua.askDevice();
 				Variable[] vars = toVar(rcup.getAll());
@@ -58,11 +60,14 @@ public class RCUTable extends DefaultMOTable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
 		}
+		
 		super.update(updateScope);
 	}
 
 	protected static RCUTable createStaticStatsTable() {
+		
 		MOTableSubIndex[] subIndexes = new MOTableSubIndex[] { new MOTableSubIndex(
 				SMIConstants.SYNTAX_GAUGE32) };
 		MOTableIndex indexDef = new MOTableIndex(subIndexes, false);
@@ -99,7 +104,7 @@ public class RCUTable extends DefaultMOTable {
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
 				MOAccessImpl.ACCESS_READ_ONLY);
 		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.3.1"),
-				indexDef, columns);
+				indexDef, columns,  new RCUAnalyzer("10.192.20.122", 502, (short) 2));
 		MOMutableTableModel model = (MOMutableTableModel) deviceStats
 				.getModel();
 		Variable[] testRow = new Variable[] { new Gauge32(100),

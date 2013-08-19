@@ -3,6 +3,7 @@ package ua.pp.msk.SNMPAgent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.logging.Logger;
 
 import org.apache.log4j.BasicConfigurator;
 import org.snmp4j.TransportMapping;
@@ -42,7 +43,7 @@ import org.snmp4j.util.ThreadPool;
 public class ModbusAgent extends BaseAgent {
 
 	static {
-		LogFactory.setLogFactory(new Log4jLogFactory());
+		 LogFactory.setLogFactory(new Log4jLogFactory());
 	}
 	
 	protected String address;
@@ -159,16 +160,18 @@ public class ModbusAgent extends BaseAgent {
 			
 			RCUTable rcut = RCUTable.createStaticStatsTable();
 			ma.registerManagedObject(rcut);
+			while(true){
 			try {
 				Thread.sleep(30000);
 			} catch (InterruptedException ex){
 				
 			}
-			
-			ma.stop();
+			}
+			//ma.stop();
 		} catch (IOException ioe){
 			ioe.printStackTrace();
 		}
+		
 		
 	}
 

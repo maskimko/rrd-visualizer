@@ -1,3 +1,4 @@
+package ua.pp.msk.SNMPAgentTest;
 import java.io.IOException;
 
 import org.snmp4j.CommunityTarget;

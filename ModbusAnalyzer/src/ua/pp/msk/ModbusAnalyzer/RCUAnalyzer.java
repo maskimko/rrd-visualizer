@@ -221,6 +221,13 @@ public class RCUAnalyzer {
 			return askRCUInputDevice(mtm, device);
 		}
 	}
+	
+	public void stop(){
+		if (mbTCP != null) {
+			
+			mbTCP = null;
+		}
+	}
 
 	// TODO
 	// Rewrite main method !
