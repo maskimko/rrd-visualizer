@@ -49,7 +49,7 @@ public class ModbusAgent extends BaseAgent {
 	
 	public ModbusAgent(File bootCounterFile, File configFile) throws IOException{
 		super(bootCounterFile, configFile, new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
-		agent.setWorkerPool(ThreadPool.create("Working pool", 4));
+		agent.setWorkerPool(ThreadPool.create("Working pool", 1));
 	} 
 	
 	
@@ -131,6 +131,12 @@ public class ModbusAgent extends BaseAgent {
 		run();
 		sendColdStartNotification();
 	}
+	
+	@Override
+	public void stop(){
+		agent = null;
+		super.stop();
+	}
 
 	/**
 	 * @param args
@@ -150,12 +156,15 @@ public class ModbusAgent extends BaseAgent {
 			ma.run();
 			ma.sendColdStartNotification();
 			ma.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "This server works!"));
-			ma.registerManagedObject(new CurrentValue(new OID(".1.3.6.1.4.1.2006.2.1"), MOAccessImpl.ACCESS_READ_WRITE, new UnsignedInteger32(1000)));
+			
+			RCUTable rcut = RCUTable.createStaticStatsTable();
+			ma.registerManagedObject(rcut);
 			try {
 				Thread.sleep(30000);
 			} catch (InterruptedException ex){
 				
 			}
+			
 			ma.stop();
 		} catch (IOException ioe){
 			ioe.printStackTrace();
@@ -165,6 +174,7 @@ public class ModbusAgent extends BaseAgent {
 
 }
 
+/*
 class CurrentValue extends MOScalar {
 	
 	
@@ -182,7 +192,7 @@ class CurrentValue extends MOScalar {
 		super.get(subr);
 	}
 	*/
-	
+/*	
 	@Override
 	public Variable getValue(){
 		long curtime = Calendar.getInstance().getTimeInMillis() / 1000;
@@ -191,5 +201,5 @@ class CurrentValue extends MOScalar {
 	
 	
 }
-
+*/
 

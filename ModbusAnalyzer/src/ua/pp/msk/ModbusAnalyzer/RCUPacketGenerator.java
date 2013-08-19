@@ -24,35 +24,35 @@ public  class RCUPacketGenerator {
 			case 0: 
 			case 1:
 			case 2:
-				multiplyer =(int) Math.random() * 20000 + current;
+				multiplyer =(int) (Math.random() * 20000) + current;
 				break;
 			case 3:
-				multiplyer =(int) Math.random() * 1000 + current2n;
+				multiplyer =(int) (Math.random() * 1000) + current2n;
 				break;
 			case 4:
 			case 5:
 			case 6:
-				multiplyer =(int) Math.random() * 2000 + voltage2l;
+				multiplyer =(int) (Math.random() * 2000) + voltage2l;
 				break;
 			case 7:
 			case 8:
 			case 9:
-				multiplyer =(int) Math.random() * 2000 + voltage2n;
+				multiplyer =(int) (Math.random() * 2000) + voltage2n;
 				break;
 			case 10:
-				multiplyer =(int) Math.random() * 200 + frequency;
+				multiplyer =(int) (Math.random() * 200) + frequency;
 				break;
 			case 11:
-				multiplyer =(int) Math.random() * 2000 + power;
+				multiplyer =(int) (Math.random() * 2000) + power;
 				break;
 			case 12: 
-				multiplyer =(int) Math.random() * 500 + kvar;
+				multiplyer =(int) (Math.random() * 500) + kvar;
 				break;
 			case 13:
-				multiplyer =(int) Math.random() * 3000 + kva;
+				multiplyer =(int) (Math.random() * 3000) + kva;
 				break;
 			case 14:
-				multiplyer =(int) Math.random() * 200 + powerFactor;
+				multiplyer =(int) (Math.random() * 200) + powerFactor;
 				break;
 			}
 			toPack[i] = multiplyer;
