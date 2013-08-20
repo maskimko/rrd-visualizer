@@ -2,19 +2,14 @@ package ua.pp.msk.SNMPAgent;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.logging.Logger;
 
 import org.apache.log4j.BasicConfigurator;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.CommandProcessor;
 import org.snmp4j.agent.DuplicateRegistrationException;
-import org.snmp4j.agent.MOAccess;
 import org.snmp4j.agent.ManagedObject;
 import org.snmp4j.agent.io.ImportModes;
-import org.snmp4j.agent.mo.MOAccessImpl;
-import org.snmp4j.agent.mo.MOScalar;
 import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.agent.mo.snmp.RowStatus;
 import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB;
@@ -24,7 +19,9 @@ import org.snmp4j.agent.mo.snmp.StorageType;
 import org.snmp4j.agent.mo.snmp.VacmMIB;
 import org.snmp4j.agent.security.MutableVACM;
 import org.snmp4j.log.Log4jLogFactory;
+import org.snmp4j.log.LogAdapter;
 import org.snmp4j.log.LogFactory;
+import org.snmp4j.log.LogLevel;
 import org.snmp4j.mp.MPv3;
 import org.snmp4j.security.SecurityLevel;
 import org.snmp4j.security.SecurityModel;
@@ -34,16 +31,18 @@ import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
-import org.snmp4j.smi.UnsignedInteger32;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.transport.TransportMappings;
 import org.snmp4j.util.ThreadPool;
+
+import ua.pp.msk.SNMPAgentTest.DeviceTable;
 
 
 public class ModbusAgent extends BaseAgent {
 
 	static {
 		 LogFactory.setLogFactory(new Log4jLogFactory());
+		 LogFactory.getLogFactory().getRootLogger().setLogLevel(LogLevel.DEBUG);
 	}
 	
 	protected String address;
@@ -51,6 +50,7 @@ public class ModbusAgent extends BaseAgent {
 	public ModbusAgent(File bootCounterFile, File configFile) throws IOException{
 		super(bootCounterFile, configFile, new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
 		agent.setWorkerPool(ThreadPool.create("Working pool", 1));
+		
 	} 
 	
 	
@@ -156,10 +156,12 @@ public class ModbusAgent extends BaseAgent {
 			ma.finishInit();
 			ma.run();
 			ma.sendColdStartNotification();
-			ma.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "This server works!"));
+			//ma.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "This server works!"));
 			
 			RCUTable rcut = RCUTable.createStaticStatsTable();
+			
 			ma.registerManagedObject(rcut);
+			
 			while(true){
 			try {
 				Thread.sleep(30000);

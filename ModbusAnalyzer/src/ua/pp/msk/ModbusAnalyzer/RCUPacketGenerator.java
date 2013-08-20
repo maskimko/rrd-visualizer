@@ -13,7 +13,14 @@ public  class RCUPacketGenerator {
 	private static final int powerFactor = 800;
 	
 	
-			
+	public static RCUPacket getZeroPacket(){
+		int[] stats = new int[RCUPacket.units];
+		for (int i = 0; i < stats.length; i++) {
+			stats[i] = 0;
+		}
+		RCUPacket rcup = new RCUPacket(stats);
+		return rcup;
+	}
 	
 	public static RCUPacket genPacket(){
 		//Generating RCU Packet

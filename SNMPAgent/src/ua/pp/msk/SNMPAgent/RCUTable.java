@@ -18,12 +18,10 @@ import ua.pp.msk.ModbusAnalyzer.RCUPacket;
 
 public class RCUTable extends DefaultMOTable {
 
-	private static boolean canUpdate = true;
-	RCUAnalyzer rcua = null;
 	
-	public RCUTable(OID oid, MOTableIndex mti, MOColumn[] cols, RCUAnalyzer rcua) {
+	
+	public RCUTable(OID oid, MOTableIndex mti, MOColumn[] cols) {
 		super(oid, mti, cols);
-		this.rcua = rcua;
 	}
 
 	private static Variable[] toVar(int[] array) {
@@ -42,6 +40,11 @@ public class RCUTable extends DefaultMOTable {
 	 * vars)); super.update(updateScope); }
 	 */
 
+
+	
+	
+	
+	/*
 	public void update(MOScope updateScope) {
 		if (canUpdate) {
 			Runnable judje = new UpdateJudje();
@@ -65,59 +68,47 @@ public class RCUTable extends DefaultMOTable {
 		
 		super.update(updateScope);
 	}
+	*/
+	
 
 	protected static RCUTable createStaticStatsTable() {
 		
 		MOTableSubIndex[] subIndexes = new MOTableSubIndex[] { new MOTableSubIndex(
 				SMIConstants.SYNTAX_GAUGE32) };
 		MOTableIndex indexDef = new MOTableIndex(subIndexes, false);
-		MOColumn[] columns = new MOColumn[RCUPacket.units];
+		MOColumn[] columns = new MOColumn[RCUPacket.units + 3];
 		int c = 0;
+		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_ONLY); //Description
+		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_IPADDRESS, MOAccessImpl.ACCESS_READ_ONLY); //IP address of a device
+		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32, MOAccessImpl.ACCESS_READ_ONLY); // IP port of a device
+		while (c < columns.length){
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
 				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
-		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.3.1"),
-				indexDef, columns,  new RCUAnalyzer("10.192.20.122", 502, (short) 2));
-		MOMutableTableModel model = (MOMutableTableModel) deviceStats
-				.getModel();
-		Variable[] testRow = new Variable[] { new Gauge32(100),
-				new Gauge32(100), new Gauge32(100), new Gauge32(100),
-				new Gauge32(100), new Gauge32(100), new Gauge32(100),
-				new Gauge32(100), new Gauge32(100), new Gauge32(100),
-				new Gauge32(100), new Gauge32(100), new Gauge32(100),
-				new Gauge32(100), new Gauge32(100), };
-		model.addRow(new DefaultMOMutableRow2PC(new OID("1"), testRow));
+		}
+		
+		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006"),
+				indexDef, columns);
+		MOMutableTableModel model = (MOMutableTableModel) deviceStats.getModel();
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(5));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(4));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice(3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseOdesaRCUDevice(2));
 		deviceStats.setVolatile(true);
 		return deviceStats;
 	}
 
+	/*
 	class UpdateJudje implements Runnable {
 
 		public void run() {
@@ -131,5 +122,5 @@ public class RCUTable extends DefaultMOTable {
 			}
 		}
 	}
-
+	*/
 }
