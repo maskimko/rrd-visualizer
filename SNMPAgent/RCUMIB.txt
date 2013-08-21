@@ -1,4 +1,4 @@
-ASTELIT-RCU-MIB DEFINITIONS ::= BEGIN
+ASTELIT-MIB DEFINITIONS ::= BEGIN
 
 --
 --  RCU MIB definitions
@@ -6,14 +6,13 @@ ASTELIT-RCU-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32,
-    NOTIFICATION-TYPE                       FROM SNMPv2-SMI
     SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
     netSnmp                                 FROM NET-SNMP-MIB
     RowStatus, StorageType                  FROM SNMPv2-TC
-    InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
+    enterprises, IpAddress, Gauge, TimeTicks     FROM RFC1155-SMI
 ;
 
-rcuModbus2SNMP MODULE-IDENTITY
+astelit MODULE-IDENTITY
     LAST-UPDATED "201308210000Z"
     ORGANIZATION "ASTELIT"
     CONTACT-INFO
@@ -32,7 +31,7 @@ rcuModbus2SNMP MODULE-IDENTITY
 --
 -- top level structure
 --
-rcuDeviceTables      OBJECT IDENTIFIER ::= { netSnmpExamples 2 }
+rcuModbusToSNMP      OBJECT IDENTIFIER ::= { astelit 1 }
 
 --
 --  Example Tables
@@ -43,14 +42,20 @@ rcuDeviceStatsTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table merely contains a set of data which is otherwise
-         useless for true network management.  It is a table which
-         describes properies about a IETF Working Group, such as the
-         names of the two working group chairs.
+         "This MIB describes RCU device Modbus to SNMP translation table
+          first digit after table entry represents city number
+          and the second one represents device number on a modbus bus.
+                City number definitions:
 
-         This example table is implemented in the
-         agent/mibgroup/examples/data_set.c file."
-    ::= { rcuDeviceTables 1 }
+        KYIV = 1
+        DNIPROPETROVSK = 2
+        DONETSK = 3
+        KHARKIV = 4
+        LVIV = 5
+        SIMFEROPOL = 6
+        ODESA = 7."
+
+    ::= { rcuModbusToSNMP 1 }
 
 rcuDeviceStatsEntry OBJECT-TYPE
     SYNTAX      RcuDeviceStatsEntry
