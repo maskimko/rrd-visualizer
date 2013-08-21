@@ -11,56 +11,105 @@ import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
 import ua.pp.msk.ModbusAnalyzer.RCUPacket;
 
 public class RCURow extends DefaultMOMutableRow2PC {
-	
+
 	private boolean canUpdate = true;
 	private RCUAnalyzer rcuAnalyzer = null;
 	private RCUDevice rcuDev = null;
-	private Variable[] rowValues = new Variable[RCUPacket.units + 3];
 	private String ipAddress = null;
 	private int port = 0;
 	private short modbusDevice = 0;
-	
-	public RCURow(RCUDevice rcudev){
+
+	public RCURow(RCUDevice rcudev) {
 		super(makeOID(rcudev), makeStatsArray(rcudev));
 		rcuDev = rcudev;
-		rowValues = makeStatsArray(rcuDev);
+		values = makeStatsArray(rcuDev);
 		ipAddress = rcuDev.getIpAddress();
 		port = rcuDev.getPort();
-		modbusDevice =(short) rcuDev.getModbusDeviceNumber();
+		modbusDevice = (short) rcuDev.getModbusDeviceNumber();
 		rcuAnalyzer = new RCUAnalyzer(ipAddress, port, modbusDevice);
 	}
-	
-	private static OID makeOID(RCUDevice rcud){
+
+	private static OID makeOID(RCUDevice rcud) {
 		String oid = "" + rcud.getCity();
 		OID rowOID = new OID(oid).append(rcud.getModbusDeviceNumber());
 		return rowOID;
 	}
-	
-	private static Variable[] makeStatsArray(RCUDevice rcud){
+
+	private static Variable[] makeStatsArray(RCUDevice rcud) {
 		int counter = 0;
 		int[] stats = rcud.getRCUStats();
 		Variable[] vars = new Variable[3 + stats.length];
 		vars[counter++] = new OctetString(rcud.getDescription());
 		vars[counter++] = new IpAddress(rcud.getIpAddress());
-		vars[counter++]	= new Gauge32(rcud.getPort());
+		vars[counter++] = new Gauge32(rcud.getPort());
 		while (counter < vars.length) {
-			vars[counter] = new Gauge32(stats[counter++ -3]);
+			vars[counter] = new Gauge32(stats[counter++ - 3]);
 		}
 		return vars;
 	}
 
-	
-	
-	/*
-	 * int counter = 0;
-		int[] stats = rcud.getRCUStats();
-		Variable[] vars = new Variable[3 + RCUPacket.units]; 
-		vars[counter++] = new OctetString(rcud.getDescription());
-		vars[counter++] = new IpAddress(rcud.getIpAddress());
-		vars[counter++]	= new Gauge32(rcud.getPort());
-		while (counter < vars.length) {
-			vars[counter] = new Gauge32(stats[counter++ - 3]);
+	private int[] getRCUPackStatsArray() throws Exception {
+		Runnable cooldowner = new CoolDown(60000);
+		Thread willWait = new Thread(cooldowner);
+		willWait.start();
+		RCUPacket rcuPack = rcuAnalyzer.askDevice();
+		return rcuPack.getAll();
+	}
+
+	private Variable[] getStatsArray() throws Exception {
+		int counter = 3;
+		Variable[] rowValues = values;
+		int[] stats = getRCUPackStatsArray();
+		while (counter < rowValues.length) {
+			rowValues[counter] = new Gauge32(stats[counter++ - 3]);
 		}
-		OID devOID = new OID("" + rcud.getCity()).append(rcud.getModbusDeviceNumber());
-	 */
+		return rowValues;
+	}
+
+	private void renewValues() {
+		if (canUpdate) {
+			try {
+				values = getStatsArray();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		} else {
+			System.out.println("Skipping updating this row");
+		}
+	}
+
+	@Override
+	public Variable getValue(int column) {
+		renewValues();
+		return super.getValue(column);
+	}
+
+	class CoolDown implements Runnable {
+
+		private long duration = 1000;
+
+		public CoolDown(long time) {
+			this.duration = time;
+		}
+
+		private void pleaseWait() {
+			try {
+				canUpdate = false;
+				Thread.sleep(duration);
+				canUpdate = true;
+			} catch (InterruptedException ie) {
+				System.out
+						.println("Bruteforce guard was broken. Cool down has been interruped.");
+			}
+		}
+
+		public void setDuration(long time) {
+			this.duration = time;
+		}
+
+		public void run() {
+			pleaseWait();
+		}
+	}
+
 }

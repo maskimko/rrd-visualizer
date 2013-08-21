@@ -6,7 +6,7 @@ import net.sourceforge.jmodbus.ModbusTCPMaster;
 
 public class RCUAnalyzer {
 
-	public static final short RCUInput = 0;
+	public static final short TYPE_RCUPOWERINPUT = 0;
 	private ModbusTCPMaster mbTCP = null;
 	private short device = 1;
 	private short deviceType = 0;
@@ -214,7 +214,7 @@ public class RCUAnalyzer {
 	 */
 	public RCUPacket askDevice(ModbusTCPMaster mtm, short device,
 			short deviceType) throws IllegalArgumentException, Exception {
-		if (deviceType != this.RCUInput) {
+		if (deviceType != this.TYPE_RCUPOWERINPUT) {
 			throw new IllegalArgumentException("There is no such device type");
 		} else {
 			this.device = device;

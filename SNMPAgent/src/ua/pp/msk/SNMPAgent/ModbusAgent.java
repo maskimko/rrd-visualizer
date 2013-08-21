@@ -42,7 +42,7 @@ public class ModbusAgent extends BaseAgent {
 
 	static {
 		 LogFactory.setLogFactory(new Log4jLogFactory());
-		 LogFactory.getLogFactory().getRootLogger().setLogLevel(LogLevel.DEBUG);
+		 LogFactory.getLogFactory().getRootLogger().setLogLevel(LogLevel.ERROR);
 	}
 	
 	protected String address;
@@ -144,7 +144,17 @@ public class ModbusAgent extends BaseAgent {
 	 */
 	public static void main(String[] args) {
 		String address;
+		if (args.length < 1 || args.length > 2){
 		address = "udp:0.0.0.0/2013";
+		System.out.println("Using default address for daemon: " + address);
+		System.out.println("Usage: java -cp ModbusAgent.jar ua.pp.msk.SNMAgent.ModbusAgent [ip address] [port]");
+		} else {
+			if (args.length == 1) {
+				address = "udp:" + args[0] + "/2013";
+			} else {
+				address = "udp:" + args[0] + "/" + args[1];
+			}
+		}
 		BasicConfigurator.configure();
 		try {
 			ModbusAgent ma = new ModbusAgent(new File("bc"), new File("cnf"));
@@ -156,7 +166,6 @@ public class ModbusAgent extends BaseAgent {
 			ma.finishInit();
 			ma.run();
 			ma.sendColdStartNotification();
-			//ma.registerManagedObject(MOCreator.createReadOnly(new OID(".1.3.6.1.4.1.2006.1.1"), "This server works!"));
 			
 			RCUTable rcut = RCUTable.createStaticStatsTable();
 			
@@ -172,6 +181,9 @@ public class ModbusAgent extends BaseAgent {
 			//ma.stop();
 		} catch (IOException ioe){
 			ioe.printStackTrace();
+		} catch (NullPointerException npe) {
+			System.err.println("It seems you has provided wrong ip address or port");
+			System.out.println("Usage: java -cp ModbusAgent.jar ua.pp.msk.SNMAgent.ModbusAgent [ip address] [port]");
 		}
 		
 		
@@ -179,32 +191,4 @@ public class ModbusAgent extends BaseAgent {
 
 }
 
-/*
-class CurrentValue extends MOScalar {
-	
-	
-
-	public CurrentValue(OID id, MOAccess access, Variable value) {
-		super(id, access, value);
-		// TODO Auto-generated constructor stub
-	}
-
-	/*
-	@Override
-	public void get(SubRequest subr){
-		long curtime = Calendar.getInstance().getTimeInMillis() / 1000;
-		setValue(new UnsignedInteger32(curtime ));
-		super.get(subr);
-	}
-	*/
-/*	
-	@Override
-	public Variable getValue(){
-		long curtime = Calendar.getInstance().getTimeInMillis() / 1000;
-		return new UnsignedInteger32(curtime);
-	}
-	
-	
-}
-*/
 
