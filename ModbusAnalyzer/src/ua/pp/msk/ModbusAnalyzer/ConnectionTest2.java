@@ -22,6 +22,8 @@ public class ConnectionTest2 {
 	}
 	*/
 	
+	///Something new!
+	
 	private static void joiner(ArrayList<Integer> result, int[] registers){
 		int val;
 		for (int i = 0; i < registers.length; i += 2){
