@@ -9,18 +9,8 @@ public class ConnectionTest2 {
 	 * @param args
 	 */
 
-	/*
-	private static int[] get64BitWords(int[] int32Bit) {
-		int val;
-		int[] toReturn = new int[int32Bit.length / 2];
-		for (int i = 0; i < int32Bit.length; i += 2) {
-			val = int32Bit[i] << (Integer.SIZE / 2);
-			val += int32Bit[i + 1];
-			toReturn[i / 2] = val;
-		}
-		return toReturn;
-	}
-	*/
+	//TODO
+	//Make auto scaling for PM700
 	
 	///Something new!
 	
