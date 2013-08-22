@@ -108,13 +108,47 @@ public class ConnectionTest2 {
 		System.out.println();
 	}
 	
+	public static short determineRCUDeviceType(ModbusTCPMaster mbtcp, short devnum) throws Exception{
+		short dt = -1;
+		boolean isPM500 = false;
+		boolean isPM700 = false;
+		//Trying to ask PM500 device
+		int[] devPM500check = new int[4];
+		mbtcp.readMultipleRegisters(devnum, 64646, devPM500check.length, 0, devPM500check);
+		if (devPM500check[0] == 256 && devPM500check[1] == 50980 && devPM500check[2] == 0 && devPM500check[3] == 1){
+			isPM500 = true;
+		}
+		int[] devPM700check = new int[2];
+		mbtcp.readMultipleRegisters(devnum, 7003, devPM700check.length, 0, devPM700check);
+		if (devPM700check[0] == 15165){
+			isPM700 = true;
+		}
+		if (isPM500) {
+			dt = RCUAnalyzer.PM500;
+			System.out.println("Modbus device number devnum is PM500");
+		} else 
+			if (isPM700){
+				dt = RCUAnalyzer.PM700;
+				System.out.println("Modbus device number devnum is PM700");
+			} else {
+				throw new Exception("I cannot determine device type!");
+			}
+		return dt;
+		
+	}
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String host = "10.208.20.122";
+		String host = "10.1.20.122";
 		int port = 502;
-		int devicePort = 2;
+		short devicePort = 2;
 		try {
 			ModbusTCPMaster mtm = new ModbusTCPMaster(host, port);
+			
+			
+		
+			
 			/**
 			 * replyPower
 			 * 4006 Total Real Power kW
@@ -152,9 +186,15 @@ public class ConnectionTest2 {
 			
 			//int[] replyPF = new int[2];
 			int[]devCheck;
-			
+			try {
+			short devType = determineRCUDeviceType(mtm, devicePort);
+			} catch (Exception exc){
+				System.err.println(exc.getMessage());
+			}
 			while (true) {
 				ArrayList<Integer> output = new ArrayList<Integer>();
+				
+				
 				mtm.readMultipleRegisters(devicePort, 4005, replyPower.length, 0, replyPower);
 				mtm.readMultipleRegisters(devicePort, 4029, replyVoltage.length, 0, replyVoltage);
 				mtm.readMultipleRegisters(devicePort, 4019, replyCurrent.length, 0, replyCurrent);
@@ -181,6 +221,7 @@ public class ConnectionTest2 {
 				//joiner(output, replyPF);
 				//joiner(output, all);
 				//hexDebug(all);
+				
 				fitter(replyVoltage);
 				hexDebug(replyVoltage);
 				fitter(replyCurrent);
@@ -247,6 +288,7 @@ public class ConnectionTest2 {
 				*/
 				
 				//showOutput(output);
+				
 				System.out.println("Frequency");
 				showAll(replyFrequency);
 				System.out.println("Current");
