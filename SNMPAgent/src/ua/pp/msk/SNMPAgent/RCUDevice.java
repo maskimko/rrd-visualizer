@@ -19,6 +19,7 @@ public class RCUDevice {
 	private String description;
 	private String ipAddress;
 	private RCUPacket pack;
+	private short modbusDeviceType;
 	
 	
 	public RCUDevice(int city, String descr, String ipAddress, int port, int modbusDeviceNumber, RCUPacket pack){
@@ -48,6 +49,10 @@ public class RCUDevice {
 	
 	public int getModbusDeviceNumber(){
 		return modbusDeviceNumber;
+	}
+	
+	public short getModbusDeviceType(){
+		return modbusDeviceType;
 	}
 	
 	public int[] getRCUStats(){

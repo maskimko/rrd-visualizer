@@ -6,6 +6,7 @@ public class RCUPacket {
 	private int i1, i2, i3, in, u12, u23, u31, u1n, u2n, u3n, freq, p, q, s,
 			powerFactor;
 	public static final short units = 15;
+	private short modbusDeviceType; 
 
 	/**
 	 * This constructor is intended to accept row data from modbus PDU in
@@ -28,7 +29,7 @@ public class RCUPacket {
 	 */
 	public RCUPacket(int i1, int i2, int i3, int in, int u12, int u23, int u31,
 			int u1n, int u2n, int u3n, int freq, int p, int q, int s,
-			int powerFactor) {
+			int powerFactor, short devType) {
 		this.i1 =  i1; // / 1000;
 		this.i2 =  i2; // / 1000;
 		this.i3 =  i3; // / 1000;
@@ -44,10 +45,12 @@ public class RCUPacket {
 		this.q =  q; // / 100;
 		this.s =  s; // / 100;
 		this.powerFactor =  powerFactor; // / 1000;
+		this.modbusDeviceType = devType;
 	}
 
-	public RCUPacket(int[] modbusResponseResult)
+	public RCUPacket(int[] modbusResponseResult, short devType)
 			throws IllegalArgumentException {
+		this.modbusDeviceType = devType;
 		if (modbusResponseResult.length != units) {
 			throw new IllegalArgumentException("Array length have to be 15");
 		} else {
@@ -59,8 +62,8 @@ public class RCUPacket {
 		}
 	}
 
-	public RCUPacket(ArrayList<Integer> modbusResponseResult) {
-
+	public RCUPacket(ArrayList<Integer> modbusResponseResult, short devType) {
+		this.modbusDeviceType = devType;
 		int counter = 0;
 		for (int val : modbusResponseResult) {
 			switcher(counter, val);
@@ -192,11 +195,23 @@ public class RCUPacket {
 	}
 
 	public String toString() {
-		return new String("I1=" + (float) i1 / 1000 + " I2=" + (float) i2  / 1000 + " I3=" + (float) i3  / 1000 + " IN=" + (float) in / 1000 
+		
+		String present = null;
+		if (modbusDeviceType == RCUAnalyzer.PM500) {
+		present =  new String("I1=" + (float) i1 / 1000 + " I2=" + (float) i2  / 1000 + " I3=" + (float) i3  / 1000 + " IN=" + (float) in / 1000 
 				+ "\nU12=" + (float) u12  / 100  + " U23=" + (float) u23  / 100 + " U31=" + (float) u31 / 100  + " U1N="
 				+ (float) u1n  / 100 + " U2N=" + (float) u2n  / 100 + " U3N=" + (float) u3n  / 100 + "\nFreq=" + (float) freq / 100 
 				+ " P=" + (float) p / 100  + " Q=" + (float) q / 100 + " S=" + (float) s  / 100 + " PowerFactor="
 				+ (float) powerFactor / 1000 );
+		} 
+		if (modbusDeviceType == RCUAnalyzer.PM700){
+			present = new String("I1=" + (float) i1 / 100 + " I2=" + (float) i2  / 100 + " I3=" + (float) i3  / 100 + " IN=" + (float) in / 100 
+					+ "\nU12=" + (float) u12  / 10  + " U23=" + (float) u23  / 10 + " U31=" + (float) u31 / 10  + " U1N="
+					+ (float) u1n  / 10 + " U2N=" + (float) u2n  / 10 + " U3N=" + (float) u3n  / 10 + "\nFreq=" + (float) freq / 100 
+					+ " P=" + (float) p / 10  + " Q=" + (float) q / 10 + " S=" + (float) s  / 10 + " PowerFactor="
+					+ (float) powerFactor / 10000 );
+		} 
+		return present;
 	}
 
 }
