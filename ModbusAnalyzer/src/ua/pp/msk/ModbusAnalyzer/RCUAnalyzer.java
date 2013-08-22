@@ -6,7 +6,9 @@ import net.sourceforge.jmodbus.ModbusTCPMaster;
 
 public class RCUAnalyzer {
 
-	public static final short TYPE_RCUPOWERINPUT = 0;
+	public static final short PM500 = 0;
+	public static final short PM700 = 1;
+
 	private ModbusTCPMaster mbTCP = null;
 	private short device = 1;
 	private short deviceType = 0;
@@ -17,11 +19,7 @@ public class RCUAnalyzer {
 		this.deviceType = type;
 	}
 
-	public RCUAnalyzer(String host, int port, short device) {
-		this(host, port, device, (short) 0);
-	}
-
-	private static void joiner(ArrayList<Integer> result, int[] registers) {
+	private static void joinerPM500(ArrayList<Integer> result, int[] registers) {
 		int val;
 		for (int i = 0; i < registers.length; i += 2) {
 			registers[i + 1] += 0x100;
@@ -29,6 +27,27 @@ public class RCUAnalyzer {
 			val += registers[i + 1];
 			result.add(val);
 		}
+	}
+
+	private static void joinerPM700(ArrayList<Integer> result, int[] registers) {
+
+		for (int i = 0; i < registers.length; i++) {
+
+			result.add(registers[i] + 0x100);
+		}
+	}
+
+	private boolean checkDevType() {
+		boolean know = false;
+		switch (this.deviceType) {
+		case PM500:
+			know = true;
+			break;
+		case PM700:
+			know = true;
+			break;
+		}
+		return know;
 	}
 
 	private static String showSwitcher(int counter) {
@@ -84,26 +103,18 @@ public class RCUAnalyzer {
 		return key;
 	}
 
-	private static void showOutputFloat(ArrayList<Float> output) {
-		
-			int counter = 0;
-			
-				
-				for (float value : output) {
-				
-					if (showSwitcher(counter) != null) {
-						System.out.println(showSwitcher(counter) + value);
-					}
-					counter++;
-
-				
-		}
+	private static void normalizePM700Power(int[] rp){
+		int swap = rp[1];
+		rp[1] = rp[2];
+		rp[2] = swap;
 	}
 	
-	private static void showOutputInteger(ArrayList<Integer> output){
+ 	private static void showOutputFloat(ArrayList<Float> output) {
+
 		int counter = 0;
-		for (int value : output) {
-		
+
+		for (float value : output) {
+
 			if (showSwitcher(counter) != null) {
 				System.out.println(showSwitcher(counter) + value);
 			}
@@ -112,8 +123,17 @@ public class RCUAnalyzer {
 		}
 	}
 
-	
-	
+	private static void showOutputInteger(ArrayList<Integer> output) {
+		int counter = 0;
+		for (int value : output) {
+
+			if (showSwitcher(counter) != null) {
+				System.out.println(showSwitcher(counter) + value);
+			}
+			counter++;
+
+		}
+	}
 
 	private static void showOutput(int[] outputArray) {
 		ArrayList<Integer> toShow = new ArrayList<Integer>();
@@ -131,34 +151,81 @@ public class RCUAnalyzer {
 		showOutputFloat(toShow);
 	}
 
-	private static boolean fallChecker(ArrayList<Integer> arr){
+	private static boolean fallChecker(ArrayList<Integer> arr) {
 		boolean isFalled = true;
 		int fallVal = 256;
-		for (int val : arr ){
+		for (int val : arr) {
 			if (val != fallVal) {
 				return false;
 			}
 		}
 		return isFalled;
 	}
-	
-	private static void fit2RCU(ArrayList<Integer> output) throws Exception{
+
+	/**
+	 * 
+	 * @param output
+	 *            Accepts ArrayList<Integer> with list of data to produce
+	 *            Generally this method is intended to correct data which we
+	 *            take from jmodbus module.
+	 * @throws Exception
+	 */
+	private static void fit2RCUPM500(ArrayList<Integer> output)
+			throws Exception {
 		int counter = 0;
-		
+
 		for (int value : output) {
 			if (!fallChecker(output)) {
-			switch (counter) {
-			case 11:
-				value -= 0x100;
-				break;
-			case 12:
-				value -= 0x100;
-				break;
-			}
+				switch (counter) {
+				case 11:
+					value -= 0x100;
+					break;
+				case 12:
+					value -= 0x100;
+					break;
+				}
 			} else {
 				throw new Exception("Cannot get an answer");
 			}
 			counter++;
+		}
+	}
+
+	/**
+	 * Generally this method is intended to correct data which we take from
+	 * jmodbus module.
+	 * 
+	 * @param output
+	 *            Accepts ArrayList<Integer> with list of data to produce
+	 * @throws Exception
+	 */
+	private static void fit2RCUPM700(ArrayList<Integer> output)
+			throws Exception {
+		
+		if (!fallChecker(output)) {
+		for (int counter = 0; counter < output.size(); counter++) {
+			
+				switch (counter) {
+				/*case 2:
+					output.set(counter, output.get(counter) - 0x100)   ;
+					break;*/
+				case 6:
+					output.set(counter, output.get(counter) - 0x100)   ;
+					break;			
+				case 8:
+					output.set(counter, output.get(counter) - 0x100)   ;
+					break;
+				case 11:
+				case 12:
+				case 13:
+					output.set(counter, output.get(counter) - 0x100)   ;
+					break;
+				}
+		}
+			} else {
+				throw new Exception("Cannot get an answer");
+			
+			
 		}
 	}
 
@@ -173,8 +240,9 @@ public class RCUAnalyzer {
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         about polled device
 	 */
-	private RCUPacket askRCUInputDevice(ModbusTCPMaster mtm, short device) throws Exception {
-		
+	private RCUPacket askRCUPM500Device(ModbusTCPMaster mtm, short device)
+			throws Exception {
+
 		int[] replyIUP = new int[28];
 		int[] replyPF = new int[2];
 
@@ -184,19 +252,76 @@ public class RCUAnalyzer {
 		// Requesting power factor
 		mtm.readMultipleRegisters(device, 870, replyPF.length, 0, replyPF);
 
-		joiner(output, replyIUP);
-		joiner(output, replyPF);
-		
-		fit2RCU(output);
-		
-		RCUPacket rcup = new RCUPacket(output);
-		
+		joinerPM500(output, replyIUP);
+		joinerPM500(output, replyPF);
+
+		fit2RCUPM500(output);
+
+		RCUPacket rcup = new RCUPacket(output, deviceType);
+
+		return rcup;
+	}
+
+	/**
+	 * 
+	 * @param mtm
+	 *            ModbusTCPMaSTER worker which handles the connection
+	 * @param device
+	 *            Device number on the modbus bus
+	 * @return RCUPacket object with measurements data
+	 * @throws Exception
+	 */
+	private RCUPacket askRCUPM700Device(ModbusTCPMaster mtm, short device)
+			throws Exception {
+
+		/**
+		 * replyPower 4006 Total Real Power kW 4007 Total Apparent Power kVA
+		 * 4008 Total Reactive Power kVAr 4009 Total Power Factor
+		 */
+		int[] replyPower = new int[4];
+		/**
+		 * 4030 Voltage, Phase 12 4031 Voltage, Phase 23 4032 Voltage, Phase 31
+		 * 4033 Voltage, Phase 1N 4034 Voltage, Phase 2N 4035 Voltage, Phase 3N
+		 */
+		int[] replyVoltage = new int[6];
+
+		/**
+		 * 4020 Current, Instantaneous, Phase 1 4021 Current, Instantaneous,
+		 * Phase 2 4022 Current, Instantaneous, Phase 3 4023 Current,
+		 * Instantaneous, Neutral
+		 */
+
+		int[] replyCurrent = new int[4];
+		/**
+		 * 4013 Frequency (derived from Phase 1 )
+		 */
+		int[] replyFrequency = new int[1];
+
+		ArrayList<Integer> output = new ArrayList<Integer>();
+		mtm.readMultipleRegisters(device, 4019, replyCurrent.length, 0,
+				replyCurrent);
+		mtm.readMultipleRegisters(device, 4029, replyVoltage.length, 0,
+				replyVoltage);
+		mtm.readMultipleRegisters(device, 4012, replyFrequency.length, 0,
+				replyFrequency);
+		mtm.readMultipleRegisters(device, 4005, replyPower.length, 0,
+				replyPower);
+
+		joinerPM700(output, replyCurrent);
+		joinerPM700(output, replyVoltage);
+		joinerPM700(output, replyFrequency);
+		normalizePM700Power(replyPower);
+		joinerPM700(output, replyPower);
+
+		fit2RCUPM700(output);
+
+		RCUPacket rcup = new RCUPacket(output, deviceType);
+
 		return rcup;
 	}
 
 	public RCUPacket askDevice() throws Exception {
-		return this.askDevice(mbTCP,  this.device,
-				this.deviceType);
+		return this.askDevice(mbTCP, this.device, this.deviceType);
 	}
 
 	/**
@@ -214,17 +339,28 @@ public class RCUAnalyzer {
 	 */
 	public RCUPacket askDevice(ModbusTCPMaster mtm, short device,
 			short deviceType) throws IllegalArgumentException, Exception {
-		if (deviceType != this.TYPE_RCUPOWERINPUT) {
-			throw new IllegalArgumentException("There is no such device type");
-		} else {
-			this.device = device;
-			return askRCUInputDevice(mtm, device);
+
+		this.device = device;
+		RCUPacket rp = null;
+		switch (deviceType) {
+		case PM500:
+			rp = askRCUPM500Device(mtm, device);
+			break;
+		case PM700:
+			rp = askRCUPM700Device(mtm, device);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					"I know nothing about this device type!");
 		}
+
+		return rp;
+
 	}
-	
-	public void stop(){
+
+	public void stop() {
 		if (mbTCP != null) {
-			
+
 			mbTCP = null;
 		}
 	}
@@ -254,17 +390,19 @@ public class RCUAnalyzer {
 		}
 		RCUAnalyzer rcuan = new RCUAnalyzer(hostname, port, dev, type);
 		try {
-			 while (true) {
-			RCUPacket rcup = rcuan.askDevice();
-			 System.out.println(rcup);
-			//showOutput(rcup.getAll());
+			while (true) {
+				RCUPacket rcup = rcuan.askDevice();
+				System.out.println(rcup);
+				// showOutput(rcup.getAll());
 
-			Thread.sleep(1000);
-			 }
+				Thread.sleep(1000);
+			}
 		} catch (InterruptedException ie) {
 			ie.printStackTrace();
 		} catch (Exception e) {
-			System.err.println(e.getMessage() + " from host " + hostname + ":" + port + " device " + dev);
+			e.printStackTrace();
+			System.err.println("from host " + hostname + ":" + port
+					+ " device " + dev);
 		}
 
 	}
