@@ -18,6 +18,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	private String ipAddress = null;
 	private int port = 0;
 	private short modbusDevice = 0;
+	private short modbusDeviceType = RCUAnalyzer.PM500;
 
 	public RCURow(RCUDevice rcudev) {
 		super(makeOID(rcudev), makeStatsArray(rcudev));
@@ -26,7 +27,8 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		ipAddress = rcuDev.getIpAddress();
 		port = rcuDev.getPort();
 		modbusDevice = (short) rcuDev.getModbusDeviceNumber();
-		rcuAnalyzer = new RCUAnalyzer(ipAddress, port, modbusDevice);
+		modbusDeviceType = rcuDev.getModbusDeviceType();
+		rcuAnalyzer = new RCUAnalyzer(ipAddress, port, modbusDevice, modbusDeviceType);
 	}
 
 	private static OID makeOID(RCUDevice rcud) {

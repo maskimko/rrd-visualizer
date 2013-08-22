@@ -18,7 +18,7 @@ public  class RCUPacketGenerator {
 		for (int i = 0; i < stats.length; i++) {
 			stats[i] = 0;
 		}
-		RCUPacket rcup = new RCUPacket(stats);
+		RCUPacket rcup = new RCUPacket(stats, RCUAnalyzer.PM500);
 		return rcup;
 	}
 	
@@ -64,7 +64,7 @@ public  class RCUPacketGenerator {
 			}
 			toPack[i] = multiplyer;
 		}
-		RCUPacket rp = new RCUPacket(toPack);
+		RCUPacket rp = new RCUPacket(toPack, RCUAnalyzer.PM500);
 		return rp;
 	}
 }
