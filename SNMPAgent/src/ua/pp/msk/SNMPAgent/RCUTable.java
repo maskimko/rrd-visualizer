@@ -86,7 +86,7 @@ public class RCUTable extends DefaultMOTable {
 				MOAccessImpl.ACCESS_READ_ONLY);
 		}
 		
-		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006"),
+		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.1.1.1"),
 				indexDef, columns);
 		MOMutableTableModel model = (MOMutableTableModel) deviceStats.getModel();
 		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(5));
