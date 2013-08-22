@@ -107,6 +107,8 @@ public class ConnectionTest2 {
 		}
 	}
 
+	//New for commit
+	
 	private static void hexDebug(int[] array){
 		for (int i  = 0; i < array.length; i++) {
 			System.out.print(" HEX:\t" + Integer.toHexString(array[i]));
