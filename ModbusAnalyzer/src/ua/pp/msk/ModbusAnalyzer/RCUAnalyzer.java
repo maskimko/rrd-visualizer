@@ -83,8 +83,8 @@ public class RCUAnalyzer {
 	
 private void msgToPM500Normalizer(short devType, int[] scaleFactor, ArrayList<Integer> toPack){
 	int multiplierI = (int) (RCUPacket.currentScaleFactor / Math.pow(10, scaleFactor[0]));
-	int multiplierV;
-	int multiplierW;
+	int multiplierV = (int) (RCUPacket.voltageScaleFactor / Math.pow(10, scaleFactor[1]));
+	int multiplierW = (int) (RCUPacket.powerScaleFactor / Math.pow(10, scaleFactor[1]));;
 		
 	}
 
