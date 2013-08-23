@@ -6,6 +6,7 @@ public class RCUPacket {
 	private int i1, i2, i3, in, u12, u23, u31, u1n, u2n, u3n, freq, p, q, s,
 			powerFactor;
 	public static final short units = 15;
+	public static final int currentScaleFactor = 3, voltageScaleFactor = 3, powerScaleFactor = 2;
 	private short modbusDeviceType; 
 
 	/**
@@ -72,6 +73,9 @@ public class RCUPacket {
 
 	}
 
+	
+	
+	
 	private void switcher(int i, int value) {
 		switch (i) {
 		case 0:
@@ -197,20 +201,12 @@ public class RCUPacket {
 	public String toString() {
 		
 		String present = null;
-		if (modbusDeviceType == RCUAnalyzer.PM500) {
 		present =  new String("I1=" + (float) i1 / 1000 + " I2=" + (float) i2  / 1000 + " I3=" + (float) i3  / 1000 + " IN=" + (float) in / 1000 
 				+ "\nU12=" + (float) u12  / 100  + " U23=" + (float) u23  / 100 + " U31=" + (float) u31 / 100  + " U1N="
 				+ (float) u1n  / 100 + " U2N=" + (float) u2n  / 100 + " U3N=" + (float) u3n  / 100 + "\nFreq=" + (float) freq / 100 
 				+ " P=" + (float) p / 100  + " Q=" + (float) q / 100 + " S=" + (float) s  / 100 + " PowerFactor="
 				+ (float) powerFactor / 1000 );
-		} 
-		if (modbusDeviceType == RCUAnalyzer.PM700){
-			present = new String("I1=" + (float) i1 / 100 + " I2=" + (float) i2  / 100 + " I3=" + (float) i3  / 100 + " IN=" + (float) in / 100 
-					+ "\nU12=" + (float) u12  / 10  + " U23=" + (float) u23  / 10 + " U31=" + (float) u31 / 10  + " U1N="
-					+ (float) u1n  / 10 + " U2N=" + (float) u2n  / 10 + " U3N=" + (float) u3n  / 10 + "\nFreq=" + (float) freq / 100 
-					+ " P=" + (float) p / 10  + " Q=" + (float) q / 10 + " S=" + (float) s  / 10 + " PowerFactor="
-					+ (float) powerFactor / 10000 );
-		} 
+		
 		return present;
 	}
 

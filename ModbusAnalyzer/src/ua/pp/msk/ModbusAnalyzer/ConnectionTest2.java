@@ -43,6 +43,8 @@ public class ConnectionTest2 {
 		}
 	}
 	
+	
+	
 	private static void showOutput(ArrayList<Integer> output){
 		int counter = 0;
 		for (int value : output){
@@ -181,16 +183,21 @@ public class ConnectionTest2 {
 			 */
 			int[] replyFrequency = new int[1];
 			
-			int[] all = new int[50];
+			//int[] all = new int[50];
 			
 			
 			//int[] replyPF = new int[2];
-			int[]devCheck;
+			//int[]devCheck;
+			
+			
+			
 			try {
 			short devType = determineRCUDeviceType(mtm, devicePort);
 			} catch (Exception exc){
 				System.err.println(exc.getMessage());
 			}
+			
+			
 			while (true) {
 				ArrayList<Integer> output = new ArrayList<Integer>();
 				
@@ -289,6 +296,8 @@ public class ConnectionTest2 {
 				
 				//showOutput(output);
 				
+				
+				/*
 				System.out.println("Frequency");
 				showAll(replyFrequency);
 				System.out.println("Current");
@@ -297,7 +306,7 @@ public class ConnectionTest2 {
 				showAll(replyVoltage);
 				System.out.println("Power");
 				showAll(replyPower);
-				
+				*/
 				
 				Thread.sleep(1000);
 			}
