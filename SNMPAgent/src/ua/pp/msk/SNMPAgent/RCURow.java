@@ -18,7 +18,6 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	private String ipAddress = null;
 	private int port = 0;
 	private short modbusDevice = 0;
-	private short modbusDeviceType = RCUAnalyzer.PM500;
 
 	public RCURow(RCUDevice rcudev) {
 		super(makeOID(rcudev), makeStatsArray(rcudev));
@@ -27,8 +26,15 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		ipAddress = rcuDev.getIpAddress();
 		port = rcuDev.getPort();
 		modbusDevice = (short) rcuDev.getModbusDeviceNumber();
-		modbusDeviceType = rcuDev.getModbusDeviceType();
-		rcuAnalyzer = new RCUAnalyzer(ipAddress, port, modbusDevice, modbusDeviceType);
+
+		try {
+			rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
+					modbusDevice);
+		} catch (Exception exc) {
+				//We could not determine device type above
+			System.err.println("Unknown type of RCU device");
+			rcuAnalyzer = null;
+		}
 	}
 
 	private static OID makeOID(RCUDevice rcud) {
@@ -72,7 +78,10 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		if (canUpdate) {
 			try {
 				values = getStatsArray();
-			} catch (Exception e) {
+			} catch (NullPointerException npe) {
+				System.err.println("Cannot update unknown type device table");
+			}
+			catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 		} else {

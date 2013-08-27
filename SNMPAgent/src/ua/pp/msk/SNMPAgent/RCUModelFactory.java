@@ -12,12 +12,12 @@ import ua.pp.msk.ModbusAnalyzer.RCUPacket;
 
 public class RCUModelFactory {
 	
-	public static void addRCUDeviceToModel(MOMutableTableModel mmtm, RCUDevice rcud){
+	public static void addRCUDeviceToModel(MOMutableTableModel mmtm, RCUDevice rcud) {
 		
 		mmtm.addRow(new RCURow(rcud));
 	}
 	
-	public static void fillRCUDeviceModel(RCUTable table, RCUDevice[] rcudevs){
+	public static void fillRCUDeviceModel(RCUTable table, RCUDevice[] rcudevs) {
 		MOMutableTableModel model = (MOMutableTableModel) table.getModel();
 		for (int i = 0; i < rcudevs.length; i++){
 			addRCUDeviceToModel(model, rcudevs[i]);

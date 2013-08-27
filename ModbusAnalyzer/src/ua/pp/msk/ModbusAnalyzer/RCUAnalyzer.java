@@ -4,47 +4,48 @@ import java.util.ArrayList;
 
 import net.sourceforge.jmodbus.ModbusTCPMaster;
 
-public class RCUAnalyzer {
+public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
-	public static final short PM500 = 0;
-	public static final short PM700 = 1;
+	protected ModbusTCPMaster mbTCP = null;
+	protected short device = 1;
+	protected short deviceType;
 
-	private ModbusTCPMaster mbTCP = null;
-	private short device = 1;
-	private short deviceType = 0;
-
-	public RCUAnalyzer(String host, int port, short device, short type)
-			throws Exception {
+	public RCUAnalyzer(String host, int port, short device, short type) {
 		this.mbTCP = new ModbusTCPMaster(host, port);
 		this.device = device;
-		if (type == PM700 || type == PM500) {
-			this.deviceType = type;
-		} else
-			throw new Exception("Cannot handle this device type!");
+		this.deviceType = type;
+		if (!checkDevType()) {
+			System.err
+					.println("Warning: There is already implemented class for this device type");
+		}
+
 	}
 
-	public RCUAnalyzer(String host, int port, short device) throws Exception {
-		this.mbTCP = new ModbusTCPMaster(host, port);
+	protected RCUAnalyzer(ModbusTCPMaster mtm, short device, short deviceType) {
+		this.mbTCP = mtm;
 		this.device = device;
-		this.deviceType = determineRCUDeviceType(mbTCP, device);
+		this.deviceType = deviceType;
 	}
 
-	private static void joinerPM500(ArrayList<Integer> result, int[] registers) {
-		int val;
-		for (int i = 0; i < registers.length; i += 2) {
-			registers[i + 1] += 0x100;
-			val = registers[i] << (Integer.SIZE / 2);
-			val += registers[i + 1];
-			result.add(val);
+	public static RCUAnalyzer getRCUDevice(String hostname, int port,
+			short device) throws Exception {
+		RCUAnalyzer ra = null;
+
+		ModbusTCPMaster mtm = new ModbusTCPMaster(hostname, port);
+		short type = determineRCUDeviceType(mtm, device);
+		switch (type) {
+		case PM500:
+			ra = new RCUPM500Analyzer(mtm, device);
+			break;
+		case PM700:
+			ra = new RCUPM700Analyzer(mtm, device);
+			break;
+		default:
+			throw new Exception(
+					"Error: Cannot create a RCUAnalyzer.\nUnknown type of device!");
 		}
-	}
 
-	private static void joinerPM700(ArrayList<Integer> result, int[] registers) {
-
-		for (int i = 0; i < registers.length; i++) {
-
-			result.add(registers[i] + 0x100);
-		}
+		return ra;
 	}
 
 	private boolean checkDevType() {
@@ -92,19 +93,7 @@ public class RCUAnalyzer {
 
 	}
 
-	private void msgToPM500Normalizer(short devType, int[] scaleFactor,
-			ArrayList<Integer> toPack) {
-		int multiplierI = (int) (RCUPacket.currentScaleFactor / Math.pow(10,
-				scaleFactor[0]));
-		int multiplierV = (int) (RCUPacket.voltageScaleFactor / Math.pow(10,
-				scaleFactor[1]));
-		int multiplierW = (int) (RCUPacket.powerScaleFactor / Math.pow(10,
-				scaleFactor[1]));
-		;
-
-	}
-
-	private static String showSwitcher(int counter) {
+	protected static String showSwitcher(int counter) {
 		String key = null;
 
 		switch (counter) {
@@ -157,12 +146,6 @@ public class RCUAnalyzer {
 		return key;
 	}
 
-	private static void normalizePM700Power(int[] rp) {
-		int swap = rp[1];
-		rp[1] = rp[2];
-		rp[2] = swap;
-	}
-
 	private static void showOutputFloat(ArrayList<Float> output) {
 
 		int counter = 0;
@@ -205,7 +188,7 @@ public class RCUAnalyzer {
 		showOutputFloat(toShow);
 	}
 
-	private static boolean fallChecker(ArrayList<Integer> arr) {
+	protected static boolean fallChecker(ArrayList<Integer> arr) {
 		boolean isFalled = true;
 		int fallVal = 256;
 		for (int val : arr) {
@@ -216,166 +199,8 @@ public class RCUAnalyzer {
 		return isFalled;
 	}
 
-	/**
-	 * 
-	 * @param output
-	 *            Accepts ArrayList<Integer> with list of data to produce
-	 *            Generally this method is intended to correct data which we
-	 *            take from jmodbus module.
-	 * @throws Exception
-	 */
-	private static void fit2RCUPM500(ArrayList<Integer> output)
-			throws Exception {
-		int counter = 0;
-
-		for (int value : output) {
-			if (!fallChecker(output)) {
-				switch (counter) {
-				case 11:
-					value -= 0x100;
-					break;
-				case 12:
-					value -= 0x100;
-					break;
-				}
-			} else {
-				throw new Exception("Cannot get an answer");
-			}
-			counter++;
-		}
-	}
-
-	/**
-	 * Generally this method is intended to correct data which we take from
-	 * jmodbus module.
-	 * 
-	 * @param output
-	 *            Accepts ArrayList<Integer> with list of data to produce
-	 * @throws Exception
-	 */
-	private static void fit2RCUPM700(ArrayList<Integer> output)
-			throws Exception {
-
-		if (!fallChecker(output)) {
-			for (int counter = 0; counter < output.size(); counter++) {
-
-				switch (counter) {
-				/*
-				 * case 2: output.set(counter, output.get(counter) - 0x100) ;
-				 * break;
-				 */
-				case 6:
-					output.set(counter, output.get(counter) - 0x100);
-					break;
-				case 8:
-					output.set(counter, output.get(counter) - 0x100);
-					break;
-				case 11:
-				case 12:
-				case 13:
-					output.set(counter, output.get(counter) - 0x100);
-					break;
-				}
-			}
-		} else {
-			throw new Exception("Cannot get an answer");
-
-		}
-	}
-
-	/**
-	 * 
-	 * @param host
-	 *            Provides a host ip address
-	 * @param port
-	 *            Provides a host ip port
-	 * @param device
-	 *            Provides a modbus device number
-	 * @return Returns object of RCUPacket class with all gathered information
-	 *         about polled device
-	 */
-	private RCUPacket askRCUPM500Device(ModbusTCPMaster mtm, short device)
-			throws Exception {
-
-		int[] replyIUP = new int[28];
-		int[] replyPF = new int[2];
-
-		ArrayList<Integer> output = new ArrayList<Integer>();
-		// Requesting for i, u, p, q, s, freq
-		mtm.readMultipleRegisters(device, 768, replyIUP.length, 0, replyIUP);
-		// Requesting power factor
-		mtm.readMultipleRegisters(device, 870, replyPF.length, 0, replyPF);
-
-		joinerPM500(output, replyIUP);
-		joinerPM500(output, replyPF);
-
-		fit2RCUPM500(output);
-
-		RCUPacket rcup = new RCUPacket(output, deviceType);
-
-		return rcup;
-	}
-
-	/**
-	 * 
-	 * @param mtm
-	 *            ModbusTCPMaSTER worker which handles the connection
-	 * @param device
-	 *            Device number on the modbus bus
-	 * @return RCUPacket object with measurements data
-	 * @throws Exception
-	 */
-	private RCUPacket askRCUPM700Device(ModbusTCPMaster mtm, short device)
-			throws Exception {
-
-		/**
-		 * replyPower 4006 Total Real Power kW 4007 Total Apparent Power kVA
-		 * 4008 Total Reactive Power kVAr 4009 Total Power Factor
-		 */
-		int[] replyPower = new int[4];
-		/**
-		 * 4030 Voltage, Phase 12 4031 Voltage, Phase 23 4032 Voltage, Phase 31
-		 * 4033 Voltage, Phase 1N 4034 Voltage, Phase 2N 4035 Voltage, Phase 3N
-		 */
-		int[] replyVoltage = new int[6];
-
-		/**
-		 * 4020 Current, Instantaneous, Phase 1 4021 Current, Instantaneous,
-		 * Phase 2 4022 Current, Instantaneous, Phase 3 4023 Current,
-		 * Instantaneous, Neutral
-		 */
-
-		int[] replyCurrent = new int[4];
-		/**
-		 * 4013 Frequency (derived from Phase 1 )
-		 */
-		int[] replyFrequency = new int[1];
-
-		ArrayList<Integer> output = new ArrayList<Integer>();
-		mtm.readMultipleRegisters(device, 4019, replyCurrent.length, 0,
-				replyCurrent);
-		mtm.readMultipleRegisters(device, 4029, replyVoltage.length, 0,
-				replyVoltage);
-		mtm.readMultipleRegisters(device, 4012, replyFrequency.length, 0,
-				replyFrequency);
-		mtm.readMultipleRegisters(device, 4005, replyPower.length, 0,
-				replyPower);
-
-		joinerPM700(output, replyCurrent);
-		joinerPM700(output, replyVoltage);
-		joinerPM700(output, replyFrequency);
-		normalizePM700Power(replyPower);
-		joinerPM700(output, replyPower);
-
-		fit2RCUPM700(output);
-
-		RCUPacket rcup = new RCUPacket(output, deviceType);
-
-		return rcup;
-	}
-
 	public RCUPacket askDevice() throws Exception {
-		return this.askDevice(mbTCP, this.device, this.deviceType);
+		return this.askDevice(mbTCP, this.device);
 	}
 
 	/**
@@ -386,31 +211,12 @@ public class RCUAnalyzer {
 	 *            Provides a host ip port
 	 * @param device
 	 *            Provides a modbus device number
-	 * @param deviceType
-	 *            What device we have to poll RCUInput = 0;
+	 * 
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         about polled device
 	 */
-	public RCUPacket askDevice(ModbusTCPMaster mtm, short device,
-			short deviceType) throws IllegalArgumentException, Exception {
-
-		this.device = device;
-		RCUPacket rp = null;
-		switch (deviceType) {
-		case PM500:
-			rp = askRCUPM500Device(mtm, device);
-			break;
-		case PM700:
-			rp = askRCUPM700Device(mtm, device);
-			break;
-		default:
-			throw new IllegalArgumentException(
-					"I know nothing about this device type!");
-		}
-
-		return rp;
-
-	}
+	public abstract RCUPacket askDevice(ModbusTCPMaster mtm, short device)
+			throws Exception;
 
 	public void stop() {
 		if (mbTCP != null) {
@@ -423,30 +229,59 @@ public class RCUAnalyzer {
 	// Rewrite main method !
 
 	public static void main(String[] args) {
-		String hostname = "127.0.0.1";
-		int port = 502;
-		short dev = 2, type = 0;
-		if (args.length == 0 || args.length > 4) {
+		String hostname = null;
+		int port = 0;
+		short dev = 0, type = -1;
+		if (args.length != 4) {
 			System.out
 					.println("Usage: RCUAnalyzer <hostname> [port] [modbus device] [rcu device type]");
 			return;
 		} else {
-			hostname = args[0];
-			if (args.length > 1) {
-				port = Integer.parseInt(args[1]);
-				if (args.length > 2) {
-					dev = Short.parseShort(args[2]);
-				}
-			}
-		}
-		RCUAnalyzer rcuan = null;
-		try {
-			if (args.length > 3) {
-				rcuan = new RCUAnalyzer(hostname, port, dev, type);
-			} else {
-				rcuan = new RCUAnalyzer(hostname, port, dev);
-			}
 			try {
+				hostname = args[0];
+				port = Integer.parseInt(args[1]);
+
+				dev = Short.parseShort(args[2]);
+				type = Short.parseShort(args[3]);
+				ModbusTCPMaster mbMstr = new ModbusTCPMaster(hostname, port);
+				RCUAnalyzer rcuan = new RCUAnalyzer(hostname, port, dev, type) {
+
+					private boolean isAsked = false;
+					short devT = -1;
+
+					public RCUPacket askDevice(ModbusTCPMaster mbMstr, short dev)
+							throws Exception {
+						RCUPacket rcuPack = null;
+
+						if (!isAsked) {
+							devT = determineRCUDeviceType(mbMstr, dev);
+
+							if (devT != this.deviceType) {
+								throw new Exception(
+										"Error: Looks like you provide wrong device type");
+							} else {
+								isAsked = true;
+							}
+						}
+						switch (devT) {
+						case 0:
+							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(
+									this.mbTCP, dev);
+							rcuPack = rcuPM500An.askDevice();
+							break;
+						case 1:
+							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(
+									this.mbTCP, dev);
+							rcuPack = rcuPM700An.askDevice();
+							break;
+						default:
+							throw new Exception(
+									"Error: Unfortunately I cannot handle this device type!");
+						}
+						return rcuPack;
+					}
+				};
+
 				while (true) {
 					RCUPacket rcup = rcuan.askDevice();
 					System.out.println(rcup);
@@ -461,8 +296,6 @@ public class RCUAnalyzer {
 				System.err.println("from host " + hostname + ":" + port
 						+ " device " + dev);
 			}
-		} catch (Exception exc) {
-			exc.printStackTrace();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package ua.pp.msk.SNMPAgent;
 
+import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
 import ua.pp.msk.ModbusAnalyzer.RCUPacket;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketGenerator;
 
@@ -15,19 +16,20 @@ public class RCUDevice {
 	
 	private int city;
 	private int port;
-	private int modbusDeviceNumber;
+	private short modbusDeviceNumber;
 	private String description;
 	private String ipAddress;
 	private RCUPacket pack;
-	private short modbusDeviceType;
+
 	
 	
-	public RCUDevice(int city, String descr, String ipAddress, int port, int modbusDeviceNumber, RCUPacket pack){
+	public RCUDevice(int city, String descr, String ipAddress, int port, short modbusDeviceNumber,  RCUPacket pack) {
 		this.city = city;
 		this.description = descr;
 		this.ipAddress = ipAddress;
 		this.port = port; 
 		this.modbusDeviceNumber = modbusDeviceNumber;
+		
 		this.pack = pack;
 	}
 	
@@ -51,9 +53,7 @@ public class RCUDevice {
 		return modbusDeviceNumber;
 	}
 	
-	public short getModbusDeviceType(){
-		return modbusDeviceType;
-	}
+
 	
 	public int[] getRCUStats(){
 		return pack.getAll();
@@ -63,31 +63,32 @@ public class RCUDevice {
 		return pack;
 	}
 	
-	public static RCUDevice createBaseKyivRCUDevice(int modbusDeviceNumber){
-		RCUDevice dev = new RCUDevice(RCUDevice.KYIV, "Kyiv power input RCU device", "10.1.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
+	public static RCUDevice createBaseKyivRCUDevice(short modbusDeviceNumber)  {
+		
+		RCUDevice dev = new RCUDevice(RCUDevice.KYIV, "Kyiv power input RCU device", "10.1.20.122", 502,  modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseDnipropetrovskRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseDnipropetrovskRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.DNIPROPETROVSK, "Dnipropetrovsk power input RCU device", "10.144.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseDonetskRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseDonetskRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.DONETSK, "Donetsk power input RCU device", "10.176.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseKharkivRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseKharkivRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.KHARKIV, "Kharkiv power input RCU device", "10.160.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseLvivRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseLvivRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.LVIV, "Lviv power input RCU device", "10.224.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseSimferopolRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseSimferopolRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.SIMFEROPOL, "Simferopol power input RCU device", "10.192.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}
-	public static RCUDevice createBaseOdesaRCUDevice(int modbusDeviceNumber){
+	public static RCUDevice createBaseOdesaRCUDevice(short modbusDeviceNumber){
 		RCUDevice dev = new RCUDevice(RCUDevice.ODESA, "Odesa power input RCU device", "10.208.20.122", 502, modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
 		return dev;
 	}

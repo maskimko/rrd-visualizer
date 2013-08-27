@@ -89,21 +89,21 @@ public class RCUTable extends DefaultMOTable {
 		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.1.1.1"),
 				indexDef, columns);
 		MOMutableTableModel model = (MOMutableTableModel) deviceStats.getModel();
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(5));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(4));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice(2));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice(3));
-		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseOdesaRCUDevice(2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)5));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)4));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDnipropetrovskRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseDonetskRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKharkivRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseLvivRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice((short)2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseSimferopolRCUDevice((short)3));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseOdesaRCUDevice((short)2));
 		deviceStats.setVolatile(true);
 		return deviceStats;
 	}
