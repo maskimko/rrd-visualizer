@@ -12,12 +12,21 @@ public class RCUAnalyzer {
 	private ModbusTCPMaster mbTCP = null;
 	private short device = 1;
 	private short deviceType = 0;
-	
 
-	public RCUAnalyzer(String host, int port, short device, short type) {
+	public RCUAnalyzer(String host, int port, short device, short type)
+			throws Exception {
 		this.mbTCP = new ModbusTCPMaster(host, port);
 		this.device = device;
-		this.deviceType = type;
+		if (type == PM700 || type == PM500) {
+			this.deviceType = type;
+		} else
+			throw new Exception("Cannot handle this device type!");
+	}
+
+	public RCUAnalyzer(String host, int port, short device) throws Exception {
+		this.mbTCP = new ModbusTCPMaster(host, port);
+		this.device = device;
+		this.deviceType = determineRCUDeviceType(mbTCP, device);
 	}
 
 	private static void joinerPM500(ArrayList<Integer> result, int[] registers) {
@@ -50,42 +59,49 @@ public class RCUAnalyzer {
 		}
 		return know;
 	}
-	
-	
-	public static short determineRCUDeviceType(ModbusTCPMaster mbtcp, short devnum) throws Exception{
+
+	public static short determineRCUDeviceType(ModbusTCPMaster mbtcp,
+			short devnum) throws Exception {
 		short dt = -1;
 		boolean isPM500 = false;
 		boolean isPM700 = false;
-		//Trying to ask PM500 device
+		// Trying to ask PM500 device
 		int[] devPM500check = new int[4];
-		mbtcp.readMultipleRegisters(devnum, 64646, devPM500check.length, 0, devPM500check);
-		if (devPM500check[0] == 256 && devPM500check[1] == 50980 && devPM500check[2] == 0 && devPM500check[3] == 1){
+		mbtcp.readMultipleRegisters(devnum, 64646, devPM500check.length, 0,
+				devPM500check);
+		if (devPM500check[0] == 256 && devPM500check[1] == 50980
+				&& devPM500check[2] == 0 && devPM500check[3] == 1) {
 			isPM500 = true;
 		}
 		int[] devPM700check = new int[2];
-		mbtcp.readMultipleRegisters(devnum, 7003, devPM700check.length, 0, devPM700check);
-		if (devPM700check[0] == 15165){
+		mbtcp.readMultipleRegisters(devnum, 7003, devPM700check.length, 0,
+				devPM700check);
+		if (devPM700check[0] == 15165) {
 			isPM700 = true;
 		}
 		if (isPM500) {
 			dt = RCUAnalyzer.PM500;
 			System.out.println("Modbus device number devnum is PM500");
-		} else 
-			if (isPM700){
-				dt = RCUAnalyzer.PM700;
-				System.out.println("Modbus device number devnum is PM700");
-			} else {
-				throw new Exception("I cannot determine device type!");
-			}
+		} else if (isPM700) {
+			dt = RCUAnalyzer.PM700;
+			System.out.println("Modbus device number devnum is PM700");
+		} else {
+			throw new Exception("I cannot determine device type!");
+		}
 		return dt;
-		
+
 	}
-	
-private void msgToPM500Normalizer(short devType, int[] scaleFactor, ArrayList<Integer> toPack){
-	int multiplierI = (int) (RCUPacket.currentScaleFactor / Math.pow(10, scaleFactor[0]));
-	int multiplierV = (int) (RCUPacket.voltageScaleFactor / Math.pow(10, scaleFactor[1]));
-	int multiplierW = (int) (RCUPacket.powerScaleFactor / Math.pow(10, scaleFactor[1]));;
-		
+
+	private void msgToPM500Normalizer(short devType, int[] scaleFactor,
+			ArrayList<Integer> toPack) {
+		int multiplierI = (int) (RCUPacket.currentScaleFactor / Math.pow(10,
+				scaleFactor[0]));
+		int multiplierV = (int) (RCUPacket.voltageScaleFactor / Math.pow(10,
+				scaleFactor[1]));
+		int multiplierW = (int) (RCUPacket.powerScaleFactor / Math.pow(10,
+				scaleFactor[1]));
+		;
+
 	}
 
 	private static String showSwitcher(int counter) {
@@ -141,13 +157,13 @@ private void msgToPM500Normalizer(short devType, int[] scaleFactor, ArrayList<In
 		return key;
 	}
 
-	private static void normalizePM700Power(int[] rp){
+	private static void normalizePM700Power(int[] rp) {
 		int swap = rp[1];
 		rp[1] = rp[2];
 		rp[2] = swap;
 	}
-	
- 	private static void showOutputFloat(ArrayList<Float> output) {
+
+	private static void showOutputFloat(ArrayList<Float> output) {
 
 		int counter = 0;
 
@@ -239,31 +255,31 @@ private void msgToPM500Normalizer(short devType, int[] scaleFactor, ArrayList<In
 	 */
 	private static void fit2RCUPM700(ArrayList<Integer> output)
 			throws Exception {
-		
+
 		if (!fallChecker(output)) {
-		for (int counter = 0; counter < output.size(); counter++) {
-			
+			for (int counter = 0; counter < output.size(); counter++) {
+
 				switch (counter) {
-				/*case 2:
-					output.set(counter, output.get(counter) - 0x100)   ;
-					break;*/
+				/*
+				 * case 2: output.set(counter, output.get(counter) - 0x100) ;
+				 * break;
+				 */
 				case 6:
-					output.set(counter, output.get(counter) - 0x100)   ;
-					break;			
+					output.set(counter, output.get(counter) - 0x100);
+					break;
 				case 8:
-					output.set(counter, output.get(counter) - 0x100)   ;
+					output.set(counter, output.get(counter) - 0x100);
 					break;
 				case 11:
 				case 12:
 				case 13:
-					output.set(counter, output.get(counter) - 0x100)   ;
+					output.set(counter, output.get(counter) - 0x100);
 					break;
 				}
-		}
-			} else {
-				throw new Exception("Cannot get an answer");
-			
-			
+			}
+		} else {
+			throw new Exception("Cannot get an answer");
+
 		}
 	}
 
@@ -420,28 +436,33 @@ private void msgToPM500Normalizer(short devType, int[] scaleFactor, ArrayList<In
 				port = Integer.parseInt(args[1]);
 				if (args.length > 2) {
 					dev = Short.parseShort(args[2]);
-					if (args.length > 3) {
-						type = Short.parseShort(args[3]);
-					}
 				}
 			}
 		}
-		RCUAnalyzer rcuan = new RCUAnalyzer(hostname, port, dev, type);
+		RCUAnalyzer rcuan = null;
 		try {
-			while (true) {
-				RCUPacket rcup = rcuan.askDevice();
-				System.out.println(rcup);
-				// showOutput(rcup.getAll());
-
-				Thread.sleep(1000);
+			if (args.length > 3) {
+				rcuan = new RCUAnalyzer(hostname, port, dev, type);
+			} else {
+				rcuan = new RCUAnalyzer(hostname, port, dev);
 			}
-		} catch (InterruptedException ie) {
-			ie.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("from host " + hostname + ":" + port
-					+ " device " + dev);
-		}
+			try {
+				while (true) {
+					RCUPacket rcup = rcuan.askDevice();
+					System.out.println(rcup);
+					// showOutput(rcup.getAll());
 
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("from host " + hostname + ":" + port
+						+ " device " + dev);
+			}
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
 	}
 }
