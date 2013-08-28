@@ -4,12 +4,33 @@ import java.util.ArrayList;
 
 import net.sourceforge.jmodbus.ModbusTCPMaster;
 
+import com.serotonin.modbus4j.ModbusLocator;
+import com.serotonin.modbus4j.code.DataType;
+import com.serotonin.modbus4j.code.RegisterRange;
+import com.serotonin.modbus4j.exception.ErrorResponseException;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
+import com.serotonin.modbus4j.ip.IpParameters;
+import com.serotonin.modbus4j.ip.tcp.TcpMaster;
+
 public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 	protected ModbusTCPMaster mbTCP = null;
 	protected short device = 1;
 	protected short deviceType;
+	protected TcpMaster tm = null;
 
+	
+	public RCUAnalyzer(String host, int port, short device, short type){
+		boolean keepAlive = false;
+		IpParameters ipParam = new IpParameters();
+		ipParam.setHost(host);
+		ipParam.setPort(port);
+		ipParam.setEncapsulated(false);
+		tm = new TcpMaster(ipParam, keepAlive);
+		this.device = device;
+		this.deviceType = type;
+	}
+	/*
 	public RCUAnalyzer(String host, int port, short device, short type) {
 		this.mbTCP = new ModbusTCPMaster(host, port);
 		this.device = device;
@@ -20,13 +41,23 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		}
 
 	}
-
+	*/
+	
+	protected RCUAnalyzer(TcpMaster tm, short device, short type){
+		this.tm = tm;
+		this.device = device;
+		this.deviceType = type;
+	}
+	
+	/*
 	protected RCUAnalyzer(ModbusTCPMaster mtm, short device, short deviceType) {
 		this.mbTCP = mtm;
 		this.device = device;
 		this.deviceType = deviceType;
 	}
-
+	*/
+	
+	
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
 			short device) throws Exception {
 		RCUAnalyzer ra = null;
@@ -61,6 +92,21 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		return know;
 	}
 
+	
+	public static short determineRCUDeviceType(TcpMaster tm, short devnum) throws ErrorResponseException, ModbusTransportException, Exception {
+		short dt = -1;
+		boolean isPM500 = false;
+		boolean isPM700 = false;
+		ModbusLocator devTypePM500Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 64646, DataType.TWO_BYTE_INT_UNSIGNED);
+		ModbusLocator devTypePM700Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 7003, DataType.TWO_BYTE_INT_UNSIGNED);
+		int someValue = (int) tm.getValue(devTypePM500Locator);
+		int someValue2 = (int) tm.getValue(devTypePM700Locator);
+		System.out.println("I got value for PM500 " + someValue);
+		System.out.println("I got value for PM700 " + someValue2);
+		
+		return dt;
+	}
+	/*
 	public static short determineRCUDeviceType(ModbusTCPMaster mbtcp,
 			short devnum) throws Exception {
 		short dt = -1;
@@ -92,6 +138,9 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		return dt;
 
 	}
+	
+	*/
+	
 
 	protected static String showSwitcher(int counter) {
 		String key = null;

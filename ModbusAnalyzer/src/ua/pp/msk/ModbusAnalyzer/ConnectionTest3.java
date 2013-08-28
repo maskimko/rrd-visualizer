@@ -12,6 +12,37 @@ import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public class ConnectionTest3 {
 
+	public static short determineRCUDeviceType(TcpMaster tm, short devnum) throws ModbusTransportException, InterruptedException {
+		short dt = -1;
+		boolean isPM500 = false;
+		boolean isPM700 = false;
+		try {
+		ModbusLocator devTypePM500Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 64646, DataType.TWO_BYTE_INT_UNSIGNED);
+		int someValue = (int) tm.getValue(devTypePM500Locator);
+		System.out.println("I got value for PM500 " + someValue);
+		isPM500 = true;
+		} catch (ErrorResponseException erePM500) {
+			System.out.println("It seems it is not PM500 device");
+		}
+		try {
+		ModbusLocator devTypePM700Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 7003, DataType.TWO_BYTE_INT_UNSIGNED);
+		int someValue2 = (int) tm.getValue(devTypePM700Locator);
+		System.out.println("I got value for PM700 " + someValue2);
+		isPM700 = true;
+		} catch (ErrorResponseException erePM700) {
+			System.out.println("It seems it is not PM700 device");
+		}
+		if (isPM500) {
+			dt = 0;
+		} else 
+			if (isPM700) {
+				dt = 1;
+			}
+		Thread.sleep(10);
+		return dt;
+	}
+	
+	
 	/**
 	 * @param args
 	 */
@@ -26,6 +57,8 @@ public class ConnectionTest3 {
 		ipParm.setEncapsulated(false);
 
 		TcpMaster tm = new TcpMaster(ipParm, keepAlive);
+		tm.setTimeout(500);
+		
 		ModbusLocator currentScaleLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4104,
 				DataType.TWO_BYTE_INT_SIGNED);
@@ -87,7 +120,9 @@ public class ConnectionTest3 {
 			return;
 		}
 		try {
-			while (true) {
+			short dt = determineRCUDeviceType(tm, (short) 2);
+			System.out.println("Device type is " + dt);
+			for (int i = 0; i < 10; i++) {
 				int realPowerValue = (int) tm.getValue(realPowerLocator);
 				int powerFactorValue = (int) tm.getValue(powerFactorLocator);
 				short powerScale = (short) tm.getValue(powerScaleLocator);
@@ -101,18 +136,22 @@ public class ConnectionTest3 {
 						voltageScale));
 				float currentA = (float) (currentAValue * Math.pow(10,
 						currentScale));
-				float powerFactor = (float) (powerFactorValue * Math.pow(10, powerScale));
-				System.out.println("Real Power  " + realPower);
-				System.out.println("Voltage AB " + voltageAB);
-				System.out.println("Current A " + currentA);
-				System.out.println("Power Factor "+ powerFactor);
+				float powerFactor = (float) (powerFactorValue * RCUPM700Analyzer.powerFactorScale);
+				System.out.println("Real Power  " + realPower );
+				System.out.println("Voltage AB " + voltageAB );
+				System.out.println("Current A " + currentA );
+				System.out.println("Power Factor "+ powerFactor );
+				Thread.sleep(1000);
 			}
 
 		} catch (ModbusTransportException mte) {
 			mte.printStackTrace();
 		} catch (ErrorResponseException ere) {
 			ere.printStackTrace();
-		} finally {
+		} catch (InterruptedException ie) {
+			System.out.println("Thread has been inerrupted");
+		}
+		finally {
 			tm.destroy();
 		}
 
