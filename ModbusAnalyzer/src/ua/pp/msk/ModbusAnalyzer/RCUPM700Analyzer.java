@@ -1,18 +1,17 @@
 package ua.pp.msk.ModbusAnalyzer;
 
-import java.util.ArrayList;
-
-import net.sourceforge.jmodbus.ModbusTCPMaster;
-
 import com.serotonin.modbus4j.ModbusLocator;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
+import com.serotonin.modbus4j.exception.ErrorResponseException;
+import com.serotonin.modbus4j.exception.ModbusInitException;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public class RCUPM700Analyzer extends RCUAnalyzer  {
 
-	public static float powerFactorScale = -3;
-	public static float frequencyScale = -1;
+	public static float powerFactorScale = -4;
+	public static float frequencyScale = -2;
 	
 	ModbusLocator currentScaleLocator = null;
 	ModbusLocator voltageScaleLocator = null;
@@ -51,68 +50,69 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	
 	private void setUpLocators(){
 		short devNum = this.device;
-		ModbusLocator currentScaleLocator = new ModbusLocator(devNum,
+		currentScaleLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4104,
 				DataType.TWO_BYTE_INT_SIGNED);
-		ModbusLocator voltageScaleLocator = new ModbusLocator(devNum,
+		voltageScaleLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4105,
 				DataType.TWO_BYTE_INT_SIGNED);
-		ModbusLocator powerScaleLocator = new ModbusLocator(devNum,
+		powerScaleLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4106,
 				DataType.TWO_BYTE_INT_SIGNED);
-		ModbusLocator realPowerLocator = new ModbusLocator(devNum,
+		realPowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4005,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator apparentPowerLocator = new ModbusLocator(devNum,
+		apparentPowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4006,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator reactivePowerLocator = new ModbusLocator(devNum,
+		reactivePowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4007,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator powerFactorLocator = new ModbusLocator(devNum,
+		powerFactorLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4008,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator frequencyLocator = new ModbusLocator(devNum,
+		frequencyLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4012,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorA = new ModbusLocator(devNum,
+		currentLocatorA = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4019,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorB = new ModbusLocator(devNum,
+		currentLocatorB = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4020,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorC = new ModbusLocator(devNum,
+		currentLocatorC = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4021,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorN = new ModbusLocator(devNum,
+		currentLocatorN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4022,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorAB = new ModbusLocator(devNum,
+		voltageLocatorAB = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4029,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorBC = new ModbusLocator(devNum,
+		voltageLocatorBC = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4030,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorCA = new ModbusLocator(devNum,
+		voltageLocatorCA = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4031,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorAN = new ModbusLocator(devNum,
+		voltageLocatorAN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4032,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorBN = new ModbusLocator(devNum,
+		voltageLocatorBN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4032,
 				DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorCN = new ModbusLocator(devNum,
+		voltageLocatorCN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4034,
 				DataType.TWO_BYTE_INT_UNSIGNED);
 	}
 	
 	
 	
+	
 
 	
-	public RCUPacketFloat askDevice() throws Exception{
-		return askDevice(this.tm, this.device);
+	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException{
+		return askDevice(tm, device);
 	}
 	
 	/**
@@ -124,10 +124,54 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	 * @return RCUPacket object with measurements data
 	 * @throws Exception
 	 */
-	public RCUPacketFloat askDevice(ModbusTCPMaster mtm, short device)
-			throws Exception {
-
-		
+	public RCUPacketFloat askDevice(TcpMaster mtm, short device)
+			throws ModbusInitException, ErrorResponseException, ModbusTransportException {
+		setUpLocators();
+		if (!tm.isInitialized()) {
+			tm.init();
+		}
+		short powerScale = (short) tm.getValue(powerScaleLocator);
+		short currentScale = (short) tm.getValue(currentScaleLocator);
+		short voltageScale = (short) tm.getValue(voltageScaleLocator);
+		int realPowerValue = (int) mtm.getValue(realPowerLocator);
+		int apparentPowerValue = (int) mtm.getValue(apparentPowerLocator);
+		int reactivePowerValue = (int) mtm.getValue(reactivePowerLocator);
+		int powerFactorValue = (int) mtm.getValue(powerFactorLocator);
+		int frequencyValue = (int) mtm.getValue(frequencyLocator);
+		int currentValueA = (int) mtm.getValue(currentLocatorA);
+		int currentValueB = (int) mtm.getValue(currentLocatorB);
+		int currentValueC = (int) mtm.getValue(currentLocatorC);
+		int currentValueN = (int) mtm.getValue(currentLocatorN);
+		int voltageValueAB = (int) mtm.getValue(voltageLocatorAB);
+		int voltageValueBC = (int) mtm.getValue(voltageLocatorBC);
+		int voltageValueCA = (int) mtm.getValue(voltageLocatorCA);
+		int voltageValueAN = (int) mtm.getValue(voltageLocatorAN);
+		int voltageValueBN = (int) mtm.getValue(voltageLocatorBN);
+		int voltageValueCN = (int) mtm.getValue(voltageLocatorCN);
+		float realPower = (float) (realPowerValue * Math.pow(10, powerScale));
+		float apparentPower = (float) (apparentPowerValue * Math.pow(10,
+				powerScale));
+		float reactivePower = (float) (reactivePowerValue * Math.pow(10,
+				powerScale));
+		float powerFactor = (float) (powerFactorValue * Math.pow(10,
+				powerFactorScale));
+		float currentA = (float) (currentValueA * Math.pow(10, currentScale));
+		float currentB = (float) (currentValueB * Math.pow(10, currentScale));
+		float currentC = (float) (currentValueC * Math.pow(10, currentScale));
+		float currentN = (float) (currentValueN * Math.pow(10, currentScale));
+		float voltageAB = (float) (voltageValueAB * Math.pow(10, voltageScale));
+		float voltageBC = (float) (voltageValueBC * Math.pow(10, voltageScale));
+		float voltageCA = (float) (voltageValueCA * Math.pow(10, voltageScale));
+		float voltageAN = (float) (voltageValueAN * Math.pow(10, voltageScale));
+		float voltageBN = (float) (voltageValueBN * Math.pow(10, voltageScale));
+		float voltageCN = (float) (voltageValueCN * Math.pow(10, voltageScale));
+		float frequency = (float) (frequencyValue * Math
+				.pow(10, frequencyScale));
+		float[] toPack = new float[] { currentA, currentB, currentC, currentN,
+				voltageAB, voltageBC, voltageCA, voltageAN, voltageBN,
+				voltageCN, frequency, realPower, reactivePower, apparentPower,
+				powerFactor };
+		RCUPacketFloat rcup = new RCUPacketFloat(toPack);
 		return rcup;
 	}
 	

@@ -1,12 +1,11 @@
 package ua.pp.msk.ModbusAnalyzer;
 
-import java.util.ArrayList;
-
-import net.sourceforge.jmodbus.ModbusTCPMaster;
-
 import com.serotonin.modbus4j.ModbusLocator;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
+import com.serotonin.modbus4j.exception.ErrorResponseException;
+import com.serotonin.modbus4j.exception.ModbusInitException;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public class RCUPM500Analyzer extends RCUAnalyzer {
@@ -15,7 +14,7 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 	public static float voltageScale = -2;
 	public static float powerScale = -2;
 	public static float powerFactorScale = -3;
-	public static float frequencyScale = -1;
+	public static float frequencyScale = -2;
 
 	private ModbusLocator realPowerLocator = null;
 	private ModbusLocator apparentPowerLocator = null;
@@ -45,53 +44,58 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 
 	private void setUpLocators() {
 		short devNum = this.device;
-		ModbusLocator realPowerLocator = new ModbusLocator(devNum,
+		realPowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 790,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator apparentPowerLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 792,
-				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator reactivePowerLocator = new ModbusLocator(devNum,
+		apparentPowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 794,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator powerFactorLocator = new ModbusLocator(devNum,
+		reactivePowerLocator = new ModbusLocator(devNum,
+				RegisterRange.HOLDING_REGISTER, 792,
+				DataType.FOUR_BYTE_INT_UNSIGNED);
+		powerFactorLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 870,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator frequencyLocator = new ModbusLocator(devNum,
+		frequencyLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 788,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorA = new ModbusLocator(devNum,
+		currentLocatorA = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 768,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorB = new ModbusLocator(devNum,
+		currentLocatorB = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 770,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorC = new ModbusLocator(devNum,
+		currentLocatorC = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 772,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator currentLocatorN = new ModbusLocator(devNum,
+		currentLocatorN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 774,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorAB = new ModbusLocator(devNum,
+		voltageLocatorAB = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 776,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorBC = new ModbusLocator(devNum,
+		voltageLocatorBC = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 778,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorCA = new ModbusLocator(devNum,
+		voltageLocatorCA = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 780,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorAN = new ModbusLocator(devNum,
+		voltageLocatorAN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 782,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorBN = new ModbusLocator(devNum,
+		voltageLocatorBN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 784,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
-		ModbusLocator voltageLocatorCN = new ModbusLocator(devNum,
+		voltageLocatorCN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 786,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
 	}
 
+	
+	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException {
+		return askDevice(tm, device);
+	}
+	
 	/**
 	 * 
 	 * @param host
@@ -105,8 +109,10 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 	 */
 
 	public RCUPacketFloat askDevice(TcpMaster mtm, short device)
-			throws Exception {
-
+			throws  ModbusInitException, ErrorResponseException, ModbusTransportException {
+		if (!tm.isInitialized()) {
+			tm.init();
+		}
 		setUpLocators();
 		long realPowerValue = (long) mtm.getValue(realPowerLocator);
 		long apparentPowerValue = (long) mtm.getValue(apparentPowerLocator);
