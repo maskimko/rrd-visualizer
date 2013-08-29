@@ -13,20 +13,20 @@ public  class RCUPacketGenerator {
 	private static final int powerFactor = 800;
 	
 	
-	public static RCUPacket getZeroPacket(){
-		int[] stats = new int[RCUPacket.units];
+	public static RCUPacketFloat getZeroPacket(){
+		int[] stats = new int[RCUPacketFloat.units];
 		for (int i = 0; i < stats.length; i++) {
 			stats[i] = 0;
 		}
-		RCUPacket rcup = new RCUPacket(stats, RCUAnalyzer.PM500);
+		RCUPacketFloat rcup = new RCUPacketFloat(stats, RCUAnalyzer.PM500);
 		return rcup;
 	}
 	
-	public static RCUPacket genPacket(){
+	public static RCUPacketFloat genPacket(){
 		//Generating RCU Packet
 		int multiplyer = 0;
-		int[] toPack = new int[RCUPacket.units];
-		for (int i = 0; i < RCUPacket.units; i++){
+		int[] toPack = new int[RCUPacketFloat.units];
+		for (int i = 0; i < RCUPacketFloat.units; i++){
 			switch (i) {
 			case 0: 
 			case 1:
@@ -64,7 +64,7 @@ public  class RCUPacketGenerator {
 			}
 			toPack[i] = multiplyer;
 		}
-		RCUPacket rp = new RCUPacket(toPack, RCUAnalyzer.PM500);
+		RCUPacketFloat rp = new RCUPacketFloat(toPack, RCUAnalyzer.PM500);
 		return rp;
 	}
 }

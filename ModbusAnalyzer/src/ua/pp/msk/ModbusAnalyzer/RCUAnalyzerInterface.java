@@ -1,15 +1,15 @@
 package ua.pp.msk.ModbusAnalyzer;
 
-import net.sourceforge.jmodbus.ModbusTCPMaster;
+import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public interface RCUAnalyzerInterface {
 
 	public static final short PM500 = 0;
 	public static final short PM700 = 1;
 	
-	public RCUPacket askDevice() throws Exception;
+	public RCUPacketFloat askDevice() throws Exception;
 	
-	public RCUPacket askDevice(ModbusTCPMaster mtm, short device) throws IllegalArgumentException, Exception;
+	public RCUPacketFloat askDevice(TcpMaster mtm, short device) throws IllegalArgumentException, Exception;
 	
 	
 	

@@ -1,7 +1,7 @@
 package ua.pp.msk.SNMPAgent;
 
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
-import ua.pp.msk.ModbusAnalyzer.RCUPacket;
+import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketGenerator;
 
 public class RCUDevice {
@@ -19,11 +19,11 @@ public class RCUDevice {
 	private short modbusDeviceNumber;
 	private String description;
 	private String ipAddress;
-	private RCUPacket pack;
+	private RCUPacketFloat pack;
 
 	
 	
-	public RCUDevice(int city, String descr, String ipAddress, int port, short modbusDeviceNumber,  RCUPacket pack) {
+	public RCUDevice(int city, String descr, String ipAddress, int port, short modbusDeviceNumber,  RCUPacketFloat pack) {
 		this.city = city;
 		this.description = descr;
 		this.ipAddress = ipAddress;
@@ -59,7 +59,7 @@ public class RCUDevice {
 		return pack.getAll();
 	}
 	
-	public RCUPacket getRCUPacket(){
+	public RCUPacketFloat getRCUPacket(){
 		return pack;
 	}
 	

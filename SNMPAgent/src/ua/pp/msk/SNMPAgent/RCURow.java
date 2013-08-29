@@ -8,7 +8,7 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
-import ua.pp.msk.ModbusAnalyzer.RCUPacket;
+import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 
 public class RCURow extends DefaultMOMutableRow2PC {
 
@@ -60,7 +60,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		Runnable cooldowner = new CoolDown(60000);
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
-		RCUPacket rcuPack = rcuAnalyzer.askDevice();
+		RCUPacketFloat rcuPack = rcuAnalyzer.askDevice();
 		return rcuPack.getAll();
 	}
 

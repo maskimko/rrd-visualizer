@@ -14,7 +14,7 @@ import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.Variable;
 
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
-import ua.pp.msk.ModbusAnalyzer.RCUPacket;
+import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 
 public class RCUTable extends DefaultMOTable {
 
@@ -76,7 +76,7 @@ public class RCUTable extends DefaultMOTable {
 		MOTableSubIndex[] subIndexes = new MOTableSubIndex[] { new MOTableSubIndex(
 				SMIConstants.SYNTAX_GAUGE32) };
 		MOTableIndex indexDef = new MOTableIndex(subIndexes, false);
-		MOColumn[] columns = new MOColumn[RCUPacket.units + 3];
+		MOColumn[] columns = new MOColumn[RCUPacketFloat.units + 3];
 		int c = 0;
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_ONLY); //Description
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_IPADDRESS, MOAccessImpl.ACCESS_READ_ONLY); //IP address of a device

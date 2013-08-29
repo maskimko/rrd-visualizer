@@ -8,7 +8,7 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 
-import ua.pp.msk.ModbusAnalyzer.RCUPacket;
+import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 
 public class RCUModelFactory {
 	

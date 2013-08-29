@@ -14,14 +14,14 @@ import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
-	protected ModbusTCPMaster mbTCP = null;
+
 	protected short device = 1;
 	protected short deviceType;
 	protected TcpMaster tm = null;
 
 	
 	public RCUAnalyzer(String host, int port, short device, short type){
-		boolean keepAlive = false;
+		boolean keepAlive = true;
 		IpParameters ipParam = new IpParameters();
 		ipParam.setHost(host);
 		ipParam.setPort(port);
@@ -30,18 +30,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		this.device = device;
 		this.deviceType = type;
 	}
-	/*
-	public RCUAnalyzer(String host, int port, short device, short type) {
-		this.mbTCP = new ModbusTCPMaster(host, port);
-		this.device = device;
-		this.deviceType = type;
-		if (!checkDevType()) {
-			System.err
-					.println("Warning: There is already implemented class for this device type");
-		}
-
-	}
-	*/
+	
 	
 	protected RCUAnalyzer(TcpMaster tm, short device, short type){
 		this.tm = tm;
@@ -49,20 +38,19 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		this.deviceType = type;
 	}
 	
-	/*
-	protected RCUAnalyzer(ModbusTCPMaster mtm, short device, short deviceType) {
-		this.mbTCP = mtm;
-		this.device = device;
-		this.deviceType = deviceType;
-	}
-	*/
+
 	
 	
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
 			short device) throws Exception {
 		RCUAnalyzer ra = null;
-
-		ModbusTCPMaster mtm = new ModbusTCPMaster(hostname, port);
+		boolean keepAlive = true;
+		IpParameters ipParm = new IpParameters();
+		ipParm.setHost(hostname);
+		ipParm.setPort(port);
+		ipParm.setEncapsulated(false);
+		
+		TcpMaster mtm = new TcpMaster(ipParm, keepAlive);
 		short type = determineRCUDeviceType(mtm, device);
 		switch (type) {
 		case PM500:
@@ -93,53 +81,40 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	}
 
 	
-	public static short determineRCUDeviceType(TcpMaster tm, short devnum) throws ErrorResponseException, ModbusTransportException, Exception {
+	public static short determineRCUDeviceType(TcpMaster tm, short devnum)
+			throws ModbusTransportException, InterruptedException {
 		short dt = -1;
 		boolean isPM500 = false;
 		boolean isPM700 = false;
-		ModbusLocator devTypePM500Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 64646, DataType.TWO_BYTE_INT_UNSIGNED);
-		ModbusLocator devTypePM700Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 7003, DataType.TWO_BYTE_INT_UNSIGNED);
-		int someValue = (int) tm.getValue(devTypePM500Locator);
-		int someValue2 = (int) tm.getValue(devTypePM700Locator);
-		System.out.println("I got value for PM500 " + someValue);
-		System.out.println("I got value for PM700 " + someValue2);
-		
-		return dt;
-	}
-	/*
-	public static short determineRCUDeviceType(ModbusTCPMaster mbtcp,
-			short devnum) throws Exception {
-		short dt = -1;
-		boolean isPM500 = false;
-		boolean isPM700 = false;
-		// Trying to ask PM500 device
-		int[] devPM500check = new int[4];
-		mbtcp.readMultipleRegisters(devnum, 64646, devPM500check.length, 0,
-				devPM500check);
-		if (devPM500check[0] == 256 && devPM500check[1] == 50980
-				&& devPM500check[2] == 0 && devPM500check[3] == 1) {
+		try {
+			ModbusLocator devTypePM500Locator = new ModbusLocator(devnum,
+					RegisterRange.HOLDING_REGISTER, 64647,
+					DataType.TWO_BYTE_INT_UNSIGNED);
+			int idPM500 = (int) tm.getValue(devTypePM500Locator);
+			System.out.println("This is PM500 device id:" + idPM500);
 			isPM500 = true;
+		} catch (ErrorResponseException erePM500) {
+			
 		}
-		int[] devPM700check = new int[2];
-		mbtcp.readMultipleRegisters(devnum, 7003, devPM700check.length, 0,
-				devPM700check);
-		if (devPM700check[0] == 15165) {
+		try {
+			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
+					RegisterRange.HOLDING_REGISTER, 7003,
+					DataType.TWO_BYTE_INT_UNSIGNED);
+			int idPM700 = (int) tm.getValue(devTypePM700Locator);
+			System.out.println("This is PM700 device id:" + idPM700);
 			isPM700 = true;
+		} catch (ErrorResponseException erePM700) {
+			
 		}
 		if (isPM500) {
-			dt = RCUAnalyzer.PM500;
-			System.out.println("Modbus device number devnum is PM500");
+			dt = 0;
 		} else if (isPM700) {
-			dt = RCUAnalyzer.PM700;
-			System.out.println("Modbus device number devnum is PM700");
-		} else {
-			throw new Exception("I cannot determine device type!");
+			dt = 1;
 		}
+		Thread.sleep(10);
 		return dt;
-
 	}
-	
-	*/
+
 	
 
 	protected static String showSwitcher(int counter) {
@@ -237,40 +212,29 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		showOutputFloat(toShow);
 	}
 
-	protected static boolean fallChecker(ArrayList<Integer> arr) {
-		boolean isFalled = true;
-		int fallVal = 256;
-		for (int val : arr) {
-			if (val != fallVal) {
-				return false;
-			}
-		}
-		return isFalled;
-	}
+	
 
-	public RCUPacket askDevice() throws Exception {
-		return this.askDevice(mbTCP, this.device);
+	public RCUPacketFloat askDevice() throws Exception {
+		return this.askDevice(tm, this.device);
 	}
 
 	/**
 	 * 
-	 * @param host
-	 *            Provides a host ip address
-	 * @param port
-	 *            Provides a host ip port
+	 * @param mtm
+	 * 			Provides a Modbus TCP Master class object
 	 * @param device
 	 *            Provides a modbus device number
 	 * 
 	 * @return Returns object of RCUPacket class with all gathered information
-	 *         about polled device
+	 *         from polled device
 	 */
-	public abstract RCUPacket askDevice(ModbusTCPMaster mtm, short device)
+	public abstract RCUPacketFloat askDevice(TcpMaster mtm, short device)
 			throws Exception;
 
 	public void stop() {
-		if (mbTCP != null) {
+		if (tm != null) {
 
-			mbTCP = null;
+			tm = null;
 		}
 	}
 
@@ -292,15 +256,14 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 				dev = Short.parseShort(args[2]);
 				type = Short.parseShort(args[3]);
-				ModbusTCPMaster mbMstr = new ModbusTCPMaster(hostname, port);
 				RCUAnalyzer rcuan = new RCUAnalyzer(hostname, port, dev, type) {
 
 					private boolean isAsked = false;
 					short devT = -1;
 
-					public RCUPacket askDevice(ModbusTCPMaster mbMstr, short dev)
+					public RCUPacketFloat askDevice(TcpMaster mbMstr, short dev)
 							throws Exception {
-						RCUPacket rcuPack = null;
+						RCUPacketFloat rcuPack = null;
 
 						if (!isAsked) {
 							devT = determineRCUDeviceType(mbMstr, dev);
@@ -313,14 +276,14 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 							}
 						}
 						switch (devT) {
-						case 0:
+						case PM500:
 							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(
-									this.mbTCP, dev);
+									this.tm, dev);
 							rcuPack = rcuPM500An.askDevice();
 							break;
-						case 1:
+						case PM700:
 							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(
-									this.mbTCP, dev);
+									this.tm, dev);
 							rcuPack = rcuPM700An.askDevice();
 							break;
 						default:
@@ -332,7 +295,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 				};
 
 				while (true) {
-					RCUPacket rcup = rcuan.askDevice();
+					RCUPacketFloat rcup = rcuan.askDevice();
 					System.out.println(rcup);
 					// showOutput(rcup.getAll());
 

@@ -28,21 +28,21 @@ public class ConnectionTest4 {
 			ModbusLocator devTypePM500Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 64647,
 					DataType.TWO_BYTE_INT_UNSIGNED);
-			int someValue = (int) tm.getValue(devTypePM500Locator);
-			System.out.println("I got value for PM500 " + someValue);
+			int idPM500 = (int) tm.getValue(devTypePM500Locator);
+			System.out.println("This is PM500 device id:" + idPM500);
 			isPM500 = true;
 		} catch (ErrorResponseException erePM500) {
-			System.out.println("It seems it is not PM500 device");
+			
 		}
 		try {
 			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 7003,
 					DataType.TWO_BYTE_INT_UNSIGNED);
-			int someValue2 = (int) tm.getValue(devTypePM700Locator);
-			System.out.println("I got value for PM700 " + someValue2);
+			int idPM700 = (int) tm.getValue(devTypePM700Locator);
+			System.out.println("This is PM700 device id:" + idPM700);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
-			System.out.println("It seems it is not PM700 device");
+			
 		}
 		if (isPM500) {
 			dt = 0;
@@ -62,7 +62,7 @@ public class ConnectionTest4 {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		boolean keepAlive = false; // We don't keep alive TCP connection
+		boolean keepAlive = true; // We don't keep alive TCP connection
 		int devNum = 2;
 		ModbusFactory factory = new ModbusFactory();
 		IpParameters ipParm = new IpParameters();

@@ -12,35 +12,7 @@ import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public class ConnectionTest3 {
 
-	public static short determineRCUDeviceType(TcpMaster tm, short devnum) throws ModbusTransportException, InterruptedException {
-		short dt = -1;
-		boolean isPM500 = false;
-		boolean isPM700 = false;
-		try {
-		ModbusLocator devTypePM500Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 64646, DataType.TWO_BYTE_INT_UNSIGNED);
-		int someValue = (int) tm.getValue(devTypePM500Locator);
-		System.out.println("I got value for PM500 " + someValue);
-		isPM500 = true;
-		} catch (ErrorResponseException erePM500) {
-			System.out.println("It seems it is not PM500 device");
-		}
-		try {
-		ModbusLocator devTypePM700Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 7003, DataType.TWO_BYTE_INT_UNSIGNED);
-		int someValue2 = (int) tm.getValue(devTypePM700Locator);
-		System.out.println("I got value for PM700 " + someValue2);
-		isPM700 = true;
-		} catch (ErrorResponseException erePM700) {
-			System.out.println("It seems it is not PM700 device");
-		}
-		if (isPM500) {
-			dt = 0;
-		} else 
-			if (isPM700) {
-				dt = 1;
-			}
-		Thread.sleep(10);
-		return dt;
-	}
+
 	
 	
 	/**
@@ -120,7 +92,7 @@ public class ConnectionTest3 {
 			return;
 		}
 		try {
-			short dt = determineRCUDeviceType(tm, (short) 2);
+			short dt = ConnectionTest4.determineRCUDeviceType(tm, (short) 2);
 			System.out.println("Device type is " + dt);
 			for (int i = 0; i < 10; i++) {
 				int realPowerValue = (int) tm.getValue(realPowerLocator);
