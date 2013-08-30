@@ -12,37 +12,43 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
-
-
+	protected String ip = null;
+	protected int port = 0;
 	protected short device = 1;
 	protected short deviceType;
 	protected TcpMaster tm = null;
 
 	
 	public RCUAnalyzer(String host, int port, short device, short type){
+		this.ip = host;
+		this.port = port;
 		boolean keepAlive = true;
 		IpParameters ipParam = new IpParameters();
 		ipParam.setHost(host);
 		ipParam.setPort(port);
 		ipParam.setEncapsulated(false);
 		tm = new TcpMaster(ipParam, keepAlive);
-		
+		tm.setTimeout(1500);
 		this.device = device;
 		this.deviceType = type;
 	}
 	
-	
-	protected RCUAnalyzer(TcpMaster tm, short device, short type){
-		this.tm = tm;
-		this.device = device;
-		this.deviceType = type;
-	}
 	
 
+	public short getModbusDeviceNumber(){
+		return this.device;
+	}
 	
+	public String getIpAddress(){
+		return ip;
+	}
+	
+	public int getPort(){
+		return port;
+	}
 	
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
-			short device) throws ModbusInitException, Exception {
+			short device) throws ModbusInitException, InterruptedException, ModbusTransportException, Exception {
 		RCUAnalyzer ra = null;
 		boolean keepAlive = true;
 		IpParameters ipParm = new IpParameters();
@@ -50,15 +56,16 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		ipParm.setPort(port);
 		ipParm.setEncapsulated(false);
 		
+		
 		TcpMaster mtm = new TcpMaster(ipParm, keepAlive);
 		mtm.init();
 		short type = determineRCUDeviceType(mtm, device);
 		switch (type) {
 		case PM500:
-			ra = new RCUPM500Analyzer(mtm, device);
+			ra = new RCUPM500Analyzer(hostname, port, device);
 			break;
 		case PM700:
-			ra = new RCUPM700Analyzer(mtm, device);
+			ra = new RCUPM700Analyzer(hostname, port, device);
 			break;
 		default:
 			throw new Exception(
@@ -106,6 +113,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			dt = 1;
 		}
 		Thread.sleep(10);
+		tm.destroy();
 		return dt;
 	}
 
@@ -255,7 +263,8 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 					private boolean isAsked = false;
 					short devT = -1;
-
+					
+					
 					public RCUPacketFloat askDevice(TcpMaster mbMstr, short dev)
 							throws Exception {
 						RCUPacketFloat rcuPack = null;
@@ -272,13 +281,11 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 						}
 						switch (devT) {
 						case PM500:
-							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(
-									this.tm, dev);
+							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(ip, port, dev);
 							rcuPack = rcuPM500An.askDevice();
 							break;
 						case PM700:
-							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(
-									this.tm, dev);
+							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(ip, port, dev);
 							rcuPack = rcuPM700An.askDevice();
 							break;
 						default:

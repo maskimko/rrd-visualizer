@@ -10,6 +10,9 @@ import org.snmp4j.smi.Variable;
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 
+import com.serotonin.modbus4j.exception.ModbusInitException;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
+
 public class RCURow extends DefaultMOMutableRow2PC {
 
 	private boolean canUpdate = true;
@@ -30,9 +33,22 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		try {
 			rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
 					modbusDevice);
-		} catch (Exception exc) {
+		} catch (ModbusInitException exc) {
+			System.err.println("Error: Cannot init Modbus TCP session\n" + exc.getMessage());
+			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
+			rcuAnalyzer = null;
+		} catch (InterruptedException ie) {
+			System.err.println("Error: Device Determination has been interrupted\n" + ie.getMessage());
+			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
+			rcuAnalyzer = null;
+		} catch (ModbusTransportException mte) {
+			System.err.println("Error: Cannot create TCP session. Check you network connection\n" + mte.getMessage());
+			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
+			rcuAnalyzer = null;
+		}catch (Exception e){
 				//We could not determine device type above
 			System.err.println("Unknown type of RCU device");
+			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
 			rcuAnalyzer = null;
 		}
 	}
@@ -61,7 +77,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
 		RCUPacketFloat rcuPack = rcuAnalyzer.askDevice();
-		return rcuPack.getAll();
+		return rcuPack.getAllInteger();
 	}
 
 	private Variable[] getStatsArray() throws Exception {

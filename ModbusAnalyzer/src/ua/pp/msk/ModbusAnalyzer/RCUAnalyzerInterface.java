@@ -11,6 +11,9 @@ public interface RCUAnalyzerInterface {
 	
 	public RCUPacketFloat askDevice(TcpMaster mtm, short device) throws IllegalArgumentException, Exception;
 	
+	public String getIpAddress();
+	public int getPort();
+	public short getModbusDeviceNumber();
 	
 	
 	public void stop();

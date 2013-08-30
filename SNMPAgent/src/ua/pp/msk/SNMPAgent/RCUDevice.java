@@ -33,6 +33,7 @@ public class RCUDevice {
 		this.pack = pack;
 	}
 	
+	
 	public int getCity(){
 		return city;
 	}
@@ -56,7 +57,7 @@ public class RCUDevice {
 
 	
 	public int[] getRCUStats(){
-		return pack.getAll();
+		return pack.getAllInteger();
 	}
 	
 	public RCUPacketFloat getRCUPacket(){

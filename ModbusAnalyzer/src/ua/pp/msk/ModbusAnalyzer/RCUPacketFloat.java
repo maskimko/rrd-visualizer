@@ -197,6 +197,26 @@ public class RCUPacketFloat {
 				freq, p, q, s, powerFactor };
 		return retArray;
 	}
+	
+	public int[] getAllInteger(){
+		int[] retArray = new int[] {(int) i1 * 1000,
+				(int) i2 * 1000,
+				(int) i3 * 1000,
+				(int) in * 1000,
+				(int) u12 * 100,
+				(int) u23 * 100,
+				(int) u31 * 100,
+				(int) u1n * 100,
+				(int) u2n * 100,
+				(int) u3n * 100,
+				(int) freq * 100,
+				(int) u12 * 100,
+				(int) p * 1000,
+				(int) q * 1000,
+				(int) s * 1000,
+				(int) powerFactor * 1000};
+		return retArray;
+	}
 
 	public String toString() {
 		

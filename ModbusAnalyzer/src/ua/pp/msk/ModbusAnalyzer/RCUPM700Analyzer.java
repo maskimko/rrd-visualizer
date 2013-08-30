@@ -42,11 +42,11 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	
 	
 	
-	
+	/*
 	public RCUPM700Analyzer(TcpMaster mtm, short device){
 		super(mtm, device, PM700);
 	}
-	
+	*/
 	
 	private void setUpLocators(){
 		short devNum = this.device;

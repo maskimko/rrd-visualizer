@@ -36,10 +36,11 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 		super(host, port, device, PM500);
 	}
 
+	/*
 	public RCUPM500Analyzer(TcpMaster tm, short device) {
 		super(tm, device, PM500);
 	}
-
+*/
 	
 
 	private void setUpLocators() {
