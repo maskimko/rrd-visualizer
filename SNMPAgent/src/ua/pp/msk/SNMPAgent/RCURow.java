@@ -29,28 +29,8 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		ipAddress = rcuDev.getIpAddress();
 		port = rcuDev.getPort();
 		modbusDevice = (short) rcuDev.getModbusDeviceNumber();
-
-		try {
-			rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
-					modbusDevice);
-		} catch (ModbusInitException exc) {
-			System.err.println("Error: Cannot init Modbus TCP session\n" + exc.getMessage());
-			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
-			rcuAnalyzer = null;
-		} catch (InterruptedException ie) {
-			System.err.println("Error: Device Determination has been interrupted\n" + ie.getMessage());
-			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
-			rcuAnalyzer = null;
-		} catch (ModbusTransportException mte) {
-			System.err.println("Error: Cannot create TCP session. Check you network connection\n" + mte.getMessage());
-			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
-			rcuAnalyzer = null;
-		}catch (Exception e){
-				//We could not determine device type above
-			System.err.println("Unknown type of RCU device");
-			System.err.println("Device " + ipAddress + ":" + port + "/" + modbusDevice);
-			rcuAnalyzer = null;
-		}
+		rcuAnalyzer = rcuDev.getRCUAnalyzer();
+		
 	}
 
 	private static OID makeOID(RCUDevice rcud) {

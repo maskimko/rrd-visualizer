@@ -14,8 +14,7 @@ public interface RCUAnalyzerInterface {
 	public String getIpAddress();
 	public int getPort();
 	public short getModbusDeviceNumber();
-	
-	
+	public short getDeviceType();
 	public void stop();
 	
 }

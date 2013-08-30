@@ -42,7 +42,7 @@ public class ModbusAgent extends BaseAgent {
 
 	static {
 		 LogFactory.setLogFactory(new Log4jLogFactory());
-		 LogFactory.getLogFactory().getRootLogger().setLogLevel(LogLevel.ERROR);
+		 LogFactory.getLogFactory().getRootLogger().setLogLevel(LogLevel.DEBUG);
 	}
 	
 	protected String address;

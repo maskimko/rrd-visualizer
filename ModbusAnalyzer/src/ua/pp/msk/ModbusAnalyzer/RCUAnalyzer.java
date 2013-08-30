@@ -47,6 +47,26 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		return port;
 	}
 	
+	public short getDeviceType(){
+		return this.deviceType;
+	}
+	
+	public static String getDeviceTypeAsString(short deviceType){
+		String dt = null;
+		switch (deviceType) {
+		case PM500:
+			dt = "PM500";
+			break;
+		case PM700:
+			dt = "PM700";
+			break;
+			default:
+				dt = "Unknown";
+				break;
+		}
+		return dt;
+	}
+	
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
 			short device) throws ModbusInitException, InterruptedException, ModbusTransportException, Exception {
 		RCUAnalyzer ra = null;
@@ -92,7 +112,6 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			}
 
 			int idPM500 = (int) tm.getValue(devTypePM500Locator);
-			System.out.println("This is PM500 device id:" + idPM500);
 			isPM500 = true;
 		} catch (ErrorResponseException erePM500) {
 			
@@ -102,7 +121,6 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 					RegisterRange.HOLDING_REGISTER, 7003,
 					DataType.TWO_BYTE_INT_UNSIGNED);
 			int idPM700 = (int) tm.getValue(devTypePM700Locator);
-			System.out.println("This is PM700 device id:" + idPM700);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
 			
