@@ -210,7 +210,6 @@ public class RCUPacketFloat {
 				(int) u2n * 100,
 				(int) u3n * 100,
 				(int) freq * 100,
-				(int) u12 * 100,
 				(int) p * 1000,
 				(int) q * 1000,
 				(int) s * 1000,
