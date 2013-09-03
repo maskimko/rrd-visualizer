@@ -49,7 +49,7 @@ public class ModbusAgent extends BaseAgent {
 	
 	public ModbusAgent(File bootCounterFile, File configFile) throws IOException{
 		super(bootCounterFile, configFile, new CommandProcessor(new OctetString(MPv3.createLocalEngineID())));
-		agent.setWorkerPool(ThreadPool.create("Working pool", 1));
+		agent.setWorkerPool(ThreadPool.create("Working pool", 8));
 		
 	} 
 	

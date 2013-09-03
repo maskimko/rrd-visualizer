@@ -82,12 +82,10 @@ public class RCUTable extends DefaultMOTable {
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_IPADDRESS, MOAccessImpl.ACCESS_READ_ONLY); //IP address of a device
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32, MOAccessImpl.ACCESS_READ_ONLY); // IP port of a device
 		while (c < columns.length){
-		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
-				MOAccessImpl.ACCESS_READ_ONLY);
+			columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,	MOAccessImpl.ACCESS_READ_ONLY);
 		}
 		
-		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.1.1.1"),
-				indexDef, columns);
+		RCUTable deviceStats = new RCUTable(new OID(".1.3.6.1.4.1.2006.1.1.1"),	indexDef, columns);
 		MOMutableTableModel model = (MOMutableTableModel) deviceStats.getModel();
 		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)5));
 		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short)4));
