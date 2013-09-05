@@ -94,7 +94,7 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 
 	
 	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException {
-		return askDevice(tm, device);
+		return askDevice(tm);
 	}
 	
 	/**
@@ -109,8 +109,8 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 	 *         about polled device
 	 */
 
-	public RCUPacketFloat askDevice(TcpMaster mtm, short device)
-			throws  ModbusInitException, ErrorResponseException, ModbusTransportException {
+	public RCUPacketFloat askDevice(TcpMaster mtm) throws ModbusInitException, ErrorResponseException, ModbusTransportException
+			 {
 		if (!tm.isInitialized()) {
 			tm.init();
 		}

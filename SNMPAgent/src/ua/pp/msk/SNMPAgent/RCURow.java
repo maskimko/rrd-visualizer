@@ -10,6 +10,7 @@ import org.snmp4j.smi.Variable;
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 
+import com.serotonin.modbus4j.exception.ErrorResponseException;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 
@@ -22,7 +23,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	private String ipAddress = null;
 	private int port = 0;
 	private short modbusDevice = 0;
-	private long renewDuration = 15000;
+	private long renewDuration = 30000;
 
 	public RCURow(RCUDevice rcudev) {
 		super(makeOID(), makeStatsArray(rcudev));
@@ -68,7 +69,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return vars;
 	}
 
-	private int[] getRCUPackStatsArray() throws Exception {
+	private int[] getRCUPackStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException  {
 		Runnable cooldowner = new CoolDown(renewDuration-1);
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
@@ -76,7 +77,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return rcuPack.getAllInteger();
 	}
 
-	private synchronized Variable[] getStatsArray() throws Exception {
+	private synchronized Variable[] getStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException {
 		int counter = 3;
 		Variable[] rowValues = values;
 		int[] stats = getRCUPackStatsArray();
@@ -92,15 +93,20 @@ public class RCURow extends DefaultMOMutableRow2PC {
 			try {
 				values = getStatsArray();
 			} catch (NullPointerException npe) {
-				System.err.println("Cannot update unknown type device table");
+				System.err.println("Cannot update device table");
+				System.err.println(npe.getMessage());
 			} catch (ModbusInitException mie) {
 				System.err.println("Error: Could not initialize TCP Modbus Master Connection!");
 				System.err.println("This row has inactual data " + rcuDev.getDescription());
 			}
-			catch (Exception e) {
-				System.out.println("Could not get values. Trying to reinitialize RCU Analyzer");
+			catch (ModbusTransportException e) {
+				System.out.println("Failed to handle modbus transport. Trying to reinitialize RCU Analyzer");
 				resetRCUAnalyzer();
 				System.out.println(e.getMessage());
+			} catch (ErrorResponseException ere) {
+				System.err.println("Got an error response! Somethin is going wrong! Trying to reconnect!");
+				resetRCUAnalyzer();
+				System.out.println(ere.getMessage());
 			}
 		} /*else {
 			System.out.println("Skipping updating this row");

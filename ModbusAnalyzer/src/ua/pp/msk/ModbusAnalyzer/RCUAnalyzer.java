@@ -234,8 +234,8 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 	
 
-	public RCUPacketFloat askDevice() throws ModbusInitException, Exception {
-		return this.askDevice(tm, this.device);
+	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException  {
+		return this.askDevice(tm);
 	}
 
 	/**
@@ -248,8 +248,8 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         from polled device
 	 */
-	public abstract RCUPacketFloat askDevice(TcpMaster mtm, short device)
-			throws ModbusInitException, Exception;
+	public abstract RCUPacketFloat askDevice(TcpMaster mtm)
+			throws ModbusInitException, ErrorResponseException, ModbusTransportException;
 
 	public void stop() {
 		if (tm != null) {
@@ -283,34 +283,40 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 					short devT = -1;
 					
 					
-					public RCUPacketFloat askDevice(TcpMaster mbMstr, short dev)
-							throws Exception {
+					public RCUPacketFloat askDevice(TcpMaster mbMstr)
+							throws ModbusInitException, ErrorResponseException, ModbusTransportException {
 						RCUPacketFloat rcuPack = null;
 
+						try {
 						if (!isAsked) {
-							devT = determineRCUDeviceType(mbMstr, dev);
+							devT = determineRCUDeviceType(mbMstr, this.device);
 
 							if (devT != this.deviceType) {
-								throw new Exception(
+								throw new ModbusInitException(
 										"Error: Looks like you provide wrong device type");
 							} else {
 								isAsked = true;
 							}
+						} }
+						catch (InterruptedException ie ) {
+							ie.printStackTrace();
 						}
 						switch (devT) {
 						case PM500:
-							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(ip, port, dev);
+							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(ip, port, this.device);
 							rcuPack = rcuPM500An.askDevice();
 							break;
 						case PM700:
-							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(ip, port, dev);
+							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(ip, port, this.device);
 							rcuPack = rcuPM700An.askDevice();
 							break;
 						default:
-							throw new Exception(
+							throw new ModbusInitException(
 									"Error: Unfortunately I cannot handle this device type!");
 						}
+						
 						return rcuPack;
+					
 					}
 				};
 
@@ -321,7 +327,12 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 					Thread.sleep(1000);
 				}
-			} catch (InterruptedException ie) {
+			} catch (ModbusInitException mie){
+				System.err.println("Error: Cannot init Modbus tcp session");
+				mie.printStackTrace();
+			}
+			
+			catch (InterruptedException ie) {
 				ie.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();

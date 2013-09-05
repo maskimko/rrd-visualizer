@@ -112,7 +112,7 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 
 	
 	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException{
-		return askDevice(tm, device);
+		return askDevice(tm);
 	}
 	
 	/**
@@ -124,7 +124,7 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	 * @return RCUPacket object with measurements data
 	 * @throws Exception
 	 */
-	public RCUPacketFloat askDevice(TcpMaster mtm, short device)
+	public RCUPacketFloat askDevice(TcpMaster mtm)
 			throws ModbusInitException, ErrorResponseException, ModbusTransportException {
 		setUpLocators();
 		if (!tm.isInitialized()) {
