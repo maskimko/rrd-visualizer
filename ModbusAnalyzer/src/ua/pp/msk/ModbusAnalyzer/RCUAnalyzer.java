@@ -292,6 +292,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 							devT = determineRCUDeviceType(mbMstr, this.device);
 
 							if (devT != this.deviceType) {
+								System.err.println("Error: Looks like you provide wrong device type");
 								throw new ModbusInitException(
 										"Error: Looks like you provide wrong device type");
 							} else {

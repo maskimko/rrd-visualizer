@@ -53,7 +53,7 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 				DataType.FOUR_BYTE_INT_UNSIGNED);
 		reactivePowerLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 792,
-				DataType.FOUR_BYTE_INT_UNSIGNED);
+				DataType.FOUR_BYTE_INT_SIGNED);
 		powerFactorLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 870,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
@@ -117,7 +117,7 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 		setUpLocators();
 		long realPowerValue = (long) mtm.getValue(realPowerLocator);
 		long apparentPowerValue = (long) mtm.getValue(apparentPowerLocator);
-		long reactivePowerValue = (long) mtm.getValue(reactivePowerLocator);
+		long reactivePowerValue = (int) mtm.getValue(reactivePowerLocator);
 		long powerFactorValue = (long) mtm.getValue(powerFactorLocator);
 		long frequencyValue = (long) mtm.getValue(frequencyLocator);
 		long currentValueA = (long) mtm.getValue(currentLocatorA);
