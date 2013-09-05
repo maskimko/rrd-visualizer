@@ -65,6 +65,7 @@ public class RCUDevice {
 	 
 	 
 	 synchronized void  resetRCUAnalyzer(){
+		 rcuAnalyzer.stop();
 		 rcuAnalyzer = null;
 		 rcuAnalyzer = createRCUAnalyzer();
 	 }

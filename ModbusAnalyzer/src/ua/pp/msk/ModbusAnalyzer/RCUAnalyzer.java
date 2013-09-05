@@ -253,7 +253,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 	public void stop() {
 		if (tm != null) {
-
+			tm.destroy();
 			tm = null;
 		}
 	}
