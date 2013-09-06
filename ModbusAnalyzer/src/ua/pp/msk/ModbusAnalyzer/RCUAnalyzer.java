@@ -15,7 +15,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	protected String ip = null;
 	protected int port = 0;
 	protected short device = 1;
-	protected short deviceType;
+	protected short deviceType = -1;
 	protected TcpMaster tm = null;
 
 	
@@ -68,7 +68,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	}
 	
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
-			short device) throws ModbusInitException, InterruptedException, ModbusTransportException, Exception {
+			short device) throws ModbusInitException, InterruptedException, ModbusTransportException, NullPointerException {
 		RCUAnalyzer ra = null;
 		boolean keepAlive = true;
 		IpParameters ipParm = new IpParameters();
@@ -88,7 +88,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ra = new RCUPM700Analyzer(hostname, port, device);
 			break;
 		default:
-			throw new Exception(
+			throw new NullPointerException(
 					"Error: Cannot create a RCUAnalyzer.\nUnknown type of device!");
 		}
 

@@ -68,7 +68,7 @@ public class RCUTable extends DefaultMOTable {
 		columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_GAUGE32,
 				MOAccessImpl.ACCESS_READ_ONLY); // IP port of a device
 		while (c < columns.length) {
-			if (c == 16) {
+			if (c == columns.length - 3) {
 				columns[c++] = new MOColumn(c, SMIConstants.SYNTAX_INTEGER32,
 						MOAccessImpl.ACCESS_READ_ONLY);
 			} else {

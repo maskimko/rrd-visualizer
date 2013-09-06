@@ -2,6 +2,7 @@ package ua.pp.msk.SNMPAgent;
 
 import org.snmp4j.agent.mo.DefaultMOMutableRow2PC;
 import org.snmp4j.smi.Gauge32;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
@@ -82,6 +83,9 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		Variable[] rowValues = values;
 		int[] stats = getRCUPackStatsArray();
 		while (counter < rowValues.length) {
+			if (counter == rowValues.length - 3) {
+				rowValues[counter] = new Integer32(stats[counter++ - 3]);
+			}
 			rowValues[counter] = new Gauge32(stats[counter++ - 3]);
 		}
 		return rowValues;
