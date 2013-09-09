@@ -62,8 +62,8 @@ public class RRDp  {
 	private InputStream reader;
 
 	public RRDp(String basedir, String cachedAddress) throws IOException {
-		//String cmd[] = new String[] { "rrdtool", "-", basedir };
-		String cmd[] = new String[] {"strace", "-s", "100", "-o", "/home/maskimko/Downloads/rrdtool/trace", "-ff", "rrdtool", "-", basedir};
+		String cmd[] = new String[] { "rrdtool", "-", basedir };
+		//String cmd[] = new String[] {"strace", "-s", "100", "-o", "/home/maskimko/Downloads/rrdtool/trace", "-ff", "rrdtool", "-", basedir};
 
 		ProcessBuilder pb = new ProcessBuilder(cmd);
 		if (cachedAddress != null) {

@@ -31,10 +31,13 @@ public class GeneralGui {
 		menuBar.add(modemenu);
 		JMenuItem randomView = new JMenuItem("Random view");
 		JMenuItem datePickerTest = new JMenuItem("Test of Date Picker");
+		JMenuItem exit = new JMenuItem("Exit");
 		randomView.addActionListener(new RandomViewListener());
 		datePickerTest.addActionListener(new DatePickerTestListener());
+		exit.addActionListener(new ExitListener());
 		modemenu.add(randomView);
 		modemenu.add(datePickerTest);
+		filemenu.add(exit);
 		
 		mainframe.setJMenuBar(menuBar);
 		mainframe.setSize(300, 300);
@@ -58,6 +61,13 @@ public class GeneralGui {
 			mainpanel = sRRDt.createMainPanel();
 			mainframe.setContentPane(mainpanel);
 			mainframe.pack();
+		}
+	}
+	
+	class ExitListener implements ActionListener {
+		public void actionPerformed(ActionEvent ae){
+			mainframe.setVisible(false);
+			System.exit(0);
 		}
 	}
 }
