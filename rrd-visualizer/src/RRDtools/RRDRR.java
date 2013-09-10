@@ -9,11 +9,12 @@ import java.util.regex.Pattern;
  * rrdtool fetch mechanism; 
  */
 
-public class RRDRR {
+public class RRDRR implements Comparable<RRDRR> {
 
 	private Calendar recordtime;
 	private RRDValue[] recordvalues;
-	public final static String regexpstring = "^([0-9]{10}):\\s*([0-9]+,[0-9]{10}[+-][0-9]{3}\\s*)+$";
+	public final static String regexpstring = "^([0-9]{10}):\\s+(([0-9]+,[0-9]{10}e[+-][0-9]{1,3}\\s*)+)$";
+	
 	
 	public RRDRR(Calendar cal, RRDValue[] rrdvalues){
 		this.recordtime = cal;
@@ -41,6 +42,9 @@ public class RRDRR {
 		recordtime.setTime(dt);	
 	}
 	
+	public int compareTo(RRDRR resRecord){
+		return recordtime.compareTo(resRecord.getTime());
+	}
 	
 	public RRDRR(String str, String[] fieldnames) throws Exception {
 		this.recordvalues = new RRDValue[fieldnames.length];
@@ -53,13 +57,22 @@ public class RRDRR {
 			this.recordtime = Calendar.getInstance(); 
 			timefield = Long.parseLong(match.group(1)) * 1000;
 			recordtime.setTime(new Date(timefield));
-			valarray = match.group(2).split(" ");
+			valarray = match.group(2).split("\\s+");
 			if (valarray.length == fieldnames.length) {
 				for (int i = 0; i < valarray.length; i++){
-					recordvalues[i] = new RRDValue(Double.parseDouble(valarray[i]), fieldnames[i]);
+					this.recordvalues[i] = new RRDValue(Double.parseDouble(valarray[i].replace(',', '.')), fieldnames[i]);
 				}
 			} else throw new Exception("Interface error! Number of field is not equal to number of parsed values!");
-		}
+		} else throw new Exception("Error: Cannot parse input");
+	}
+	
+	public static boolean RRDRRMatcher(String str){
+		boolean istrue = false;
+		Matcher match;
+		Pattern recordpat = Pattern.compile(regexpstring);
+		match = recordpat.matcher(str);
+		if (match.find()) istrue = true;
+		return istrue;
 	}
 	
 	
@@ -102,11 +115,13 @@ public class RRDRR {
 	}
 	
 	public String toString(){
-		String output = recordtime.getTime().toString();
-		output.concat(": ");
+		Long timestamp = (Long) recordtime.getTimeInMillis() / 1000;
+		String output = timestamp + " - ";
+		
 		for (int i = 0; i < recordvalues.length; i++){
-			output.concat(((Double)recordvalues[i].getValue()).toString());
-			if ( recordvalues.length - i < 1 ) output.concat(" ");
+			Double valuetoprint = (Double) recordvalues[i].getValue(); 
+			output += valuetoprint;
+			if ( recordvalues.length - i != 1 ) output += " ";
 			//output += recordvalues[i].getValue() + " ";
 		}
 		return output;
@@ -114,26 +129,3 @@ public class RRDRR {
 }
 
 
-class RRDValue {
-	protected double value;
-	protected String name;
-	
-	public RRDValue(double value, String name){
-		this.value = value;
-		this.name = name;
-	}
-	
-	public double getValue(){
-		return value;
-	}
-	
-	public String getName(){
-		return name;
-	}
-	
-	public String toString(){
-		String output = ((Double)this.getValue()).toString();
-		output.concat(" " + this.getName());
-		return output;
-	}
-}

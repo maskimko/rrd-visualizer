@@ -46,7 +46,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-//import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 //import java.util.regex.Matcher;
@@ -61,9 +60,20 @@ public class RRDp  {
 	private OutputStream writer;
 	private InputStream reader;
 
+	public RRDp(String basedir) throws IOException{
+		String cmd[] = new String[] { "rrdtool", "-", basedir };
+
+		ProcessBuilder pb = new ProcessBuilder(cmd);
+		
+
+		rrdtool = pb.start();
+
+		InputStream r = rrdtool.getInputStream();
+		reader = r;
+		writer = rrdtool.getOutputStream();
+	}
 	public RRDp(String basedir, String cachedAddress) throws IOException {
 		String cmd[] = new String[] { "rrdtool", "-", basedir };
-		//String cmd[] = new String[] {"strace", "-s", "100", "-o", "/home/maskimko/Downloads/rrdtool/trace", "-ff", "rrdtool", "-", basedir};
 
 		ProcessBuilder pb = new ProcessBuilder(cmd);
 		if (cachedAddress != null) {
@@ -103,10 +113,18 @@ public class RRDp  {
 		}
 
 		String fullcommand = "";
+		int counter = 0;
 		for (String component : command){
-			fullcommand += component + " ";
+			if (command.length - counter > 1) {
+				fullcommand += component + " ";
+			} else {
+				fullcommand += component + "\n";
+			}
+			counter++;
 		}
-		fullcommand += "\n";
+		
+		
+	
 		StringBuffer sb = new StringBuffer();
 		/*for (String c: command) {
 			if (sb.length() > 0) sb.append(' ');
@@ -119,8 +137,8 @@ public class RRDp  {
 			logger.finer(fullcommand);
 		}
 
-		//System.out.println(sb.toString());
-		System.out.println(fullcommand);
+		//System.out.println(sb.toString()); 
+		System.out.println("Full command: '" + fullcommand + "'");
 		try {
 			//writer.write(sb.toString().getBytes());
 			writer.write(fullcommand.getBytes());
@@ -156,6 +174,7 @@ public class RRDp  {
 				r.error = line;
 				break;
 			}
+			OSDiffMatcher.isHeaderMatch(line, r);
 			/*if (line.startsWith("OK")) {
 				m = okpat.matcher(line);
 
@@ -174,6 +193,7 @@ public class RRDp  {
 			} catch (Exception ex) {
 				r.ok = false;
 				r.error = ex.getMessage();
+				System.err.println(ex.getMessage());
 			}
 
 			/*m = infoPat.matcher(line);
@@ -214,10 +234,11 @@ public class RRDp  {
 				// EOF without ANY response
 				throw new Exception("Protocol error: No reply (EOF)");
 			}
-			throw new Exception("Protocol error: short reply (EOF)");
+			throw new Exception("Protocol error: Short reply (EOF)");
 		}
 		
-		r.output = sb.toString();
+		//r.output = sb.toString();
+		r.setOutput(sb);
 		//r.info = data;
 
 		if (logger.isLoggable(Level.FINEST)) {
@@ -295,3 +316,5 @@ public class RRDp  {
 	}
 
 }
+
+

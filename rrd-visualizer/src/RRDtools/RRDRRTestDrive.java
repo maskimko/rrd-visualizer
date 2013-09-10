@@ -13,7 +13,8 @@ public class RRDRRTestDrive {
 			RRDRR resrec = new RRDRR(output, fields);
 			System.out.println(resrec.toString());
 		}  catch (Exception ex) {
-			System.out.println("Error: " + ex.getMessage());
+			System.out.print("Error: ");
+			ex.printStackTrace();
 		}
 	}
 

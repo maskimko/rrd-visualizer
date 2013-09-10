@@ -2,13 +2,13 @@ package RRDtools;
 
 import java.util.ArrayList;
 
-public interface CommandResultInterface {
+public interface CommandResultInterface{
 	float user = 0;
     float system = 0;
     float total = 0;
     public boolean ok = false;
     public String error = null;
-    public String output = null;
+    //public String output = null;
     
     ArrayList<String> names = null;
     
@@ -25,6 +25,9 @@ public interface CommandResultInterface {
 
 	public String getError();
 
+	public void setOutput(String output)throws Exception;
+	public void setOutput(StringBuffer sb) throws Exception;
+	
 	public String getOutput();
 
 	//public byte[] getImageBytes();

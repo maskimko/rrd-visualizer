@@ -34,6 +34,7 @@ package RRDtools;
 
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 //import java.util.HashMap;
 
 public class CommandResult implements CommandResultInterface{
@@ -42,8 +43,9 @@ public class CommandResult implements CommandResultInterface{
     float total;
     public boolean ok = false;
     public String error = null;
-    public String output = null;
+    private String output = null;
     private ArrayList<String> fieldsnamelist= new ArrayList<String>();
+    private TreeSet<RRDRR> outputobject= new TreeSet<RRDRR>();
     // support for output from special commands
     //public HashMap<String, String> info = null;  // info, graphv
 	//public byte image[] = null; // graphv
@@ -87,10 +89,41 @@ public class CommandResult implements CommandResultInterface{
 		return error;
 	}
 
+	public void setOutput(String output) throws Exception{
+		this.output = output;
+		output2Object();
+	}
+	
+	public void setOutput(StringBuffer sb) throws Exception{
+		this.output = sb.toString();
+		output2Object();
+	}
+	
 	public String getOutput() {
 		return output;
 	}
 
+	private void output2Object() throws Exception{
+		if (this.output.length() == 0) throw new Exception("Error: Empty output"); 
+		else if (fieldsnamelist.size() == 0) throw new Exception("Error: Empty fields list");
+			else {
+			String[] fl = new String[fieldsnamelist.size()];
+			int i = 0;
+			for (String field : fieldsnamelist){
+				fl[i] = field;
+				i++;
+			}
+			String[] valrecords = this.output.split("\n");
+			for (String vr :valrecords) {
+				if (RRDRR.RRDRRMatcher(vr)) outputobject.add(new RRDRR(vr, fl));
+			}
+		}
+	}
+	
+	public TreeSet<RRDRR> getOutputObject(){
+		return outputobject;
+	}
+	
 	/*public HashMap<String, String> getInfo() {
 		return info;
 	}*/
