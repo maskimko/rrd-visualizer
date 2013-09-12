@@ -1,3 +1,4 @@
+package Racks;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -14,19 +15,18 @@ public class RackCollection extends ArrayList<Rack> {
 	public RackCollection(Rack firstrack){
 		this.add(firstrack);
 	}
+	
 	public RackCollection(ArrayList<Rack> racklist){
 		for (Rack currentrack : racklist){
 			this.add(currentrack);
 		}
 	}
 	
-	public RackCollection(String name, Rectangle size){
-		this.add(new Rack(name, size, 50f));
+	public RackCollection(String name, Rectangle size, RackProperty rp){
+		
+		this.add(new Rack(name, size, rp));
 	}
 	
-	public RackCollection(String name, Rectangle size, float temperature){
-		this.add(new Rack(name, size, temperature));
-	}
 	
 	public BufferedImage drawRackCollection(BufferedImage sourceimage){
 		BufferedImage destinationimage = new BufferedImage(sourceimage.getWidth(), sourceimage.getHeight(), BufferedImage.TYPE_INT_ARGB);

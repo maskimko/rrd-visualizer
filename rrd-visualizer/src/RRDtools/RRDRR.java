@@ -84,7 +84,7 @@ public class RRDRR implements Comparable<RRDRR> {
 		return recordvalues;
 	}
 	
-	public RRDValue getContent(String name) throws Exception {
+	public RRDValue getContent(String name) throws IllegalArgumentException {
 		int position = -1;
 		for (int i = 0; i < recordvalues.length; i++){
 			if (name.equals(recordvalues[i].getName())){
@@ -94,7 +94,7 @@ public class RRDRR implements Comparable<RRDRR> {
 		}
 		if (position != -1) {
 			return recordvalues[position];
-		} else throw new Exception("There is now field with specified name");
+		} else throw new IllegalArgumentException("There is now field with specified name");
 		
 		
 	}

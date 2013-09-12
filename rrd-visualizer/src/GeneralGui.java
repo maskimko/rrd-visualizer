@@ -46,8 +46,8 @@ public class GeneralGui {
 		exit.addActionListener(new ExitListener());
 		modemenu.add(randomView);
 		modemenu.add(datePickerTest);
-		filemenu.add(exit);
 		filemenu.add(open);
+		filemenu.add(exit);
 		mainframe.setJMenuBar(menuBar);
 		mainframe.setSize(300, 300);
 		
@@ -57,10 +57,10 @@ public class GeneralGui {
 	class OpenFileListener implements ActionListener {
 		private final JFileChooser jfc = new JFileChooser(); 
 		public void actionPerformed(ActionEvent ae) {
-			int retVal = jfc.showOpenDialog(mainframe);
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			FileFilter  rrdFFilter = new FileNameExtensionFilter("RRD file", "rrd");
 			jfc.setFileFilter(rrdFFilter);
+			int retVal = jfc.showOpenDialog(mainframe);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File rrdFile = jfc.getSelectedFile();
 				if (sRRDt != null) {
