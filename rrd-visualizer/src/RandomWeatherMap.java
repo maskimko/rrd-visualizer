@@ -23,8 +23,8 @@ public class RandomWeatherMap {
 		mainPanel = new JPanel(layout);
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		impnl = new ImagePanel("6 floor");
-		RackCollection racks = RackCollectionTestDrive.createStaticCollection();
-		impnl.add2Image(racks);
+		//RackCollection racks = RackCollectionTestDrive.createStaticCollection();
+		//impnl.add2Image(racks);
 		ImagePanelScrollable imagePanel = new ImagePanelScrollable(impnl);
 	
 		Box controlPanel = new Box(BoxLayout.Y_AXIS);

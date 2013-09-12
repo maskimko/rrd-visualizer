@@ -37,19 +37,23 @@ public class Radiation extends Ellipse2D.Float implements RadiationInterface {
 		hueDiff = (hr[0] - hr[hr.length - 1]) / colors.length;
 		brightnessDiff = (br[0] - br[br.length - 1]) / colors.length;
 		saturationDiff = (sr[0] - sr[sr.length - 1]) / colors.length;
-		alphaDiff = Math.round((ar[0] - ar[ar.length - 1]) / colors.length);
+		//alphaDiff = Math.round((ar[0] - ar[ar.length - 1]) / colors.length);
+		alphaDiff = Math.max(ar[0], ar[ar.length -1]);
 		int colorIntRGBValue, alpha, colorIntRGBAValue;
 		float hue, saturation, brightness;
 		for (int i = 0; i < colors.length; i++){
 			hue = hr[0] - hueDiff * i;
 			saturation = sr[0] - saturationDiff * i;
 			brightness = br[0] - brightnessDiff * i;
-			alpha = ar[0] - alphaDiff * i;
+			alphaDiff = (int) (ar[0] / Math.pow(2, (i + 1)));
+			System.out.print(" alphaDiff: " + alphaDiff);
+			alpha = alphaDiff;
+			System.out.print(" alpha: " + alpha);
 			colorIntRGBValue = Color.HSBtoRGB(hue, saturation, brightness);
 			colorIntRGBAValue = colorIntRGBValue + alpha * 0x1000000;
 			colors[i] = new Color(colorIntRGBAValue, true);
 		}
-		
+		System.out.println();
 		radiation = new RadialGradientPaint((float)rack.getCenterX(), (float)rack.getCenterY(), RadiationSizer.getRadiationRadiusFromRack(rack, propDescr, time), fract, colors, CycleMethod.NO_CYCLE);
 	}
 

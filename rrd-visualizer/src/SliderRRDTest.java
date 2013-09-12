@@ -35,7 +35,7 @@ public class SliderRRDTest {
 	private JSlider moment;
 	private static long previousMoment, previousStart, previousEnd;
 	private File rrdFile = null;
-	private RackCollection rackColl = new RackCollection();
+	//private RackCollection rackColl = new RackCollection();
 
 	public JPanel createMainPanel() {
 		mainPanel = new JPanel(new BorderLayout());
