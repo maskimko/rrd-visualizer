@@ -19,8 +19,9 @@ public class Radiation extends Ellipse2D.Float implements RadiationInterface {
 	 */
 	private static final long serialVersionUID = 5592985157892531905L;
 	protected RadialGradientPaint radiation= null;
-	private float hueDiff, brightnessDiff, saturationDiff;
-	private int alphaDiff;
+	private float hueDiff, brightnessDiff, saturationDiff, hue, saturation, brightness;;
+	private int colorIntRGBValue, alpha, alphaMax, colorIntRGBAValue;
+	
 	protected float[] hr, sr, br, fractions;
 	protected int[] ar;
 	
@@ -38,22 +39,24 @@ public class Radiation extends Ellipse2D.Float implements RadiationInterface {
 		brightnessDiff = (br[0] - br[br.length - 1]) / colors.length;
 		saturationDiff = (sr[0] - sr[sr.length - 1]) / colors.length;
 		//alphaDiff = Math.round((ar[0] - ar[ar.length - 1]) / colors.length);
-		alphaDiff = Math.max(ar[0], ar[ar.length -1]);
-		int colorIntRGBValue, alpha, colorIntRGBAValue;
-		float hue, saturation, brightness;
+		alphaMax = Math.max(ar[0], ar[ar.length -1]);
+		
 		for (int i = 0; i < colors.length; i++){
 			hue = hr[0] - hueDiff * i;
 			saturation = sr[0] - saturationDiff * i;
 			brightness = br[0] - brightnessDiff * i;
-			alphaDiff = (int) (ar[0] / Math.pow(2, (i + 1)));
-			System.out.print(" alphaDiff: " + alphaDiff);
-			alpha = alphaDiff;
-			System.out.print(" alpha: " + alpha);
+			alpha = (int)  ((alphaMax / Math.pow(2, i)) * (i / 2.3 + 1));
+			//System.out.println("hue: " + hue);
+			//System.out.println("brightness: " + brightness);
+			//System.out.println("saturation: " + saturation);
+			//System.out.println("alpha: " + Integer.toHexString(alpha));
 			colorIntRGBValue = Color.HSBtoRGB(hue, saturation, brightness);
-			colorIntRGBAValue = colorIntRGBValue + alpha * 0x1000000;
+			//System.out.println("color: " + Integer.toHexString(colorIntRGBValue - 0xff000000) + " alpha: " + Integer.toHexString(alpha * 0x1000000));
+			colorIntRGBAValue = colorIntRGBValue - (0xff000000 - alpha * 0x1000000);
+			//System.out.println("color alpha: " + Integer.toHexString(colorIntRGBAValue) + "\n\n");
 			colors[i] = new Color(colorIntRGBAValue, true);
 		}
-		System.out.println();
+		//System.out.println();
 		radiation = new RadialGradientPaint((float)rack.getCenterX(), (float)rack.getCenterY(), RadiationSizer.getRadiationRadiusFromRack(rack, propDescr, time), fract, colors, CycleMethod.NO_CYCLE);
 	}
 

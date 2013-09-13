@@ -2,6 +2,7 @@ package Test;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -23,7 +24,10 @@ public class RackPaintTest {
 
 	private BufferedImage floor6;
 	private String path2Image;
-
+	int firsta = 50, firstb = 50, seconda = 300, secondb = 300;
+	ImageArea ima = null;
+	RackProperty temperature = null;
+	
 	public void go() {
 		JFrame window = new JFrame("Test of one rack");
 		File imgFile = new File(path2Image);
@@ -40,10 +44,10 @@ public class RackPaintTest {
 		JPanel mainPanel = (JPanel) window.getContentPane();
 
 		if (floor6 != null) {
-			ImageArea ima = new ImageArea();
+			ima = new ImageArea();
 			ima.setSize(floor6.getWidth(), floor6.getHeight());
 			mainPanel.add(BorderLayout.CENTER, ima);
-			RackProperty temperature = new RackProperty(
+			temperature = new RackProperty(
 					"Testing of RackProperty class",
 					RadiationTemp.RadiationParametersTemp,
 					Calendar.getInstance(), Calendar.getInstance()) {
@@ -67,22 +71,59 @@ public class RackPaintTest {
 				}
 			};
 
-			Rack r = new Rack("Test rack", 5, 5, 100, 100, temperature);
+			
+			
+			
+			
+			Rack r = new Rack("Test rack", firsta, firstb, 100, 100, temperature);
 			Rack r2 = new Rack("Test rack2", 330, 270, 50, 40, temperature);
 			Rack r3 = new Rack("Test rack2", 330, 30, 50, 40, temperature);
 			Rack r4 = new Rack("Test rack2", 160, 400, 50, 40, temperature);
+			Rack rt = new Rack("Test rack tween", seconda, secondb, 100, 100, temperature);
 			ima.addRack(r);
-			ima.addRack(r2);
-			ima.addRack(r3);
-			ima.addRack(r4);
+			ima.addRack(rt);
+			
+			
+			
+			//ima.addRack(r2);
+			//ima.addRack(r3);
+			//ima.addRack(r4);
 
 		} else {
 			System.err.println("Image has been not loaded");
 		}
-		window.setSize(500, 500);
+		window.setSize(floor6.getWidth(), floor6.getHeight());
 		window.setVisible(true);
-
+		Thread move = new Thread(new ImageRunner());
+		move.run();
 	}
+	
+	class ImageRunner implements Runnable {
+		Rack r, rt;
+		
+		public void run(){
+			try {
+				while(firsta < 300){
+					r =  new Rack("Test rack", firsta++, firstb++, 100, 100, temperature);
+					rt = new Rack("Test rack", seconda--, secondb--, 100, 100, temperature);
+					
+					ima.clearRacks();
+					ima.addRack(r);
+					ima.addRack(rt);
+					ima.repaint();
+					//System.out.println(firsta + ":"+ firstb);
+					
+					
+						Thread.sleep(100);
+					
+				}
+				
+				} catch (InterruptedException ie){
+					System.err.println("Was interrupted!");
+				}
+		}
+	}
+	
 
 	class ImageArea extends JPanel {
 
@@ -92,17 +133,61 @@ public class RackPaintTest {
 			racks.add(rack);
 		}
 		
+		public void clearRacks(){
+			racks = new ArrayList<Rack>();
+		}
+		
+		private BufferedImage getLayer(int width, int height, ArrayList<Rack> racks){
+			BufferedImage layer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			Graphics2D lGr2 = layer.createGraphics();
+			
+			
+			
+			if (racks.size() != 0) {
+				for (Rack rack : racks) {
+					//rack.paintRack(g2);
+					rack.paintRadiation("Testing of RackProperty class", Calendar.getInstance(), lGr2);
+				}
+				float dot, hue;
+				Color point = null;
+				int  dotRGB, dotRGBA;
+				for (int k = 0; k < layer.getWidth(); k++){
+					for (int j = 0; j < layer.getHeight(); j++){
+						point = new Color(layer.getRGB(k, j), true);
+						hue = point.getAlpha();
+						hue /= 256;
+						hue = 1 - hue;
+						hue  = Math.min(hue, 0.55f);
+						dotRGB = Color.HSBtoRGB( hue , 1f, 1f);
+						dotRGBA = dotRGB + 0x33000000;
+						dotRGB = 0;
+						layer.setRGB(k, j, dotRGBA);
+					}
+				}
+			}
+			return layer;
+		}
+		
+		
 		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
+			
 			g2.setComposite(AlphaComposite.SrcOver);
-			g2.drawImage(floor6, null, 0, 0);
+			
+			
+			
+			
 			if (racks.size() != 0) {
 				for (Rack rack : racks) {
 					rack.paintRack(g2);
-					rack.paintRadiation("Testing of RackProperty class", Calendar.getInstance(), g2);
+					
 				}
+				
 			}
+			
+			g2.drawImage(floor6, null, 0, 0);
+			g2.drawImage(getLayer(floor6.getWidth(), floor6.getHeight(), racks), null, 0, 0);
 			g2.dispose();
 		}
 	}
