@@ -24,7 +24,7 @@ public class RackPaintTest {
 
 	private BufferedImage floor6;
 	private String path2Image;
-	int firsta = 50, firstb = 50, seconda = 300, secondb = 300;
+	int firsta = 50, firstb = 50, seconda = 300, secondb = 300, t1=400, t2 = 200, f1 = 100, f2 = 500, f3 = 200, f4 = 100 ;
 	ImageArea ima = null;
 	RackProperty temperature = null;
 	
@@ -76,18 +76,15 @@ public class RackPaintTest {
 			
 			
 			Rack r = new Rack("Test rack", firsta, firstb, 100, 100, temperature);
-			Rack r2 = new Rack("Test rack2", 330, 270, 50, 40, temperature);
-			Rack r3 = new Rack("Test rack2", 330, 30, 50, 40, temperature);
-			Rack r4 = new Rack("Test rack2", 160, 400, 50, 40, temperature);
+			Rack r2 = new Rack("Test rack2", t1, t2, 50, 40, temperature);
+			Rack r3 = new Rack("Test rack2", f1, f2, 50, 40, temperature);
+			Rack r4 = new Rack("Test rack2", f3, f4, 50, 40, temperature);
 			Rack rt = new Rack("Test rack tween", seconda, secondb, 100, 100, temperature);
 			ima.addRack(r);
 			ima.addRack(rt);
-			
-			
-			
-			//ima.addRack(r2);
-			//ima.addRack(r3);
-			//ima.addRack(r4);
+			ima.addRack(r2);
+			ima.addRack(r3);
+			ima.addRack(r4);
 
 		} else {
 			System.err.println("Image has been not loaded");
@@ -99,17 +96,22 @@ public class RackPaintTest {
 	}
 	
 	class ImageRunner implements Runnable {
-		Rack r, rt;
+		Rack r, rt, r2 , r3 , r4;
 		
 		public void run(){
 			try {
 				while(firsta < 300){
 					r =  new Rack("Test rack", firsta++, firstb++, 100, 100, temperature);
 					rt = new Rack("Test rack", seconda--, secondb--, 100, 100, temperature);
-					
+					r2 = new Rack("Test rack2", t1--, t2++, 50, 40, temperature);
+					r3 = new Rack("Test rack2", f1++, f2--, 50, 40, temperature);
+					r4 = new Rack("Test rack2", f3++, f4++, 50, 40, temperature);
 					ima.clearRacks();
 					ima.addRack(r);
 					ima.addRack(rt);
+					ima.addRack(r2);
+					ima.addRack(r3);
+					ima.addRack(r4);
 					ima.repaint();
 					//System.out.println(firsta + ":"+ firstb);
 					
@@ -200,6 +202,7 @@ public class RackPaintTest {
 		if (args.length != 1) {
 			System.out.println("Usage: RackPaintTest <png image path>");
 		} else {
+			System.out.println(System.getProperty("user.dir"));
 			RackPaintTest rpt = new RackPaintTest();
 			rpt.path2Image = args[0];
 			rpt.go();
