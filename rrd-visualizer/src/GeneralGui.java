@@ -78,7 +78,7 @@ public class GeneralGui {
 	
 	class RandomViewListener implements ActionListener {
 		public void actionPerformed(ActionEvent ae){
-			RandomWeatherMap rwm = new RandomWeatherMap();
+			RandomTemperatureMap rwm = new RandomTemperatureMap();
 			mainpanel = rwm.createMainPanel();
 			mainframe.setContentPane(mainpanel);
 			mainframe.pack();

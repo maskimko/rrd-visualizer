@@ -1,9 +1,7 @@
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -11,11 +9,15 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import Racks.RackCollection;
+import Racks.TemperatureLayer;
 
-public class RandomWeatherMap {
+
+public class RandomTemperatureMap {
   
 	public JPanel mainPanel;
 	private ImagePanel impnl = null;
+	private BufferedImage tempLayer = null;
 	//private ImagePanelScrollable imagePanel = null;
 	
 	public  JPanel createMainPanel(){
@@ -42,7 +44,11 @@ public class RandomWeatherMap {
 		public void actionPerformed(ActionEvent ae){
 			System.out.println("\"Generate New\" button has been pressed");
 			impnl.clearDrawings();
-			impnl.add2Image(RackCollectionTestDrive.createStaticCollection());
+			RackCollection rc = RackCollectionTestDrive.createStaticCollection();
+			
+			tempLayer = TemperatureLayer.getLayer(impnl.getWidth(), impnl.getHeight(), rc.getRackProperty("temperature"), rc);
+			impnl.setBufferedImage("temperature", tempLayer);
+			impnl.add2Image(rc);
 			impnl.repaint();
 		}
 	}

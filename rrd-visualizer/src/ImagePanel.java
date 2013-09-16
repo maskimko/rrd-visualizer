@@ -3,69 +3,102 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JPanel;
 
+import Racks.Rack;
+import Racks.RackCollection;
+
 public class ImagePanel extends JPanel {
 
-	private BufferedImage bfimg = null;
+	private HashMap<String, BufferedImage> bfimgs = new HashMap<String, BufferedImage>();
 	private FloorMap fm = null;
 	public Dimension imageDimension;
 	private RackCollection drawings = new RackCollection();
-	private int x,y;
+	private int x, y;
 
-	
-	
 	public ImagePanel(String mapname, int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
 		try {
 			fm = new FloorMap(mapname);
-			bfimg = fm.getImage();
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			bfimgs.put("base", fm.getImage());
+			imageDimension = new Dimension(fm.getImage().getWidth(), fm
+					.getImage().getHeight());
+			this.setPreferredSize(imageDimension);
+		} catch (IOException ioe) {
+			System.err.println(ioe.getMessage());
+		} catch (IllegalArgumentException iae) {
+			System.err.println(iae.getMessage());
 		}
-		imageDimension = new Dimension(bfimg.getWidth(), bfimg.getHeight());
-		this.setPreferredSize(imageDimension);
 
 	}
-	
-	public ImagePanel(String mapname){
+
+	public ImagePanel(String mapname) {
 		this(mapname, 0, 0);
 	}
 
 	@Override
-	
 	public void paintComponent(Graphics g) {
 		// super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
-		if (bfimg != null) {
-			g2.drawImage(bfimg, null, 0, 0);
+		Iterator<BufferedImage> bfitr = bfimgs.values().iterator();
+		if (bfitr.hasNext()) {
+			g2.setComposite(AlphaComposite.Src);
+			g2.drawImage(bfitr.next(), null, 0, 0);
+
+			g2.setComposite(AlphaComposite.SrcOver);
+			for (Rack currentrack : drawings) {
+				currentrack.paintRack(g2);
+			}
+			while (bfitr.hasNext()) {
+				g2.drawImage(bfitr.next(), null, 0, 0);
+			}
+			g2.dispose();
 		}
-		g2.setComposite(AlphaComposite.SrcOver);
-		for (Rack currentrack : drawings){
-    		currentrack.paintRack(g2);
-    	}
-    	g2.dispose();
 	}
 
-	public void add2Image(RackCollection racks){
-    	for (Rack currentrack : racks){
-    		drawings.add(currentrack);
-    	}
-    }
-    
-    public void add2Image(Rack rack){
-    	drawings.add(rack);
-    }
-    
-    public void clearDrawings(){
-    	drawings = new RackCollection();
-    }
-	
-	public BufferedImage getImage() {
-		return bfimg;
+	public void add2Image(RackCollection racks) {
+		for (Rack currentrack : racks) {
+			drawings.add(currentrack);
+		}
+	}
+
+	public void add2Image(Rack rack) {
+		drawings.add(rack);
+	}
+
+	public void clearDrawings() {
+		drawings = new RackCollection();
+	}
+
+	public void clearLayers() {
+		bfimgs = new HashMap<String, BufferedImage>();
+	}
+
+	public void setBufferedImage(String layerName, BufferedImage bfImage) {
+		bfimgs.put(layerName, bfImage);
+	}
+
+	public BufferedImage getLayer(String layerName, BufferedImage bfImage) {
+		return bfimgs.get(layerName);
+	}
+
+	public void rmLayer(String layerName) {
+		bfimgs.remove(layerName);
+	}
+
+	public BufferedImage getBaseImage() {
+		return bfimgs.get(0);
+	}
+
+	public HashMap<String, BufferedImage> getImages() {
+		return bfimgs;
 	}
 
 	public Dimension getImageDimension() {

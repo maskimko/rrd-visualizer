@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class RackCollection extends ArrayList<Rack> {
@@ -27,6 +28,14 @@ public class RackCollection extends ArrayList<Rack> {
 		this.add(new Rack(name, size, rp));
 	}
 	
+	public RackProperty getRackProperty(String propertyDescription){
+		RackProperty desiredProp = null;
+		Iterator<Rack> itr = this.iterator();
+		while(itr.hasNext() && (desiredProp == null)){
+			desiredProp = itr.next().getRackProperty(propertyDescription);
+		}
+		return desiredProp;
+	}
 	
 	public BufferedImage drawRackCollection(BufferedImage sourceimage){
 		BufferedImage destinationimage = new BufferedImage(sourceimage.getWidth(), sourceimage.getHeight(), BufferedImage.TYPE_INT_ARGB);

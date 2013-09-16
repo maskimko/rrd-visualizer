@@ -17,8 +17,8 @@ public class ImagePanelScrollable extends JScrollPane {
 		
 		}
 	
-	public BufferedImage getImage(){
-		return imagePanel.getImage();
+	public BufferedImage getBaseImage(){
+		return imagePanel.getBaseImage();
 	}
 	
 	public Dimension getImageDimension(){

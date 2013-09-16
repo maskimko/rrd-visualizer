@@ -1,16 +1,23 @@
+import java.util.Calendar;
+
+import Racks.Rack;
+import Racks.RackCollection;
+import Racks.RackProperty;
+import Racks.Radiation;
+import Racks.RadiationTemp;
 
 
 
 public class RackCollectionTestDrive {
 	
-	private int racknumber = 0;
+	private static int racknumber = 0;
 	
-	private Rack createRackUglyCoordinates(int x1, int y1, int x2, int y2, float temperature){
+	private Rack createRackUglyCoordinates(int x1, int y1, int x2, int y2, RackProperty rackProp){
 		int x = Math.min(x1, x2);
 		int y = Math.min(y1, y2);
 		int width = Math.abs(x1 -x2);
 		int height = Math.abs(y1 -y2);
-		Rack createdrack = new Rack("Rack" + racknumber, x, y, width, height, temperature);
+		Rack createdrack = new Rack("Rack " + racknumber, x, y, width, height, rackProp);
 		racknumber++;
 		return createdrack;
 	}
@@ -20,10 +27,40 @@ public class RackCollectionTestDrive {
 		int y = Math.min(y1, y2);
 		int width = Math.abs(x1 -x2);
 		int height = Math.abs(y1 -y2);
-		Rack createdrack = new Rack("Rack" + racknumber, x, y, width, height, 30);
+		Rack createdrack = new Rack("Rack " + racknumber, x, y, width, height, null);
 		racknumber++;
 		return createdrack;
 	}
+	
+	private static RackProperty createRackProperty(){
+		
+		RackProperty rp = new RackProperty("temperature", RadiationTemp.RadiationParametersTemp, Calendar.getInstance(), Calendar.getInstance()) {
+			
+			float value = (float) Math.random() * 100;
+			
+			@Override
+			public float getValue(Calendar cal) throws IllegalArgumentException,
+					NullPointerException {
+				
+				return value;
+			}
+			
+			@Override
+			public Radiation getRadiation(Rack rack, Calendar cal)
+					throws IllegalArgumentException, NullPointerException {
+			
+				return new Radiation(rack, this.description, this.stop, this.radParam);
+			}
+			
+			@Override
+			public String getDescription() {
+				
+				return this.description;
+			}
+		};
+		return rp;
+	}
+	
 	
 	public static RackCollection createStaticCollection(){
 		RackCollectionTestDrive rctd = new RackCollectionTestDrive();
@@ -43,12 +80,12 @@ public class RackCollectionTestDrive {
 		rc.add(rctd.createRackUglyCoordinates(470-7, 328, 473, 361));
 		*/
 		for (int i = 190; i < 496; i = i + 25) {
-			float temperature = (float)Math.random()*100;
-			rc.add(rctd.createRackUglyCoordinates(i, 401, i + 23, 434, temperature));
-			rc.add(rctd.createRackUglyCoordinates(i, 328, i + 23, 361, temperature));
-			//System.out.println("Temp: " + temperature);
+	
+			rc.add(rctd.createRackUglyCoordinates(i, 401, i + 24, 434, createRackProperty()));
+			rc.add(rctd.createRackUglyCoordinates(i, 328, i + 24, 361, createRackProperty()));
+			
 		}
-		rc.add(rctd.createRackUglyCoordinates(305, 228,  350, 261, 100));
+		
 		return rc;
 	}
 }

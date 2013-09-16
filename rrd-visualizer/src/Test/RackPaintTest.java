@@ -19,6 +19,7 @@ import Racks.Rack;
 import Racks.RackProperty;
 import Racks.Radiation;
 import Racks.RadiationTemp;
+import Racks.TemperatureLayer;
 
 public class RackPaintTest {
 
@@ -189,7 +190,10 @@ public class RackPaintTest {
 			}
 			
 			g2.drawImage(floor6, null, 0, 0);
-			g2.drawImage(getLayer(floor6.getWidth(), floor6.getHeight(), racks), null, 0, 0);
+			//g2.drawImage(getLayer(floor6.getWidth(), floor6.getHeight(), racks), null, 0, 0);
+			TemperatureLayer layer = new TemperatureLayer(floor6, racks);
+			g2.drawImage(layer.getLayer(temperature), null, 0, 0);
+			
 			g2.dispose();
 		}
 	}

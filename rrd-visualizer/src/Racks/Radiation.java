@@ -105,7 +105,8 @@ public class Radiation extends Ellipse2D.Float implements RadiationInterface {
 	@Override
 	public void paintRadiation(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setComposite(AlphaComposite.SrcOver);
+		//g2.setComposite(AlphaComposite.SrcOver);
+		
 		g2.setPaint(radiation);
 		g2.fill(this);
 	}
