@@ -1,23 +1,20 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
+
+import Racks.RackCreatorGUI;
 
 
 public class GeneralGui {
 
 	public JFrame mainframe;
 	public JPanel mainpanel;
-	private JMenuItem open;
+	private JMenuItem open, addRack;
 	private SliderRRDTest sRRDt = null;
 	
 	public static void main(String[] main){
@@ -39,14 +36,18 @@ public class GeneralGui {
 		JMenuItem datePickerTest = new JMenuItem("Test of Date Picker");
 		JMenuItem exit = new JMenuItem("Exit");
 		open = new JMenuItem("Open file");
+		addRack = new JMenuItem("Add rack");
 		open.setEnabled(false);
+		addRack.setEnabled(false);
 		open.addActionListener(new OpenFileListener());
+		addRack.addActionListener(new AddRackListener());
 		randomView.addActionListener(new RandomViewListener());
 		datePickerTest.addActionListener(new DatePickerTestListener());
 		exit.addActionListener(new ExitListener());
 		modemenu.add(randomView);
 		modemenu.add(datePickerTest);
-		filemenu.add(open);
+		//filemenu.add(open);
+		filemenu.add(addRack);
 		filemenu.add(exit);
 		mainframe.setJMenuBar(menuBar);
 		mainframe.setSize(300, 300);
@@ -55,8 +56,9 @@ public class GeneralGui {
 	}
 	
 	class OpenFileListener implements ActionListener {
-		private final JFileChooser jfc = new JFileChooser(); 
+		//private final JFileChooser jfc = new JFileChooser(); 
 		public void actionPerformed(ActionEvent ae) {
+			/*
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			FileFilter  rrdFFilter = new FileNameExtensionFilter("RRD file", "rrd");
 			jfc.setFileFilter(rrdFFilter);
@@ -64,17 +66,28 @@ public class GeneralGui {
 			if (retVal == JFileChooser.APPROVE_OPTION) {
 				File rrdFile = jfc.getSelectedFile();
 				if (sRRDt != null) {
-					try {
-					sRRDt.setRRDFile(rrdFile);
-					} catch (IOException ioe) {
-						System.err.println(ioe.getMessage());
-					}
+					//try {
+					//sRRDt.setRRDFile(rrdFile);
+					//} catch (IOException ioe) {
+					//	System.err.println(ioe.getMessage());
+					//}
 				} else {
 					System.err.println("Error: Cannot get view with slider");
 				}
-			}
+				
+			} */
 		}
 	}
+	
+	
+	class AddRackListener implements ActionListener{
+		public void actionPerformed(ActionEvent ae){
+			RackCreatorGUI rcg = new RackCreatorGUI();
+			rcg.showMenu();
+		}
+	}
+	
+	
 	
 	class RandomViewListener implements ActionListener {
 		public void actionPerformed(ActionEvent ae){
@@ -93,7 +106,8 @@ public class GeneralGui {
 			mainpanel = sRRDt.createMainPanel();
 			mainframe.setContentPane(mainpanel);
 			mainframe.pack();
-			open.setEnabled(true);
+			//open.setEnabled(true);
+			addRack.setEnabled(true);
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package RRDtools;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -9,8 +10,12 @@ import java.util.regex.Pattern;
  * rrdtool fetch mechanism; 
  */
 
-public class RRDRR implements Comparable<RRDRR> {
+public class RRDRR implements Comparable<RRDRR>, Serializable {
 
+	/**
+	 * Generated 17/09/2013
+	 */
+	private static final long serialVersionUID = 2084976594649667099L;
 	private Calendar recordtime;
 	private RRDValue[] recordvalues;
 	public final static String regexpstring = "^([0-9]{10}):\\s+(([0-9]+,[0-9]{10}e[+-][0-9]{1,3}\\s*)+)$";

@@ -24,8 +24,8 @@ public class RackTempProperty extends RackProperty {
 	public static final String MAX = "MAX";
 	public static final String LAST = "LAST";
 	
-	public RackTempProperty(String descr, RadiationParameters radParm, File rrdFile, String consFunc,  Calendar startTime, Calendar stopTime) throws IllegalArgumentException, NullPointerException, IOException{
-		super(descr, radParm, startTime, stopTime);
+	public RackTempProperty(RadiationParameters radParm, File rrdFile, String consFunc,  Calendar startTime, Calendar stopTime) throws IllegalArgumentException, NullPointerException, IOException{
+		super("Rack Temperature", radParm, startTime, stopTime);
 		if (rrdf != null) {
 			rrdf = rrdFile;
 		} else {

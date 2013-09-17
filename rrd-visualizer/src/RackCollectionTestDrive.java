@@ -79,11 +79,19 @@ public class RackCollectionTestDrive {
 		rc.add(rctd.createRackUglyCoordinates(448-7, 328, 448, 361));
 		rc.add(rctd.createRackUglyCoordinates(470-7, 328, 473, 361));
 		*/
-		for (int i = 190; i < 496; i = i + 25) {
+		for (int i = 190; i < 476; i = i + 25) {
 	
 			rc.add(rctd.createRackUglyCoordinates(i, 401, i + 24, 434, createRackProperty()));
-			rc.add(rctd.createRackUglyCoordinates(i, 328, i + 24, 361, createRackProperty()));
-			
+			rc.add(rctd.createRackUglyCoordinates(i, 328, i + 24, 361, createRackProperty()));	
+			rc.add(rctd.createRackUglyCoordinates(i, 220, i + 24, 253, createRackProperty()));	
+		}
+		
+		for (int i = 370; i < 626; i = i + 25) {
+			rc.add(rctd.createRackUglyCoordinates(i, 150, i + 24, 184, createRackProperty()));
+		}
+		
+		for (int i = 530; i < 680; i +=25 ){
+			rc.add(rctd.createRackUglyCoordinates(i, 220, i + 24, 253, createRackProperty()));
 		}
 		
 		return rc;

@@ -1,12 +1,9 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -21,6 +18,9 @@ import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import Racks.Rack;
+import Racks.RackCollection;
+
 import com.toedter.calendar.JDateChooser;
 
 public class SliderRRDTest {
@@ -34,8 +34,9 @@ public class SliderRRDTest {
 	private JDateChooser dateStart, dateEnd;
 	private JSlider moment;
 	private static long previousMoment, previousStart, previousEnd;
-	private File rrdFile = null;
-	//private RackCollection rackColl = new RackCollection();
+	//private File rrdFile = null;
+	private RackCollection rackColl = new RackCollection();
+	
 
 	public JPanel createMainPanel() {
 		mainPanel = new JPanel(new BorderLayout());
@@ -143,6 +144,7 @@ public class SliderRRDTest {
 
 	}
 
+	/*
 	public void setRRDFile(File rrdf) throws IOException {
 		if (rrdf.canRead()) {
 			this.rrdFile = rrdf;
@@ -154,7 +156,12 @@ public class SliderRRDTest {
 			throw new IOException("Cannot open file " + rrdf.getAbsolutePath());
 		}
 	}
+	*/
 
+	private void addRack(Rack rack){
+		rackColl.add(rack);
+	}
+	
 	private int getDateDiff() {
 		return Math.abs((int) ((dateEnd.getDate().getTime() - dateStart
 				.getDate().getTime()) / 1000 / 60));
