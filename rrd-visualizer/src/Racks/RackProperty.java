@@ -2,8 +2,13 @@ package Racks;
 
 import java.util.Calendar;
 
-public abstract class RackProperty implements RackPropertyInterface{
+
+public abstract class RackProperty implements RackPropertyInterface, Comparable<RackProperty> {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2614511279396352386L;
 	protected String description;
 	protected RadiationParameters radParam;
 	protected Calendar start, stop;
@@ -88,5 +93,25 @@ public abstract class RackProperty implements RackPropertyInterface{
 		} else {
 			throw new NullPointerException("Error: Array must be at least one value long");
 		}
+	}
+	
+	public int compareTo(RackProperty rackProperty){
+		return description.compareTo(rackProperty.description);
+	}
+	
+	@Override
+	public String toString(){
+		return description;
+	}
+	
+	@Override
+	public boolean equals(Object a){
+		RackProperty rp = (RackProperty) a;
+		return description.equals(rp.description);
+	}
+	
+	@Override 
+	public int hashCode(){
+		return description.hashCode();
 	}
 }

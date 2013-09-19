@@ -7,7 +7,7 @@ import javax.imageio.ImageIO;
 public class FloorMap {
 
 	private BufferedImage floorimage;
-	private static String floor6ImagePath = "src/testimage.png";
+	private static String floor6ImagePath = "src/floor6.png";
 
 	public FloorMap(String mapname) throws IllegalArgumentException, IOException {
 		switch (mapname) {

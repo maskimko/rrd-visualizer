@@ -1,8 +1,9 @@
 package Racks;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
-public interface RackPropertyInterface {
+public interface RackPropertyInterface extends Serializable {
 
 	public Calendar[] getBounds();
 	public void setBounds(Calendar[] bounds) throws NullPointerException;

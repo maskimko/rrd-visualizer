@@ -9,6 +9,11 @@ import java.util.Iterator;
 
 public class RackCollection extends ArrayList<Rack> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5328146854452255744L;
+
 	public RackCollection(){
 		super();
 	}

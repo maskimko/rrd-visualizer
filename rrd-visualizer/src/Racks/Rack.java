@@ -22,7 +22,9 @@ public class Rack extends Rectangle2D.Float implements RackInterface{
 	public Rack(String name, int x, int y, int width, int height, RackProperty rp) {
 		super(x, y, width, height);
 		this.name = name;
-		props.put(rp.description, rp);
+		if (rp != null) {
+			props.put(rp.description, rp);
+		}
 	}
 	
 	

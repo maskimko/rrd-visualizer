@@ -2,6 +2,10 @@ package Racks;
 
 public class RadiationParameters implements RadiationParametersInterface {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6025684909417710986L;
 	private float[] hr, sr, br, fractions;
 	private int[] ar;
 	

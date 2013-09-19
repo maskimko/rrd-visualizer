@@ -1,5 +1,4 @@
 package Racks;
-import java.awt.geom.Ellipse2D;
 import java.util.Calendar;
 
 
@@ -86,7 +85,6 @@ public  class RadiationSizer {
 	}
 	
 	public static float getRadiationRadiusFromRack(Rack rack, float value){
-		float coefficient =  value / 100 * influence + 1;
 		float ellipseW = getRadiationWidthFromRack(rack, value);
 		float ellipseH = getRadiationHeightFromRack(rack, value);
 		float radius = (float)Math.min(ellipseW/2, ellipseH/2);

@@ -1,6 +1,8 @@
 package Racks;
 
-public interface RadiationParametersInterface {
+import java.io.Serializable;
+
+public interface RadiationParametersInterface extends Serializable {
 
 	public float[] getHueRange();
 	public float[] getSaturationRange();

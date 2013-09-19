@@ -82,7 +82,7 @@ public class GeneralGui {
 	
 	class AddRackListener implements ActionListener{
 		public void actionPerformed(ActionEvent ae){
-			RackCreatorGUI rcg = new RackCreatorGUI();
+			RackCreatorGUI rcg = new RackCreatorGUI(sRRDt, mainframe);
 			rcg.showMenu();
 		}
 	}

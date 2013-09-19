@@ -138,7 +138,7 @@ public class RRDp  {
 		}
 
 		//System.out.println(sb.toString()); 
-		System.out.println("Full command: '" + fullcommand + "'");
+		//System.out.println("Full command: '" + fullcommand + "'");
 		try {
 			//writer.write(sb.toString().getBytes());
 			writer.write(fullcommand.getBytes());

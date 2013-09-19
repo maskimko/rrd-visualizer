@@ -13,11 +13,12 @@ public class RRDToolTest {
 		
 		try {
 			//File rrdfile = new File("D:\\transfer\\pvs2_sensstatetemper_12198.rrd");
-			String basedirectory = "d:\\transfer\\";
+			String basedirectory = System.getProperty("user.dir");
 			//String basedirectory = "/home/maskimko/Downloads";
 			//String rrdfilename = "file.rrd";
 			//String rrdfilename = "pvs2_sensstatetemper_12198.rrd";
-			String rrdfilename = "pvs2_sensstatetemper_12212.rrd";
+			//String rrdfilename = "pvs2_sensstatetemper_12212.rrd";
+			String rrdfilename = "d:\\transfer\\pvs2_sensstatetemper_12212.rrd";
 			System.out.println("Setting temporary directory to " + basedirectory);
 			//RRDp rrd = new RRDp(System.getProperty("java.io.tmpdir"), "55");
 			RRDp rrd = new RRDp(basedirectory);

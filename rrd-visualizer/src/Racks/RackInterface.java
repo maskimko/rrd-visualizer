@@ -1,10 +1,11 @@
 package Racks;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public interface RackInterface {
+public interface RackInterface extends Serializable {
 
 	public HashMap<String, RackProperty> getRackPropertyMap();
 	public void addRackProperty(RackProperty rp);

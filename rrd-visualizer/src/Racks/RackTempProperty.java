@@ -13,9 +13,13 @@ import RRDtools.RRDp;
 
 public class RackTempProperty extends RackProperty {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2796204285632862114L;
 	private File rrdf;
-	private RRDp rrdProcessor;
-	private String tmpDir;
+	private transient RRDp rrdProcessor;
+	private transient String tmpDir;
 	private String cf = AVERAGE;
 	private TreeSet<RRDRR>  rrdValues;
 	private static final String fieldId ="sensStateTemper";
@@ -26,7 +30,7 @@ public class RackTempProperty extends RackProperty {
 	
 	public RackTempProperty(RadiationParameters radParm, File rrdFile, String consFunc,  Calendar startTime, Calendar stopTime) throws IllegalArgumentException, NullPointerException, IOException{
 		super("Rack Temperature", radParm, startTime, stopTime);
-		if (rrdf != null) {
+		if (rrdFile != null) {
 			rrdf = rrdFile;
 		} else {
 			throw new NullPointerException("Error: You should provide RRD file");
@@ -47,7 +51,7 @@ public class RackTempProperty extends RackProperty {
 	}
 	
 	
-	@SuppressWarnings("finally")
+	
 	@Override
 	public float getValue(Calendar cal){
 		float retVal = 0;
@@ -57,10 +61,8 @@ public class RackTempProperty extends RackProperty {
 			retVal = (float) rrdVal.getValue();
 		} catch (IllegalArgumentException iae) {
 			System.err.println(iae.getMessage());
-		} finally {
+		} 
 			return retVal;
-		}
-		
 	}
 	
 

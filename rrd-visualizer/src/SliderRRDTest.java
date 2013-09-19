@@ -19,11 +19,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import Racks.Rack;
+import Racks.RackAddable;
 import Racks.RackCollection;
 
 import com.toedter.calendar.JDateChooser;
 
-public class SliderRRDTest {
+public class SliderRRDTest implements RackAddable{
 
 	public JPanel mainPanel;
 	public ImagePanel imagePanel;
@@ -137,6 +138,7 @@ public class SliderRRDTest {
 		return mainPanel;
 	}
 
+	
 	private void updateSlider() {
 
 		moment.setMinimum(0);
@@ -158,8 +160,12 @@ public class SliderRRDTest {
 	}
 	*/
 
-	private void addRack(Rack rack){
+	
+	
+	public void addRack(Rack rack){
 		rackColl.add(rack);
+		String rackInfo = "Coordinates " + rack.getCenterX() + ":" + rack.getCenterY() + " width " + rack.getWidth() + " height " + rack.getHeight();
+		infoText.append("Added rack " + rackInfo + "\n");
 	}
 	
 	private int getDateDiff() {
@@ -204,6 +210,14 @@ public class SliderRRDTest {
 
 	}
 
+	public Calendar getStartTime(){
+		return dateStart.getCalendar();
+	}
+	
+	public Calendar getEndTime(){
+		return dateEnd.getCalendar();
+	}
+	
 	private Calendar getCurrentCal(JSlider js) {
 		long dateValueInMillis = js.getValue();
 		System.out.println("Moment value: " + dateValueInMillis);
