@@ -57,6 +57,10 @@ public class RackCollectionTestDrive {
 				
 				return this.description;
 			}
+			
+			public void updateTimeBounds(Calendar start, Calendar stop){
+				
+			}
 		};
 		return rp;
 	}

@@ -2,10 +2,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 
 import javax.swing.BoxLayout;
@@ -21,6 +23,8 @@ import javax.swing.event.ChangeListener;
 import Racks.Rack;
 import Racks.RackAddable;
 import Racks.RackCollection;
+import Racks.RackTempProperty;
+import Racks.TemperatureLayer;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -28,13 +32,15 @@ public class SliderRRDTest implements RackAddable{
 
 	public JPanel mainPanel;
 	public ImagePanel imagePanel;
+	//private BufferedImage temperatureLayer;
 	private JPanel dateChoose;
 	private JPanel infoPanel, buttonPanel;
 	private JTextArea infoText;
 	private JScrollPane scrollInfoText, scrollImage;
 	private JDateChooser dateStart, dateEnd;
 	private JSlider moment;
-	private static long previousMoment, previousStart, previousEnd;
+	private Calendar currentCal;
+	private long previousMoment, previousStart, previousEnd;
 	//private File rrdFile = null;
 	private RackCollection rackColl = new RackCollection();
 	
@@ -59,9 +65,9 @@ public class SliderRRDTest implements RackAddable{
 		previousEnd = dateEnd.getDate().getTime();
 		dateStart.addPropertyChangeListener(new StartDateChangeListener());
 		dateEnd.addPropertyChangeListener(new EndDateChangeListener());
-
+		currentCal = dateEnd.getCalendar();
 		moment = createSliderFromDate(dateStart.getDate(), dateEnd.getDate());
-
+		
 		JLabel dateStartLabel = new JLabel("Start date");
 		JLabel dateEndLabel = new JLabel("End date");
 
@@ -194,6 +200,11 @@ public class SliderRRDTest implements RackAddable{
 		return sldr;
 	}
 
+	private BufferedImage getLayer(String rackPropDescr){
+		BufferedImage temperatureLayer = TemperatureLayer.getLayer(imagePanel.getWidth(), imagePanel.getHeight(), rackColl.getRackProperty(rackPropDescr), rackColl, currentCal);
+		return temperatureLayer;
+	}
+	
 	private void swapDates(JDateChooser start, JDateChooser end) {
 		Date swapDate = start.getDate();
 		dateStart.setDate(end.getDate());
@@ -218,6 +229,16 @@ public class SliderRRDTest implements RackAddable{
 		return dateEnd.getCalendar();
 	}
 	
+	
+	private void  updateRackProperties(){
+		infoText.append("Please, wait while getting new data from racks...  ");
+		Iterator<Rack> rackIt = rackColl.iterator();
+		while (rackIt.hasNext()){
+			rackIt.next().updateProperties(dateStart.getCalendar(), dateEnd.getCalendar());
+		}
+		infoText.append(" ... finished!\n");
+	}
+	
 	private Calendar getCurrentCal(JSlider js) {
 		long dateValueInMillis = js.getValue();
 		System.out.println("Moment value: " + dateValueInMillis);
@@ -240,8 +261,18 @@ public class SliderRRDTest implements RackAddable{
 	class MomentListener implements ChangeListener {
 
 		public void stateChanged(ChangeEvent ce) {
-			Calendar currentCal = getCurrentCal((JSlider) ce.getSource());
+			currentCal = getCurrentCal((JSlider) ce.getSource());
 			System.out.println("Current value " + currentCal.getTime());
+			
+			Iterator<Rack> rcIter = rackColl.iterator();
+			while(rcIter.hasNext()){
+				rcIter.next().paintRadiation(RackTempProperty.rackTempDescription, currentCal, imagePanel.getGraphics());
+			}
+			
+			//imagePanel.setBufferedImage(RackTempProperty.rackTempDescription, getLayer("Rack Temperature"));
+			//imagePanel.add2Image(rackColl);
+			//imagePanel.repaint();
+		
 		}
 	}
 
@@ -255,8 +286,9 @@ public class SliderRRDTest implements RackAddable{
 						+ dateStart.getDate().getTime());
 				System.out.println("Human readable format: "
 						+ dateStart.getDate().toString());
-
+				updateRackProperties();
 				updateSlider();
+				
 			}
 		}
 	}
@@ -270,8 +302,9 @@ public class SliderRRDTest implements RackAddable{
 						+ dateEnd.getDate().getTime());
 				System.out.println("Human readable format: "
 						+ dateEnd.getDate().toString());
+				updateRackProperties();
 				updateSlider();
-
+				
 			}
 		}
 

@@ -39,10 +39,17 @@ public class TemperatureLayer {
 
 	
 	public BufferedImage getLayer(RackProperty rp){
-		return getLayer(this.width, this.height, rp, this.racks);
+		return getLayer(this.width, this.height, rp, this.racks, Calendar.getInstance());
 	}
 	
-	public static BufferedImage getLayer(int width, int height, RackProperty rackProperty, ArrayList<Rack> racks) {
+	public BufferedImage getLayer(RackProperty rp, Calendar atTime){
+		return getLayer(this.width, this.height, rp, this.racks, atTime);
+	}
+	
+	
+	
+	
+	public static BufferedImage getLayer(int width, int height, RackProperty rackProperty, ArrayList<Rack> racks, Calendar moment) {
 		BufferedImage layer = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D lGr2 = layer.createGraphics();
@@ -50,7 +57,7 @@ public class TemperatureLayer {
 		if (racks.size() != 0) {
 			for (Rack rack : racks) {
 				rack.paintRadiation(rackProperty,
-						Calendar.getInstance(), lGr2);
+						moment, lGr2);
 			}
 			float hue;
 			Color point = null;

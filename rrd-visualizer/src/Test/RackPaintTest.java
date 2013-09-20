@@ -70,6 +70,10 @@ public class RackPaintTest {
 
 					return description;
 				}
+				
+				public void updateTimeBounds(Calendar start, Calendar stop){
+					
+				}
 			};
 
 			

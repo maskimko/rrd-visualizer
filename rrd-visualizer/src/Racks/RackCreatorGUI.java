@@ -3,6 +3,7 @@ package Racks;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
@@ -31,7 +32,7 @@ public class RackCreatorGUI {
 	private Rack rack;
 	private TreeSet<RackProperty> rpSet = new TreeSet<RackProperty>();
 	private JList<RackProperty> list;
-	
+
 	public RackCreatorGUI(RackAddable ra, JFrame jf) {
 		customer = ra;
 		owner = jf;
@@ -45,8 +46,8 @@ public class RackCreatorGUI {
 	public RackAddable getCustomer() {
 		return customer;
 	}
-	
-	public JFrame getOwner(){
+
+	public JFrame getOwner() {
 		return owner;
 	}
 
@@ -57,7 +58,7 @@ public class RackCreatorGUI {
 		 * rackMaker.addWindowListener(new WindowAdapter(){ public void
 		 * windowClosing(WindowEvent e){ System.exit(0); } });
 		 */
-		//rackMaker.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		// rackMaker.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		JPanel params = new JPanel();
 		params.setLayout(new BoxLayout(params, BoxLayout.Y_AXIS));
 		JPanel namePane = new JPanel();
@@ -90,7 +91,7 @@ public class RackCreatorGUI {
 		coordValueBox.setLayout(new BoxLayout(coordValueBox, BoxLayout.X_AXIS));
 		coordValueBox.setPreferredSize(new Dimension(200, 20));
 		coordPane.add(coordLabelBox);
-		//coordPane.add(new JSeparator(SwingConstants.VERTICAL));
+		// coordPane.add(new JSeparator(SwingConstants.VERTICAL));
 		coordPane.add(coordValueBox);
 		coordAndSize.add(coordPane);
 		JPanel sizePane = new JPanel();
@@ -102,7 +103,7 @@ public class RackCreatorGUI {
 		sizeValueBox.setLayout(new BoxLayout(sizeValueBox, BoxLayout.X_AXIS));
 		sizeValueBox.setPreferredSize(new Dimension(200, 20));
 		sizePane.add(sizeLabelBox);
-		//sizePane.add(new JSeparator(SwingConstants.VERTICAL));
+		// sizePane.add(new JSeparator(SwingConstants.VERTICAL));
 		sizePane.add(sizeValueBox);
 		coordAndSize.add(sizePane);
 		JLabel coordLb = new JLabel("X coordinate, Y coordinate");
@@ -120,13 +121,14 @@ public class RackCreatorGUI {
 		sizeValueBox.add(Box.createRigidArea(new Dimension(10, 0)));
 		sizeValueBox.add(heightField);
 		params.add(coordAndSize);
-		
+
 		JPanel propertyPanel = new JPanel();
 		propertyPanel.setLayout(new BoxLayout(propertyPanel, BoxLayout.X_AXIS));
-		propertyPanel.setBorder(BorderFactory.createTitledBorder("Rack Properties"));
+		propertyPanel.setBorder(BorderFactory
+				.createTitledBorder("Rack Properties"));
 		JPanel propLabelBox = new JPanel();
 		propLabelBox.setLayout(new BoxLayout(propLabelBox, BoxLayout.Y_AXIS));
-		//propLabelBox.setAlignmentX(0.5f);
+		// propLabelBox.setAlignmentX(0.5f);
 		JLabel propLb = new JLabel("Select Rack Property");
 		JLabel propLb2 = new JLabel("to create");
 		propLabelBox.add(propLb);
@@ -145,15 +147,15 @@ public class RackCreatorGUI {
 		propertyPanel.add(propLabelBox);
 		propertyPanel.add(propListBox);
 		JPanel propButtonPanel = new JPanel();
-		propButtonPanel.setLayout(new BoxLayout(propButtonPanel, BoxLayout.LINE_AXIS));
+		propButtonPanel.setLayout(new BoxLayout(propButtonPanel,
+				BoxLayout.LINE_AXIS));
 		propButtonPanel.add(Box.createHorizontalGlue());
 		JButton cProp = new JButton("Create Property");
 		cProp.addActionListener(new CreatePropertyListener());
 		propButtonPanel.add(cProp);
 		propListBox.add(propButtonPanel);
 		params.add(propertyPanel);
-		
-		
+
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
 		buttonPane.add(Box.createHorizontalGlue());
@@ -169,29 +171,24 @@ public class RackCreatorGUI {
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonPane.add(ok);
 		params.add(buttonPane);
-		
-		
+
 		infoArea = new JTextArea(1, 50);
 		infoArea.setEditable(false);
 		params.add(infoArea);
-		
 
 		rackMaker.setContentPane(params);
 		rackMaker.pack();
 		rackMaker.setVisible(true);
 	}
-	
-	
 
-	private void resetFields(){
+	private void resetFields() {
 		nameField.setText("");
 		xField.setText("");
 		yField.setText("");
 		widthField.setText("");
 		heightField.setText("");
 	}
-	
-	
+
 	private Rack makeRack() throws NumberFormatException {
 		RackProperty rackProperty = null;
 		String name = nameField.getText();
@@ -200,6 +197,10 @@ public class RackCreatorGUI {
 		int width = Integer.parseInt(widthField.getText());
 		int height = Integer.parseInt(heightField.getText());
 		rack = new Rack(name, x, y, width, height, rackProperty);
+		Iterator<RackProperty> rpIt = rpSet.iterator();
+		while (rpIt.hasNext()){
+			rack.addRackProperty(rpIt.next());
+		}
 		return rack;
 	}
 
@@ -208,30 +209,33 @@ public class RackCreatorGUI {
 			Rack rc = null;
 			try {
 				rc = makeRack();
-			} catch (NumberFormatException nfe){
+			} catch (NumberFormatException nfe) {
 				infoArea.setText("Invalid input " + nfe.getMessage());
 			}
 			if (rc != null) {
-			customer.addRack(rc);
-			infoArea.setText("Rack " + rc.name + " has been successfully added!");
-			resetFields();
-			rackMaker.setVisible(false);
+				customer.addRack(rc);
+				infoArea.setText("Rack " + rc.name
+						+ " has been successfully added!");
+				resetFields();
+				rackMaker.setVisible(false);
 			}
 		}
 	}
-	
-	class CreatePropertyListener implements ActionListener{
-		public void actionPerformed(ActionEvent ae){
+
+	class CreatePropertyListener implements ActionListener {
+		public void actionPerformed(ActionEvent ae) {
 			int rpSetSize = rpSet.size();
-			RackTempPropCreatorGUI tPropCreator = new RackTempPropCreatorGUI(rpSet, owner, customer);
+			RackTempPropCreatorGUI tPropCreator = new RackTempPropCreatorGUI(
+					rpSet, owner, customer);
 			tPropCreator.showMenu();
-			if (rpSet.size() != rpSetSize){
-			RackProperty rp = rpSet.last();
-			int index  = list.getSelectedIndex();
-			index++;
-			listModel.insertElementAt(rp, index);
-			list.ensureIndexIsVisible(index);
-			infoArea.setText("Rack property "+ rp.description + " has been added");
+			if (rpSet.size() != rpSetSize) {
+				RackProperty rp = rpSet.last();
+				int index = list.getSelectedIndex();
+				index++;
+				listModel.insertElementAt(rp, index);
+				list.ensureIndexIsVisible(index);
+				infoArea.setText("Rack property " + rp.description
+						+ " has been added");
 			}
 		}
 	}

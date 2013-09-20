@@ -14,4 +14,5 @@ public interface RackPropertyInterface extends Serializable {
 	public float getValue(Calendar cal) throws IllegalArgumentException, NullPointerException;
 	public Radiation getRadiation(Rack rack, Calendar cal) throws IllegalArgumentException, NullPointerException; 
 	public String getDescription();
+	public void updateTimeBounds(Calendar start, Calendar end);
 }

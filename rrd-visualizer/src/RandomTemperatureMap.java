@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -45,8 +46,8 @@ public class RandomTemperatureMap {
 			System.out.println("\"Generate New\" button has been pressed");
 			impnl.clearDrawings();
 			RackCollection rc = RackCollectionTestDrive.createStaticCollection();
-			
-			tempLayer = TemperatureLayer.getLayer(impnl.getWidth(), impnl.getHeight(), rc.getRackProperty("temperature"), rc);
+			Calendar dummyTime = Calendar.getInstance();
+			tempLayer = TemperatureLayer.getLayer(impnl.getWidth(), impnl.getHeight(), rc.getRackProperty("temperature"), rc, dummyTime);
 			impnl.setBufferedImage("temperature", tempLayer);
 			impnl.add2Image(rc);
 			impnl.repaint();

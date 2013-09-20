@@ -17,6 +17,7 @@ public class RackTempProperty extends RackProperty {
 	 * 
 	 */
 	private static final long serialVersionUID = -2796204285632862114L;
+	public static final String rackTempDescription = "Rack Temperature";
 	private File rrdf;
 	private transient RRDp rrdProcessor;
 	private transient String tmpDir;
@@ -29,7 +30,7 @@ public class RackTempProperty extends RackProperty {
 	public static final String LAST = "LAST";
 	
 	public RackTempProperty(RadiationParameters radParm, File rrdFile, String consFunc,  Calendar startTime, Calendar stopTime) throws IllegalArgumentException, NullPointerException, IOException{
-		super("Rack Temperature", radParm, startTime, stopTime);
+		super(rackTempDescription, radParm, startTime, stopTime);
 		if (rrdFile != null) {
 			rrdf = rrdFile;
 		} else {
@@ -50,6 +51,16 @@ public class RackTempProperty extends RackProperty {
 		}
 	}
 	
+	
+	public void updateTimeBounds(Calendar start, Calendar stop){
+		this.start = start; 
+		this.stop = stop;
+		try {
+			rrdValues = getResult(getRRDCommand());
+		} catch (Exception e) {
+			System.err.println("Cannot get data " + e.getMessage());
+		}
+	}
 	
 	
 	@Override

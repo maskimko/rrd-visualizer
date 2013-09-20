@@ -15,4 +15,5 @@ public interface RackInterface extends Serializable {
 	public void paintRadiation(RackProperty rp, Calendar time, Graphics g);
 	public void paintRadiation(String propertyDescription, Calendar time, Graphics g);
 	public void paintRack(Graphics g);
+	public void updateProperties(Calendar start, Calendar stop);
 }

@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class Rack extends Rectangle2D.Float implements RackInterface{
@@ -91,5 +92,12 @@ public class Rack extends Rectangle2D.Float implements RackInterface{
 		g2.dispose();
 		return destinationimage;
 	}*/
+	
+	public void updateProperties(Calendar start, Calendar stop){
+		Iterator<RackProperty> propIt = props.values().iterator();
+		while (propIt.hasNext()){
+			propIt.next().updateTimeBounds(start, stop);
+		}
+	}
 
 }
