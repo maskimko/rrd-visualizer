@@ -18,8 +18,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	protected short deviceType = -1;
 	protected TcpMaster tm = null;
 
-	
-	public RCUAnalyzer(String host, int port, short device, short type){
+	public RCUAnalyzer(String host, int port, short device, short type) {
 		this.ip = host;
 		this.port = port;
 		boolean keepAlive = true;
@@ -32,26 +31,24 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		this.device = device;
 		this.deviceType = type;
 	}
-	
-	
 
-	public short getModbusDeviceNumber(){
+	public short getModbusDeviceNumber() {
 		return this.device;
 	}
-	
-	public String getIpAddress(){
+
+	public String getIpAddress() {
 		return ip;
 	}
-	
-	public int getPort(){
+
+	public int getPort() {
 		return port;
 	}
-	
-	public short getDeviceType(){
+
+	public short getDeviceType() {
 		return this.deviceType;
 	}
-	
-	public static String getDeviceTypeAsString(short deviceType){
+
+	public static String getDeviceTypeAsString(short deviceType) {
 		String dt = null;
 		switch (deviceType) {
 		case PM500:
@@ -60,23 +57,25 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		case PM700:
 			dt = "PM700";
 			break;
-			default:
-				dt = "Unknown";
-				break;
+		case PM1200:
+			dt = "PM1200";
+		default:
+			dt = "Unknown";
+			break;
 		}
 		return dt;
 	}
-	
+
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
-			short device) throws ModbusInitException, InterruptedException, ModbusTransportException, NullPointerException {
+			short device) throws ModbusInitException, InterruptedException,
+			ModbusTransportException, NullPointerException {
 		RCUAnalyzer ra = null;
 		boolean keepAlive = true;
 		IpParameters ipParm = new IpParameters();
 		ipParm.setHost(hostname);
 		ipParm.setPort(port);
 		ipParm.setEncapsulated(false);
-		
-		
+
 		TcpMaster mtm = new TcpMaster(ipParm, keepAlive);
 		mtm.init();
 		short type = determineRCUDeviceType(mtm, device);
@@ -87,6 +86,9 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		case PM700:
 			ra = new RCUPM700Analyzer(hostname, port, device);
 			break;
+		case PM1200:
+			ra = new RCUPM1200Analyzer(hostname, port, device);
+			break;
 		default:
 			throw new NullPointerException(
 					"Error: Cannot create a RCUAnalyzer.\nUnknown type of device!");
@@ -95,14 +97,13 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		return ra;
 	}
 
-	
-
-	
 	public static short determineRCUDeviceType(TcpMaster tm, short devnum)
-			throws ModbusTransportException, InterruptedException, ModbusInitException {
+			throws ModbusTransportException, InterruptedException,
+			ModbusInitException {
 		short dt = -1;
 		boolean isPM500 = false;
 		boolean isPM700 = false;
+		boolean isPM1200 = false;
 		try {
 			ModbusLocator devTypePM500Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 64647,
@@ -114,7 +115,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			int idPM500 = (int) tm.getValue(devTypePM500Locator);
 			isPM500 = true;
 		} catch (ErrorResponseException erePM500) {
-			
+
 		}
 		try {
 			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
@@ -123,19 +124,29 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			int idPM700 = (int) tm.getValue(devTypePM700Locator);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
+
+		}
+		
+		try {
+			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 3901, DataType.FOUR_BYTE_INT_UNSIGNED);
+			long idPM1200 = (long) tm.getValue(devTypePM1200Locator);
+			System.out.println("PM1200 id " + idPM1200);
+			isPM1200 = true;
+		} catch (ErrorResponseException erePM1200){
 			
 		}
+		
 		if (isPM500) {
-			dt = 0;
+			dt = PM500;
 		} else if (isPM700) {
-			dt = 1;
+			dt = PM700;
+		} else if (isPM1200) {
+			dt = PM1200;
 		}
 		Thread.sleep(10);
 		tm.destroy();
 		return dt;
 	}
-
-	
 
 	protected static String showSwitcher(int counter) {
 		String key = null;
@@ -232,16 +243,15 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		showOutputFloat(toShow);
 	}
 
-	
-
-	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException  {
+	public RCUPacketFloat askDevice() throws ModbusInitException,
+			ErrorResponseException, ModbusTransportException {
 		return this.askDevice(tm);
 	}
 
 	/**
 	 * 
 	 * @param mtm
-	 * 			Provides a Modbus TCP Master class object
+	 *            Provides a Modbus TCP Master class object
 	 * @param device
 	 *            Provides a modbus device number
 	 * 
@@ -249,7 +259,8 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	 *         from polled device
 	 */
 	public abstract RCUPacketFloat askDevice(TcpMaster mtm)
-			throws ModbusInitException, ErrorResponseException, ModbusTransportException;
+			throws ModbusInitException, ErrorResponseException,
+			ModbusTransportException;
 
 	public void stop() {
 		if (tm != null) {
@@ -281,43 +292,47 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 					private boolean isAsked = false;
 					short devT = -1;
-					
-					
+
 					public RCUPacketFloat askDevice(TcpMaster mbMstr)
-							throws ModbusInitException, ErrorResponseException, ModbusTransportException {
+							throws ModbusInitException, ErrorResponseException,
+							ModbusTransportException {
 						RCUPacketFloat rcuPack = null;
 
 						try {
-						if (!isAsked) {
-							devT = determineRCUDeviceType(mbMstr, this.device);
-
-							if (devT != this.deviceType) {
-								System.err.println("Error: Looks like you provide wrong device type");
-								throw new ModbusInitException(
-										"Error: Looks like you provide wrong device type");
-							} else {
-								isAsked = true;
+							if (!isAsked) {
+								devT = determineRCUDeviceType(mbMstr,
+										this.device);
+								System.out.println("I got " + devT);
+								if (devT != this.deviceType) {
+									System.err
+											.println("Error: Looks like you provide wrong device type");
+									throw new ModbusInitException(
+											"Error: Looks like you provide wrong device type");
+								} else {
+									isAsked = true;
+								}
 							}
-						} }
-						catch (InterruptedException ie ) {
+						} catch (InterruptedException ie) {
 							ie.printStackTrace();
 						}
 						switch (devT) {
 						case PM500:
-							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(ip, port, this.device);
+							RCUPM500Analyzer rcuPM500An = new RCUPM500Analyzer(
+									ip, port, this.device);
 							rcuPack = rcuPM500An.askDevice();
 							break;
 						case PM700:
-							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(ip, port, this.device);
+							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(
+									ip, port, this.device);
 							rcuPack = rcuPM700An.askDevice();
 							break;
 						default:
 							throw new ModbusInitException(
 									"Error: Unfortunately I cannot handle this device type!");
 						}
-						
+
 						return rcuPack;
-					
+
 					}
 				};
 
@@ -328,11 +343,11 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 					Thread.sleep(1000);
 				}
-			} catch (ModbusInitException mie){
+			} catch (ModbusInitException mie) {
 				System.err.println("Error: Cannot init Modbus tcp session");
 				mie.printStackTrace();
 			}
-			
+
 			catch (InterruptedException ie) {
 				ie.printStackTrace();
 			} catch (Exception e) {

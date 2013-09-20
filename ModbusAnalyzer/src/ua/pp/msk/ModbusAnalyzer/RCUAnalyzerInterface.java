@@ -9,6 +9,7 @@ public interface RCUAnalyzerInterface {
 
 	public static final short PM500 = 0;
 	public static final short PM700 = 1;
+	public static final short PM1200 = 2;
 	
 	public RCUPacketFloat askDevice() throws ModbusInitException, ErrorResponseException, ModbusTransportException;
 	
