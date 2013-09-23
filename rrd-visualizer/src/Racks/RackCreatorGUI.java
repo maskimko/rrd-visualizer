@@ -216,7 +216,6 @@ public class RackCreatorGUI {
 				customer.addRack(rc);
 				infoArea.setText("Rack " + rc.name
 						+ " has been successfully added!");
-				resetFields();
 				rackMaker.setVisible(false);
 			}
 		}

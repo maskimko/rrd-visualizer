@@ -84,6 +84,7 @@ public class GeneralGui {
 		public void actionPerformed(ActionEvent ae){
 			RackCreatorGUI rcg = new RackCreatorGUI(sRRDt, mainframe);
 			rcg.showMenu();
+			//sRRDt.updatePropertyList();
 		}
 	}
 	
