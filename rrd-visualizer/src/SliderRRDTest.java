@@ -2,6 +2,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -39,6 +41,7 @@ public class SliderRRDTest implements RackAddable{
 	private JScrollPane scrollInfoText, scrollImage;
 	private JDateChooser dateStart, dateEnd;
 	private JSlider moment;
+	private JLabel momentLabel;
 	private Calendar currentCal;
 	private long previousMoment, previousStart, previousEnd;
 	//private File rrdFile = null;
@@ -66,15 +69,31 @@ public class SliderRRDTest implements RackAddable{
 		dateStart.addPropertyChangeListener(new StartDateChangeListener());
 		dateEnd.addPropertyChangeListener(new EndDateChangeListener());
 		currentCal = dateEnd.getCalendar();
-		moment = createSliderFromDate(dateStart.getDate(), dateEnd.getDate());
 		
+		JPanel sliderAndDatePanel = new JPanel(new BorderLayout());
+		
+		JPanel sliderDate = new JPanel();
+		sliderDate.setLayout(new FlowLayout());
+		sliderDate.setAlignmentY(0f);
+		sliderDate.setAlignmentX(0.5f);
+		JPanel sliderPanel = new JPanel();
+		sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.Y_AXIS));
+		
+		momentLabel = new JLabel("Current time point");
+		sliderDate.setAlignmentY(1f);
+		sliderDate.add(momentLabel);
+		
+		moment = createSliderFromDate(dateStart.getDate(), dateEnd.getDate());
+		sliderPanel.add(moment);
+		sliderAndDatePanel.add(BorderLayout.NORTH, sliderDate);
+		sliderAndDatePanel.add(BorderLayout.SOUTH, sliderPanel);
 		JLabel dateStartLabel = new JLabel("Start date");
 		JLabel dateEndLabel = new JLabel("End date");
 
 		dateChoose = new JPanel(new FlowLayout());
 		dateChoose.add(dateStartLabel);
 		dateChoose.add(dateStart);
-		dateChoose.add(moment);
+		dateChoose.add(sliderAndDatePanel);
 		dateChoose.add(dateEnd);
 		dateChoose.add(dateEndLabel);
 		mainPanel.add(BorderLayout.NORTH, dateChoose);
@@ -196,6 +215,7 @@ public class SliderRRDTest implements RackAddable{
 
 		sldr = new JSlider(JSlider.HORIZONTAL, 0, timeDiff, timeDiff);
 		sldr.addChangeListener(new MomentListener());
+		sldr.addMouseListener(new MomentMouseListener());
 
 		return sldr;
 	}
@@ -264,10 +284,8 @@ public class SliderRRDTest implements RackAddable{
 			currentCal = getCurrentCal((JSlider) ce.getSource());
 			System.out.println("Current value " + currentCal.getTime());
 			
-			Iterator<Rack> rcIter = rackColl.iterator();
-			while(rcIter.hasNext()){
-				rcIter.next().paintRadiation(RackTempProperty.rackTempDescription, currentCal, imagePanel.getGraphics());
-			}
+			String textDate = currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE) + " " + currentCal.get(Calendar.DAY_OF_MONTH) + "/" + currentCal.get(Calendar.MONTH) + "/" + currentCal.get(Calendar.YEAR);
+			momentLabel.setText(textDate);
 			
 			//imagePanel.setBufferedImage(RackTempProperty.rackTempDescription, getLayer("Rack Temperature"));
 			//imagePanel.add2Image(rackColl);
@@ -276,6 +294,35 @@ public class SliderRRDTest implements RackAddable{
 		}
 	}
 
+	class MomentMouseListener implements MouseListener {
+		public void mousePressed(MouseEvent e){
+			//System.out.println("Mouser pressed");
+		}
+		
+		public void mouseReleased(MouseEvent e){
+			System.out.println("Painting ...");
+			Iterator<Rack> rcIter = rackColl.iterator();
+			while(rcIter.hasNext()){
+				rcIter.next().paintRadiation(RackTempProperty.rackTempDescription, currentCal, imagePanel.getGraphics());
+			}
+		}
+		
+		public void mouseEntered(MouseEvent e){
+			//System.out.println("Mouse Entered");
+		}
+		
+		public void mouseExited(MouseEvent e){
+			//System.out.println("Mouse Exited");
+		}
+		
+		public void mouseClicked(MouseEvent e){
+			//System.out.println("Mouse Clicked");
+		}
+		
+		
+	}
+	
+	
 	class StartDateChangeListener implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent pce) {
