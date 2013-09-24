@@ -187,35 +187,39 @@ public class SliderRRDTest implements RackAddable {
 		return mainPanel;
 	}
 	
-	//TODO
-	//Property List Update implement in future 
-/*
-	public void updatePropertyList() {
+	
+
+	 void updatePropertyList() {
 		TreeSet<RackProperty> rpSet = new TreeSet<RackProperty>();
 		Iterator<Rack> rIter = rackColl.iterator();
 		while (rIter.hasNext()) {
-			HashMap<String, RackProperty> rMap = rIter.next()
-					.getRackPropertyMap();
+			Rack rck = rIter.next();
+			HashMap<String, RackProperty> rMap = rck.getRackPropertyMap();
 			Iterator<RackProperty> irp = rMap.values().iterator();
 			while (irp.hasNext()) {
-				rpSet.add(irp.next());
+				RackProperty rp = irp.next();
+				rpSet.add(rp);
+				//System.out.println("Added property " + rp.getDescription() + " form rack " + rck.getName());
 			}
 		}
 
 		int selIndex = Math.max(propList.getSelectedIndex(), 0);
 
-		propertyModel = new DefaultListModel<RackProperty>();
+		//propertyModel = new DefaultListModel<RackProperty>();
+		propertyModel.clear();
 		Iterator<RackProperty> rpIter = rpSet.iterator();
+		int indx = 0;
 		while (rpIter.hasNext()) {
 			propertyModel.addElement(rpIter.next());
+			propList.ensureIndexIsVisible(indx++);
 		}
 		propList.setSelectedIndex(selIndex);
 	}
-	*/
+	
 
-	public void addProperty2List(RackProperty rp){
+	/*public void addProperty2List(RackProperty rp){
 		propertyModel.addElement(rp);
-	}
+	}*/
 	
 	private void updateSlider() {
 
@@ -224,15 +228,7 @@ public class SliderRRDTest implements RackAddable {
 
 	}
 
-	/*
-	 * public void setRRDFile(File rrdf) throws IOException { if
-	 * (rrdf.canRead()) { this.rrdFile = rrdf; infoText.append("File " +
-	 * rrdFile.getAbsolutePath() + " has been loaded successfully!\n"); } else {
-	 * infoText.setCaretColor(new Color(0xff0000));
-	 * infoText.append("Cannot open file " + rrdf.getAbsolutePath() + "\n");
-	 * infoText.setCaretColor(new Color(0xffffff)); throw new
-	 * IOException("Cannot open file " + rrdf.getAbsolutePath()); } }
-	 */
+
 
 	public void addRack(Rack rack) {
 		rackColl.add(rack);
@@ -240,10 +236,10 @@ public class SliderRRDTest implements RackAddable {
 				+ rack.getCenterY() + " width " + rack.getWidth() + " height "
 				+ rack.getHeight();
 		infoText.append("Added rack " + rackInfo + "\n");
-		Iterator<RackProperty> rpIter = rack.getRackPropertyMap().values().iterator();
+		/*Iterator<RackProperty> rpIter = rack.getRackPropertyMap().values().iterator();
 		while (rpIter.hasNext()){
 			addProperty2List(rpIter.next());
-		}
+		}*/
 	}
 
 	private int getDateDiff() {
@@ -315,6 +311,14 @@ public class SliderRRDTest implements RackAddable {
 		return rackColl;
 	}
 	
+	 void setRackCollection(RackCollection rc) throws NullPointerException{
+		 if (rc != null) {
+			 rackColl = rc;
+		 } else {
+			 throw new NullPointerException("Rack Collection must be initialized before loading!");
+		 }
+	 }
+	 
 	private void updateRackProperties() {
 		infoText.append("Please, wait while getting new data from racks...  ");
 		Iterator<Rack> rackIt = rackColl.iterator();

@@ -61,6 +61,10 @@ public class Rack extends Rectangle2D.Float implements RackInterface{
 		rd.paintRadiation(g2);
 	}
 	
+	public String getName(){
+		return name;
+	}
+	
 	public RackProperty getRackProperty(String propDescr){
 		return props.get(propDescr);
 	}
@@ -73,6 +77,8 @@ public class Rack extends Rectangle2D.Float implements RackInterface{
 	public void addRackProperty(RackProperty rp){
 		props.put(rp.description, rp);
 	}
+	
+	
 	
 	public void paintRack(Graphics g){
 		Graphics2D g2 = (Graphics2D) g;

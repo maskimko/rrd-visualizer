@@ -1,9 +1,11 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import javax.swing.JFileChooser;
@@ -23,7 +25,7 @@ public class GeneralGui {
 
 	public JFrame mainframe;
 	public JPanel mainpanel;
-	private JMenuItem open, addRack, saveRacks;
+	private JMenuItem openRacks, addRack, saveRacks;
 	private SliderRRDTest sRRDt = null;
 	
 	public static void main(String[] main){
@@ -44,13 +46,13 @@ public class GeneralGui {
 		JMenuItem randomView = new JMenuItem("Random view");
 		JMenuItem datePickerTest = new JMenuItem("Test of Date Picker");
 		JMenuItem exit = new JMenuItem("Exit");
-		open = new JMenuItem("Open file");
+		openRacks = new JMenuItem("Open Racks");
 		addRack = new JMenuItem("Add rack");
-		saveRacks = new JMenuItem("SaveRacks");
+		saveRacks = new JMenuItem("Save Racks");
 		saveRacks.setEnabled(false);
-		open.setEnabled(false);
+		openRacks.setEnabled(false);
 		addRack.setEnabled(false);
-		open.addActionListener(new OpenFileListener());
+		openRacks.addActionListener(new OpenFileListener());
 		addRack.addActionListener(new AddRackListener());
 		saveRacks.addActionListener(new SaveRacksListener());
 		randomView.addActionListener(new RandomViewListener());
@@ -58,8 +60,9 @@ public class GeneralGui {
 		exit.addActionListener(new ExitListener());
 		modemenu.add(randomView);
 		modemenu.add(datePickerTest);
-		//filemenu.add(open);
+		
 		filemenu.add(addRack);
+		filemenu.add(openRacks);
 		filemenu.add(saveRacks);
 		filemenu.add(exit);
 		mainframe.setJMenuBar(menuBar);
@@ -69,26 +72,41 @@ public class GeneralGui {
 	}
 	
 	class OpenFileListener implements ActionListener {
-		//private final JFileChooser jfc = new JFileChooser(); 
+		private final JFileChooser jfc = new JFileChooser(); 
 		public void actionPerformed(ActionEvent ae) {
-			/*
+			
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			FileFilter  rrdFFilter = new FileNameExtensionFilter("RRD file", "rrd");
-			jfc.setFileFilter(rrdFFilter);
-			int retVal = jfc.showOpenDialog(mainframe);
+			FileFilter  serFilter = new FileNameExtensionFilter("Serialized objects", "ser");
+			jfc.setFileFilter(serFilter);
+			int retVal = jfc.showOpenDialog(sRRDt.mainPanel);
 			if (retVal == JFileChooser.APPROVE_OPTION) {
-				File rrdFile = jfc.getSelectedFile();
+				File serFile = jfc.getSelectedFile();
 				if (sRRDt != null) {
-					//try {
-					//sRRDt.setRRDFile(rrdFile);
-					//} catch (IOException ioe) {
-					//	System.err.println(ioe.getMessage());
-					//}
+					try {
+					FileInputStream fIN = new FileInputStream(serFile);
+						ObjectInputStream rcIn = new ObjectInputStream(fIN);
+						Object rackCollectionObject = rcIn.readObject();
+						sRRDt.setRackCollection((RackCollection) rackCollectionObject);
+						if (sRRDt.getRackCollection().size() != 0){
+							sRRDt.updatePropertyList();
+						}
+						rcIn.close();
+					} catch (NullPointerException npe) {
+						npe.printStackTrace();
+						sRRDt.add2InfoText(npe.getMessage());
+					} catch (ClassNotFoundException cnfe){
+						cnfe.printStackTrace();
+						sRRDt.add2InfoText(cnfe.getMessage());
+					}
+					catch (IOException ioe) {
+						ioe.printStackTrace();
+						sRRDt.add2InfoText(ioe.getMessage());
+					}
 				} else {
 					System.err.println("Error: Cannot get view with slider");
 				}
 				
-			} */
+			} 
 		}
 	}
 	
@@ -97,9 +115,10 @@ public class GeneralGui {
 		public void actionPerformed(ActionEvent ae){
 			RackCreatorGUI rcg = new RackCreatorGUI(sRRDt, mainframe);
 			rcg.showMenu();
-			//sRRDt.updatePropertyList();
+			sRRDt.updatePropertyList();
 			if (sRRDt.getRackCollection().size() != 0){
 				saveRacks.setEnabled(true);
+				sRRDt.updatePropertyList();
 			}
 		}
 	}
@@ -112,7 +131,9 @@ public class GeneralGui {
 			mainpanel = rwm.createMainPanel();
 			mainframe.setContentPane(mainpanel);
 			mainframe.pack();
-			open.setEnabled(false);
+			openRacks.setEnabled(false);
+			saveRacks.setEnabled(false);
+			addRack.setEnabled(false);
 		}
 	}
 	
@@ -125,6 +146,7 @@ public class GeneralGui {
 			mainframe.pack();
 			//open.setEnabled(true);
 			addRack.setEnabled(true);
+			openRacks.setEnabled(true);
 		}
 	}
 	
