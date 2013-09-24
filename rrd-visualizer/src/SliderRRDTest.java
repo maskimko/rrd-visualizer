@@ -39,7 +39,7 @@ import com.toedter.calendar.JDateChooser;
 
 public class SliderRRDTest implements RackAddable {
 
-	public JPanel mainPanel;
+	JPanel mainPanel;
 	public ImagePanel imagePanel;
 	// private BufferedImage temperatureLayer;
 	private JPanel dateChoose;
@@ -311,6 +311,10 @@ public class SliderRRDTest implements RackAddable {
 		return dateEnd.getCalendar();
 	}
 
+	 RackCollection getRackCollection(){
+		return rackColl;
+	}
+	
 	private void updateRackProperties() {
 		infoText.append("Please, wait while getting new data from racks...  ");
 		Iterator<Rack> rackIt = rackColl.iterator();
@@ -321,6 +325,10 @@ public class SliderRRDTest implements RackAddable {
 		infoText.append(" ... finished!\n");
 	}
 
+	void add2InfoText(String message){
+		infoText.append(message);
+	}
+	
 	private Calendar getCurrentCal(JSlider js) {
 		long dateValueInMillis = js.getValue();
 		System.out.println("Moment value: " + dateValueInMillis);

@@ -1,12 +1,21 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import Racks.RackCollection;
 import Racks.RackCreatorGUI;
 
 
@@ -14,7 +23,7 @@ public class GeneralGui {
 
 	public JFrame mainframe;
 	public JPanel mainpanel;
-	private JMenuItem open, addRack;
+	private JMenuItem open, addRack, saveRacks;
 	private SliderRRDTest sRRDt = null;
 	
 	public static void main(String[] main){
@@ -37,10 +46,13 @@ public class GeneralGui {
 		JMenuItem exit = new JMenuItem("Exit");
 		open = new JMenuItem("Open file");
 		addRack = new JMenuItem("Add rack");
+		saveRacks = new JMenuItem("SaveRacks");
+		saveRacks.setEnabled(false);
 		open.setEnabled(false);
 		addRack.setEnabled(false);
 		open.addActionListener(new OpenFileListener());
 		addRack.addActionListener(new AddRackListener());
+		saveRacks.addActionListener(new SaveRacksListener());
 		randomView.addActionListener(new RandomViewListener());
 		datePickerTest.addActionListener(new DatePickerTestListener());
 		exit.addActionListener(new ExitListener());
@@ -48,6 +60,7 @@ public class GeneralGui {
 		modemenu.add(datePickerTest);
 		//filemenu.add(open);
 		filemenu.add(addRack);
+		filemenu.add(saveRacks);
 		filemenu.add(exit);
 		mainframe.setJMenuBar(menuBar);
 		mainframe.setSize(300, 300);
@@ -85,6 +98,9 @@ public class GeneralGui {
 			RackCreatorGUI rcg = new RackCreatorGUI(sRRDt, mainframe);
 			rcg.showMenu();
 			//sRRDt.updatePropertyList();
+			if (sRRDt.getRackCollection().size() != 0){
+				saveRacks.setEnabled(true);
+			}
 		}
 	}
 	
@@ -116,6 +132,35 @@ public class GeneralGui {
 		public void actionPerformed(ActionEvent ae){
 			mainframe.setVisible(false);
 			System.exit(0);
+		}
+	}
+	
+	
+	class SaveRacksListener implements ActionListener {
+		public void actionPerformed(ActionEvent ae){
+			RackCollection rc = sRRDt.getRackCollection();
+			JFileChooser  saveFileChooser = new JFileChooser();
+			saveFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			FileFilter serFileFilter = new FileNameExtensionFilter("Serialized objects", "ser");
+			saveFileChooser.setFileFilter(serFileFilter);
+			int result = saveFileChooser.showSaveDialog(sRRDt.mainPanel);
+			if (result == JFileChooser.APPROVE_OPTION){
+				File save2 = saveFileChooser.getSelectedFile();
+				try {	
+					FileOutputStream fsOut = new FileOutputStream(save2);
+					ObjectOutputStream rcOut = new ObjectOutputStream(fsOut);
+					rcOut.writeObject(rc);
+					rcOut.close();
+					sRRDt.add2InfoText("Current Racks has been saved to " + save2.getAbsolutePath());
+				} catch (FileNotFoundException fnfe){
+					fnfe.printStackTrace();
+					sRRDt.add2InfoText("Cannot find file " + save2.getAbsolutePath());
+				} catch (IOException ioe){
+					ioe.printStackTrace();
+					sRRDt.add2InfoText(ioe.getMessage());
+				}
+			}
+			
 		}
 	}
 }

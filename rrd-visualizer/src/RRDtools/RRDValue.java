@@ -1,6 +1,12 @@
 package RRDtools;
 
-public class RRDValue {
+import java.io.Serializable;
+
+public class RRDValue implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 346227018013151305L;
 	protected double value;
 	protected String name;
 	
