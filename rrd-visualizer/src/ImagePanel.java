@@ -27,10 +27,12 @@ public class ImagePanel extends JPanel {
 		this.y = y;
 		try {
 			fm = new FloorMap(mapname);
-			bfimgs.put("base", fm.getImage());
+			bfimgs.put("Base", fm.getImage());
 			imageDimension = new Dimension(fm.getImage().getWidth(), fm
 					.getImage().getHeight());
 			this.setPreferredSize(imageDimension);
+			BufferedImage racklayer = new BufferedImage(fm.getImage().getWidth(), fm.getImage().getHeight(), BufferedImage.TYPE_INT_ARGB);
+			bfimgs.put("Racks", racklayer);
 		} catch (IOException ioe) {
 			System.err.println(ioe.getMessage());
 		} catch (IllegalArgumentException iae) {
@@ -51,11 +53,8 @@ public class ImagePanel extends JPanel {
 		if (bfitr.hasNext()) {
 			g2.setComposite(AlphaComposite.Src);
 			g2.drawImage(bfitr.next(), null, 0, 0);
-
 			g2.setComposite(AlphaComposite.SrcOver);
-			for (Rack currentrack : drawings) {
-				currentrack.paintRack(g2);
-			}
+			drawRacks();			
 			while (bfitr.hasNext()) {
 				g2.drawImage(bfitr.next(), null, 0, 0);
 			}
@@ -63,6 +62,13 @@ public class ImagePanel extends JPanel {
 		}
 	}
 
+	private void drawRacks(){
+		Graphics2D racksGraphics = (Graphics2D) getRackImage().getGraphics();
+		for (Rack currentrack : drawings) {
+		currentrack.paintRack(racksGraphics);
+	}
+	}
+	
 	public void add2Image(RackCollection racks) {
 		for (Rack currentrack : racks) {
 			drawings.add(currentrack);
@@ -85,7 +91,7 @@ public class ImagePanel extends JPanel {
 		bfimgs.put(layerName, bfImage);
 	}
 
-	public BufferedImage getLayer(String layerName, BufferedImage bfImage) {
+	public BufferedImage getLayer(String layerName) {
 		return bfimgs.get(layerName);
 	}
 
@@ -94,7 +100,11 @@ public class ImagePanel extends JPanel {
 	}
 
 	public BufferedImage getBaseImage() {
-		return bfimgs.get(0);
+		return bfimgs.get("Base");
+	}
+	
+	public BufferedImage getRackImage() {
+		return bfimgs.get("Racks");
 	}
 
 	public HashMap<String, BufferedImage> getImages() {

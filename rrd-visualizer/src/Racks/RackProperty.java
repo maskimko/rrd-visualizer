@@ -114,4 +114,9 @@ public abstract class RackProperty implements RackPropertyInterface, Comparable<
 	public int hashCode(){
 		return description.hashCode();
 	}
+	
+	@Override
+	public String getDescription() {
+		return this.description;
+	}
 }

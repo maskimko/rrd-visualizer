@@ -114,10 +114,6 @@ public class RackTempProperty extends RackProperty {
 	  return new Radiation(rack, this.description, cal, RadiationTemp.RadiationParametersTemp);
 	}
 
-	@Override
-	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 }

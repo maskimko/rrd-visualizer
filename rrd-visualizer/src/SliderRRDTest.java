@@ -373,9 +373,13 @@ public class SliderRRDTest implements RackAddable {
 			// rcIter.next().paintRadiation(RackTempProperty.rackTempDescription,
 			// currentCal, imagePanel.getGraphics());
 			// }
-			BufferedImage tmpLayer = getLayer(propList.getSelectedValue());
-			imagePanel.setBufferedImage(propList.getSelectedValue()
-					.getDescription(), tmpLayer);
+			
+			
+			RackProperty prop2Show = propList.getSelectedValue();
+			 
+			BufferedImage tmpLayer = getLayer(prop2Show);
+			System.out.println(prop2Show.getDescription() + " is selected");
+			imagePanel.setBufferedImage(prop2Show.getDescription(), tmpLayer);
 			imagePanel.repaint();
 		}
 
