@@ -20,13 +20,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 public class CoordinatePicker {
 
 	private BufferedImage map;
 	private JDialog coordinator;
 	private JFrame owner;
-	private String crd = "", dim = "";
+	
 	private int x1, x2, y1, y2;
 	private Rectangle rackPosition;
 	private JLabel showCoordinates;
@@ -54,20 +55,30 @@ public class CoordinatePicker {
 			}
 		};
 		JPanel buttonPanel  = new JPanel(new FlowLayout());
-		JLabel resultCoord = new JLabel("Rack coordinates" + crd + dim);
+		JLabel resultCoord = new JLabel("Rack coordinates" );
 		JButton okButton = new JButton("OK");
 		JButton cancelButton = new JButton("Cancel");
 		okButton.addActionListener(new OKButtonListener());
 		cancelButton.addActionListener(new CancelButtonListener());
+		buttonPanel.add(resultCoord);
+		buttonPanel.add(okButton);
+		buttonPanel.add(cancelButton);
 		JPanel coordPanel = new JPanel(new FlowLayout());
-		JScrollPane mapPanel = new JScrollPane(imagePanel);
-		mapPanel.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
-		showCoordinates = new JLabel("Coordinates: " + crd);
+		imagePanel.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		imagePanel.addMouseListener(new ImageMouseListener());
+		JScrollPane mapPanel = new JScrollPane(imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		showCoordinates = new JLabel("Coordinates: ");
+		coordPanel.add(showCoordinates);
 		JPanel content = new JPanel();
-		content.add(BorderLayout.NORTH, buttonPanel);
-		content.add(BorderLayout.CENTER, mapPanel);
-		content.add(BorderLayout.SOUTH, coordPanel);
+		content.setLayout(new BorderLayout());
+		buttonPanel.setPreferredSize(new Dimension(map.getWidth(), 40));
+		coordPanel.setPreferredSize(new Dimension(map.getWidth(), 30));
+		content.add(BorderLayout.PAGE_START, buttonPanel);
+		content.add(mapPanel);
+		content.add(BorderLayout.PAGE_END, coordPanel);
 		coordinator.add(content);
+		coordinator.pack();
 		coordinator.setVisible(true);
 	}
 	
@@ -79,7 +90,7 @@ public class CoordinatePicker {
 	class ImageMouseListener implements MouseListener {
 		public void mousePressed(MouseEvent e) {
 			Point dot = e.getPoint();
-			crd = dot.x + ":" + dot.y;
+			showCoordinates.setText("Coordinates: " + dot.x + ":" + dot.y);
 		}
 
 		public void mouseReleased(MouseEvent e) {

@@ -1,5 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -441,5 +440,11 @@ public class SliderRRDTest implements RackAddable {
 			}
 		}
 
+	}
+
+	@Override
+	public BufferedImage getBaseLayer() {
+		
+		return imagePanel.getBaseImage();
 	}
 }

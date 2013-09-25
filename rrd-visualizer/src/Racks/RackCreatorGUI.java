@@ -1,5 +1,7 @@
 package Racks;
 
+import guitools.CoordinatePicker;
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,6 +79,8 @@ public class RackCreatorGUI {
 		nameValueBox.add(nameField);
 		namePane.add(nameValueBox);
 		params.add(namePane);
+		
+		
 		JPanel coordAndSize = new JPanel();
 		coordAndSize.setLayout(new BoxLayout(coordAndSize, BoxLayout.Y_AXIS));
 		coordAndSize.setBorder(BorderFactory
@@ -94,6 +98,7 @@ public class RackCreatorGUI {
 		// coordPane.add(new JSeparator(SwingConstants.VERTICAL));
 		coordPane.add(coordValueBox);
 		coordAndSize.add(coordPane);
+		
 		JPanel sizePane = new JPanel();
 		sizePane.setLayout(new BoxLayout(sizePane, BoxLayout.X_AXIS));
 		JPanel sizeLabelBox = new JPanel();
@@ -106,6 +111,20 @@ public class RackCreatorGUI {
 		// sizePane.add(new JSeparator(SwingConstants.VERTICAL));
 		sizePane.add(sizeValueBox);
 		coordAndSize.add(sizePane);
+		
+		JPanel pointOnMap = new JPanel();
+		pointOnMap.setLayout(new BoxLayout(pointOnMap, BoxLayout.X_AXIS));
+		JButton pointer = new JButton("Point On Map");
+		pointer.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				CoordinatePicker coop = new CoordinatePicker(customer.getBaseLayer(), owner);
+				resetFields();
+				coop.showDialog();
+				
+			}
+		});
+		pointOnMap.add(pointer);
+		coordAndSize.add(pointOnMap);
 		JLabel coordLb = new JLabel("X coordinate, Y coordinate");
 		JLabel sizeLb = new JLabel("Width, Height");
 		widthField = new JTextField("Rack width");
