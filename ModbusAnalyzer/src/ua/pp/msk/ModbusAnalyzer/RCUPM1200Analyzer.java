@@ -55,49 +55,52 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 		 * RegisterRange.HOLDING_REGISTER, 4106, DataType.TWO_BYTE_INT_SIGNED);
 		 */
 		realPowerLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3903, DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3902, DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		apparentPowerLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3901,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3900,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		reactivePowerLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3905,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3904,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		powerFactorLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3907,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3906,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		frequencyLocator = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3015,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3914,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		currentLocatorA = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3929,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3928,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		currentLocatorB = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3943,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3942,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		currentLocatorC = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3957,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3956,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		currentLocatorN = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3703,
-				DataType.FOUR_BYTE_FLOAT);
+				//TODO
+				//find needed parameter
+				//RegisterRange.HOLDING_REGISTER, 3702,
+				RegisterRange.HOLDING_REGISTER, 3912,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorAB = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3925,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3924,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorBC = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3939,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3938,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorCA = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3953,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3952,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorAN = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3927,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3926,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorBN = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3941,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3940,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 		voltageLocatorCN = new ModbusLocator(devNum,
-				RegisterRange.HOLDING_REGISTER, 3955,
-				DataType.FOUR_BYTE_FLOAT);
+				RegisterRange.HOLDING_REGISTER, 3954,
+				DataType.FOUR_BYTE_FLOAT_SWAPPED);
 	}
 
 	public RCUPacketFloat askDevice() throws ModbusInitException,

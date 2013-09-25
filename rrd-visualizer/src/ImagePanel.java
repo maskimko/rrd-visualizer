@@ -4,7 +4,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -15,16 +14,19 @@ import Racks.RackCollection;
 
 public class ImagePanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1997450953438786765L;
 	private HashMap<String, BufferedImage> bfimgs = new HashMap<String, BufferedImage>();
 	private FloorMap fm = null;
 	public Dimension imageDimension;
 	private RackCollection drawings = new RackCollection();
-	private int x, y;
+	
 
 	public ImagePanel(String mapname, int x, int y) {
 		super();
-		this.x = x;
-		this.y = y;
+	
 		try {
 			fm = new FloorMap(mapname);
 			bfimgs.put("Base", fm.getImage());

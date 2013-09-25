@@ -128,8 +128,10 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		}
 		
 		try {
-			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 3901, DataType.FOUR_BYTE_INT_UNSIGNED);
-			long idPM1200 = (long) tm.getValue(devTypePM1200Locator);
+			//ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 3914, DataType.FOUR_BYTE_FLOAT_SWAPPED);
+			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 3914, DataType.FOUR_BYTE_FLOAT_SWAPPED);
+			
+			float idPM1200 = (float) tm.getValue(devTypePM1200Locator);
 			System.out.println("PM1200 id " + idPM1200);
 			isPM1200 = true;
 		} catch (ErrorResponseException erePM1200){
@@ -325,6 +327,10 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 							RCUPM700Analyzer rcuPM700An = new RCUPM700Analyzer(
 									ip, port, this.device);
 							rcuPack = rcuPM700An.askDevice();
+							break;
+						case PM1200:
+							RCUPM1200Analyzer rcuPM1200An = new RCUPM1200Analyzer(ip, port, this.device);
+							rcuPack = rcuPM1200An.askDevice();
 							break;
 						default:
 							throw new ModbusInitException(
