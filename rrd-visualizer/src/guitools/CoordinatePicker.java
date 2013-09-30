@@ -2,6 +2,7 @@ package guitools;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -12,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JButton;
@@ -28,9 +30,13 @@ public class CoordinatePicker {
 	private JDialog coordinator;
 	private JFrame owner;
 	
-	private int x1, x2, y1, y2;
+
 	private Rectangle rackPosition;
-	private JLabel showCoordinates;
+	//private JLabel showCoordinates;
+	private JLabel resultCoord;
+	private int mouseX, mouseY, dragX, dragY, oldX, oldY;
+	private JPanel coordP;
+	private boolean drag = false, rect = true, oldRect = true;
 	
 	public CoordinatePicker(BufferedImage map, JFrame owner){
 		this.map = map;
@@ -40,44 +46,76 @@ public class CoordinatePicker {
 	public void showDialog(){
 		coordinator = new JDialog(owner, "Set coordinates");
 		coordinator.setModal(true);
-		JPanel imagePanel = new JPanel(){
+		coordP = new JPanel(){
 			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paintComponent(Graphics g){
+			public void paint(Graphics g){
 				Graphics2D g2 = (Graphics2D) g;
-				g2.setComposite(AlphaComposite.Src);
-				g2.drawImage(map, null, 0, 0);
+				
+				if (drag) {
+					g2.setColor(Color.BLACK);
+					g2.setXORMode(Color.WHITE);
+					if (oldRect) {
+						int x = Math.min(mouseX, oldX);
+						int y = Math.min(mouseY,  oldY);
+						int w = Math.abs(mouseX - oldX);
+						int h = Math.abs(mouseY - oldY);
+						g2.drawRect(x, y, w, h);
+					}
+					if (rect) {
+						int x = Math.min(mouseX, dragX);
+						int y = Math.min(mouseY,  dragY);
+						int w = Math.abs(mouseX - dragX);
+						int h = Math.abs(mouseY - dragY);
+						g2.drawRect(x, y, w, h);
+					}
+					oldX = dragX;
+					oldY = dragY;
+					oldRect = rect;
+					drag = false;
+				} else {
+					g2.setComposite(AlphaComposite.Src);
+					g2.drawImage(map, null, 0, 0);
+				}
+				
+				
 				g2.dispose();
 			}
+			
+			@Override
+			public void update(Graphics g){
+				paint(g);
+			}
 		};
-		JPanel buttonPanel  = new JPanel(new FlowLayout());
-		JLabel resultCoord = new JLabel("Rack coordinates" );
+		JPanel bPan  = new JPanel(new FlowLayout());
+		resultCoord = new JLabel("Rack coordinates" );
 		JButton okButton = new JButton("OK");
 		JButton cancelButton = new JButton("Cancel");
 		okButton.addActionListener(new OKButtonListener());
 		cancelButton.addActionListener(new CancelButtonListener());
-		buttonPanel.add(resultCoord);
-		buttonPanel.add(okButton);
-		buttonPanel.add(cancelButton);
-		JPanel coordPanel = new JPanel(new FlowLayout());
-		imagePanel.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
-		imagePanel.addMouseListener(new ImageMouseListener());
-		JScrollPane mapPanel = new JScrollPane(imagePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		bPan.add(resultCoord);
+		bPan.add(okButton);
+		bPan.add(cancelButton);
+		//JPanel coordPanel = new JPanel(new FlowLayout());
+		coordP.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		coordP.addMouseListener(new ImageMouseListener());
+		coordP.addMouseMotionListener(new ImageMouseMotionListener());
+		JScrollPane mapPanel = new JScrollPane(coordP, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
-		showCoordinates = new JLabel("Coordinates: ");
-		coordPanel.add(showCoordinates);
+		//showCoordinates = new JLabel("Coordinates: ");
+		//coordPanel.add(showCoordinates);
 		JPanel content = new JPanel();
 		content.setLayout(new BorderLayout());
-		buttonPanel.setPreferredSize(new Dimension(map.getWidth(), 40));
-		coordPanel.setPreferredSize(new Dimension(map.getWidth(), 30));
-		content.add(BorderLayout.PAGE_START, buttonPanel);
-		content.add(mapPanel);
-		content.add(BorderLayout.PAGE_END, coordPanel);
-		coordinator.add(content);
+		//bPan.setPreferredSize(new Dimension(map.getWidth(), 40));
+		//coordPanel.setPreferredSize(new Dimension(map.getWidth(), 30));
+		content.add(BorderLayout.PAGE_START, bPan);
+		content.add(BorderLayout.CENTER, mapPanel);
+		//content.add(BorderLayout.PAGE_END, coordPanel);
+		coordinator.setContentPane(content);
 		coordinator.pack();
 		coordinator.setVisible(true);
 	}
@@ -90,7 +128,12 @@ public class CoordinatePicker {
 	class ImageMouseListener implements MouseListener {
 		public void mousePressed(MouseEvent e) {
 			Point dot = e.getPoint();
-			showCoordinates.setText("Coordinates: " + dot.x + ":" + dot.y);
+			if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
+			//showCoordinates.setText("Coordinates: " + dot.x + ":" + dot.y);
+			mouseX = dragX = oldX = dot.x;
+			mouseY = dragY = oldY = dot.y;
+			
+			}
 		}
 
 		public void mouseReleased(MouseEvent e) {
@@ -108,6 +151,17 @@ public class CoordinatePicker {
 			System.out.println(prop2Show.getDescription() + " is selected");
 			imagePanel.setBufferedImage(prop2Show.getDescription(), tmpLayer);
 			imagePanel.repaint();*/
+			if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0){
+				if (mouseX != e.getX() && mouseY != e.getY()) {
+					int x = Math.min(mouseX, e.getX());
+					int y  = Math.min(mouseY, e.getY());
+					int w = Math.abs(mouseX - e.getX());
+					int h = Math.abs(mouseY -e.getY());
+					rackPosition = new Rectangle(x, y, w, h);
+					resultCoord.setText("X: "+x+" Y: "+y+" Width: "+w+" Height: "+h);
+				}
+			}
+			
 		}
 
 		public void mouseEntered(MouseEvent e) {
@@ -123,12 +177,21 @@ public class CoordinatePicker {
 		}
 	}
 	
+	class ImageMouseMotionListener implements MouseMotionListener {
+		public void mouseMoved(MouseEvent e) {}
+		public void mouseDragged(MouseEvent e) {
+					drag = true;
+				dragX = e.getX();
+				dragY = e.getY();
+				coordP.repaint();
+		}
+	}
+	
 	class OKButtonListener implements ActionListener{
 		public void actionPerformed(ActionEvent ae){
-			if (x1 != x2 && y1 != y2){
-				rackPosition = new Rectangle(Math.min(x1, x2), Math.min(y1,  y2), Math.abs(x1 - x2), Math.abs(y1 -y2));
+			if (rackPosition != null){
 				coordinator.setVisible(false);
-			}
+			} 
 		}
 	}
 	

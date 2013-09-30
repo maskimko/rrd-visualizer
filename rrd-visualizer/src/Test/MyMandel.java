@@ -198,7 +198,7 @@ public class MyMandel {
 	
 	class ListenTheKeyboard implements KeyListener {
 		public void keyPressed(KeyEvent e){
-			System.out.println(e.getKeyCode());
+			//System.out.println(e.getKeyCode());
 			if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 				max = 16;
 				viewX = 0;

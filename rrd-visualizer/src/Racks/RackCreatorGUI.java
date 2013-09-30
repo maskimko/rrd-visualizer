@@ -3,6 +3,7 @@ package Racks;
 import guitools.CoordinatePicker;
 
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -113,13 +114,20 @@ public class RackCreatorGUI {
 		coordAndSize.add(sizePane);
 		
 		JPanel pointOnMap = new JPanel();
-		pointOnMap.setLayout(new BoxLayout(pointOnMap, BoxLayout.X_AXIS));
+		pointOnMap.setLayout(new FlowLayout());
 		JButton pointer = new JButton("Point On Map");
 		pointer.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent ae){
 				CoordinatePicker coop = new CoordinatePicker(customer.getBaseLayer(), owner);
 				resetFields();
 				coop.showDialog();
+				
+				try {
+			    xField.setText(""+coop.getPosition().x);
+				yField.setText(""+coop.getPosition().y);
+				widthField.setText(""+coop.getPosition().width);
+				heightField.setText(""+coop.getPosition().height);
+				} catch (NullPointerException npe){	}
 				
 			}
 		});
