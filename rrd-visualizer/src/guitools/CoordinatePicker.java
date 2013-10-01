@@ -1,5 +1,6 @@
 package guitools;
 
+import java.applet.Applet;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,7 +37,10 @@ public class CoordinatePicker {
 	private JLabel resultCoord;
 	private int mouseX, mouseY, dragX, dragY, oldX, oldY;
 	private JPanel coordP;
-	private boolean drag = false, rect = true, oldRect = true;
+	private boolean drag = false, rect = true, oldRect = true, exist = false;
+	
+	
+	private MyCoordinatePicker mcp = null;
 	
 	public CoordinatePicker(BufferedImage map, JFrame owner){
 		this.map = map;
@@ -53,7 +57,7 @@ public class CoordinatePicker {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void paint(Graphics g){
+			public void paintComponent(Graphics g){
 				Graphics2D g2 = (Graphics2D) g;
 				
 				if (drag) {
@@ -88,7 +92,7 @@ public class CoordinatePicker {
 			
 			@Override
 			public void update(Graphics g){
-				paint(g);
+				paintComponent(g);
 			}
 		};
 		JPanel bPan  = new JPanel(new FlowLayout());
@@ -101,19 +105,25 @@ public class CoordinatePicker {
 		bPan.add(okButton);
 		bPan.add(cancelButton);
 		//JPanel coordPanel = new JPanel(new FlowLayout());
-		coordP.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
-		coordP.addMouseListener(new ImageMouseListener());
-		coordP.addMouseMotionListener(new ImageMouseMotionListener());
+		//coordP.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		//coordP.addMouseListener(new ImageMouseListener());
+		//coordP.addMouseMotionListener(new ImageMouseMotionListener());
 		JScrollPane mapPanel = new JScrollPane(coordP, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		//showCoordinates = new JLabel("Coordinates: ");
 		//coordPanel.add(showCoordinates);
 		JPanel content = new JPanel();
 		content.setLayout(new BorderLayout());
-		//bPan.setPreferredSize(new Dimension(map.getWidth(), 40));
-		//coordPanel.setPreferredSize(new Dimension(map.getWidth(), 30));
+		
 		content.add(BorderLayout.PAGE_START, bPan);
-		content.add(BorderLayout.CENTER, mapPanel);
+		
+		mcp = new MyCoordinatePicker();
+		mcp.addMouseListener(new ImageMouseListener());
+		mcp.addMouseMotionListener(new ImageMouseMotionListener());
+		mcp.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+		JScrollPane appletPanel = new JScrollPane(mcp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		content.add(BorderLayout.CENTER, appletPanel);
+		//content.add(BorderLayout.CENTER, mapPanel);
 		//content.add(BorderLayout.PAGE_END, coordPanel);
 		coordinator.setContentPane(content);
 		coordinator.pack();
@@ -130,7 +140,15 @@ public class CoordinatePicker {
 			Point dot = e.getPoint();
 			if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
 			//showCoordinates.setText("Coordinates: " + dot.x + ":" + dot.y);
-			mouseX = dragX = oldX = dot.x;
+			if (exist){
+				mcp.clearSelection();
+				rect = false;
+				mcp.repaint();
+				rect = true;
+				
+				exist = false;
+			}
+				mouseX = dragX = oldX = dot.x;
 			mouseY = dragY = oldY = dot.y;
 			
 			}
@@ -159,6 +177,8 @@ public class CoordinatePicker {
 					int h = Math.abs(mouseY -e.getY());
 					rackPosition = new Rectangle(x, y, w, h);
 					resultCoord.setText("X: "+x+" Y: "+y+" Width: "+w+" Height: "+h);
+					exist = true;
+					mcp.showSelection(rackPosition);
 				}
 			}
 			
@@ -183,7 +203,8 @@ public class CoordinatePicker {
 					drag = true;
 				dragX = e.getX();
 				dragY = e.getY();
-				coordP.repaint();
+				//coordP.repaint();
+				mcp.repaint();
 		}
 	}
 	
@@ -200,5 +221,62 @@ public class CoordinatePicker {
 			rackPosition = null;
 			coordinator.setVisible(false);
 		}
+	}
+	
+	class MyCoordinatePicker extends Applet {
+		
+		Rectangle oldArea = null;
+		
+		public void paint(Graphics g){
+		Graphics2D g2 = (Graphics2D) g;
+		
+		if (drag) {
+			g2.setColor(Color.BLACK);
+			g2.setXORMode(Color.WHITE);
+			if (oldRect) {
+				int x = Math.min(mouseX, oldX);
+				int y = Math.min(mouseY,  oldY);
+				int w = Math.abs(mouseX - oldX);
+				int h = Math.abs(mouseY - oldY);
+				g2.drawRect(x, y, w, h);
+			}
+			if (rect) {
+				int x = Math.min(mouseX, dragX);
+				int y = Math.min(mouseY,  dragY);
+				int w = Math.abs(mouseX - dragX);
+				int h = Math.abs(mouseY - dragY);
+				g2.drawRect(x, y, w, h);
+			}
+			oldX = dragX;
+			oldY = dragY;
+			oldRect = rect;
+			drag = false;
+		} else {
+			//g2.setComposite(AlphaComposite.Src);
+			g2.drawImage(map, null, 0, 0);
+		}
+		
+		
+		g2.dispose();
+	}
+	
+		public void showSelection(Rectangle area){
+			oldArea = area;
+			Graphics2D g2 = (Graphics2D) this.getGraphics();
+			g2.setColor(Color.WHITE);
+			g2.setXORMode(new Color(0x88ff0000));
+			g2.fillRect(area.x, area.y, area.width, area.height);
+		}
+		
+		public void clearSelection(){
+			Graphics2D g2 = (Graphics2D) this.getGraphics();
+			g2.setColor(Color.WHITE);
+			g2.setXORMode(new Color(0x88ff0000));
+			g2.fillRect(oldArea.x, oldArea.y, oldArea.width, oldArea.height);
+		}
+	
+	public void update(Graphics g){
+		paint(g);
+	}	
 	}
 }
