@@ -1,5 +1,6 @@
 package ua.pp.msk.ModbusAnalyzer;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import com.serotonin.modbus4j.ModbusLocator;
@@ -27,7 +28,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		ipParam.setPort(port);
 		ipParam.setEncapsulated(false);
 		tm = new TcpMaster(ipParam, keepAlive);
-		tm.setTimeout(1500);
+		tm.setTimeout(3500);
 		this.device = device;
 		this.deviceType = type;
 	}
@@ -112,7 +113,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 				tm.init();
 			}
 
-			int idPM500 = (int) tm.getValue(devTypePM500Locator);
+			tm.getValue(devTypePM500Locator);
 			isPM500 = true;
 		} catch (ErrorResponseException erePM500) {
 
@@ -121,7 +122,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 7003,
 					DataType.TWO_BYTE_INT_UNSIGNED);
-			int idPM700 = (int) tm.getValue(devTypePM700Locator);
+			tm.getValue(devTypePM700Locator);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
 
@@ -132,7 +133,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum, RegisterRange.HOLDING_REGISTER, 3914, DataType.FOUR_BYTE_FLOAT_SWAPPED);
 			
 			float idPM1200 = (float) tm.getValue(devTypePM1200Locator);
-			System.out.println("PM1200 id " + idPM1200);
+			//System.out.println("PM1200 id " + idPM1200);
 			isPM1200 = true;
 		} catch (ErrorResponseException erePM1200){
 			
@@ -246,7 +247,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	}
 
 	public RCUPacketFloat askDevice() throws ModbusInitException,
-			ErrorResponseException, ModbusTransportException {
+			ErrorResponseException, ModbusTransportException, SocketException {
 		return this.askDevice(tm);
 	}
 
@@ -259,10 +260,11 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	 * 
 	 * @return Returns object of RCUPacket class with all gathered information
 	 *         from polled device
+	 * @throws SocketException 
 	 */
 	public abstract RCUPacketFloat askDevice(TcpMaster mtm)
 			throws ModbusInitException, ErrorResponseException,
-			ModbusTransportException;
+			ModbusTransportException, SocketException;
 
 	public void stop() {
 		if (tm != null) {
@@ -297,14 +299,14 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 
 					public RCUPacketFloat askDevice(TcpMaster mbMstr)
 							throws ModbusInitException, ErrorResponseException,
-							ModbusTransportException {
+							ModbusTransportException, SocketException {
 						RCUPacketFloat rcuPack = null;
 
 						try {
 							if (!isAsked) {
 								devT = determineRCUDeviceType(mbMstr,
 										this.device);
-								System.out.println("I got " + devT);
+								System.out.println("I got " + RCUAnalyzer.getDeviceTypeAsString(devT));
 								if (devT != this.deviceType) {
 									System.err
 											.println("Error: Looks like you provide wrong device type");

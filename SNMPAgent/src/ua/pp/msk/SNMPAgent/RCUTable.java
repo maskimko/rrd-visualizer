@@ -111,6 +111,7 @@ public class RCUTable extends DefaultMOTable {
 				RCUDevice.createBaseSimferopolRCUDevice((short) 3));
 		RCUModelFactory.addRCUDeviceToModel(model,
 				RCUDevice.createBaseOdesaRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model, RCUDevice.createBaseKyivRCUDevice((short) 6));
 		deviceStats.setVolatile(true);
 		return deviceStats;
 	}

@@ -1,5 +1,7 @@
 package ua.pp.msk.ModbusAnalyzer;
 
+import java.net.SocketException;
+
 import com.serotonin.modbus4j.ModbusLocator;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
@@ -104,7 +106,7 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 	}
 
 	public RCUPacketFloat askDevice() throws ModbusInitException,
-			ErrorResponseException, ModbusTransportException {
+			ErrorResponseException, ModbusTransportException, SocketException {
 		return askDevice(tm);
 	}
 
@@ -118,7 +120,7 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 	 * @throws Exception
 	 */
 	public RCUPacketFloat askDevice(TcpMaster mtm) throws ModbusInitException,
-			ErrorResponseException, ModbusTransportException {
+			ErrorResponseException, ModbusTransportException, SocketException {
 		setUpLocators();
 		if (!tm.isInitialized()) {
 			tm.init();
@@ -165,9 +167,9 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 				.pow(10, frequencyScale));
 		*/
 		
-		float realPower = (float) mtm.getValue(realPowerLocator);
-		float apparentPower = (float) mtm.getValue(apparentPowerLocator);
-		float reactivePower = (float) mtm.getValue(reactivePowerLocator);
+		float realPower = (float) mtm.getValue(realPowerLocator) /1000;
+		float apparentPower = (float) mtm.getValue(apparentPowerLocator) / 1000;
+		float reactivePower = (float) mtm.getValue(reactivePowerLocator) / 1000;
 		float powerFactor = (float) mtm.getValue(powerFactorLocator);
 		float frequency = (float) mtm.getValue(frequencyLocator);
 		float currentA = (float) mtm.getValue(currentLocatorA);

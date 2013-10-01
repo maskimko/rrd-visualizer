@@ -1,5 +1,7 @@
 package ua.pp.msk.SNMPAgent;
 
+import java.net.SocketException;
+
 import org.snmp4j.agent.mo.DefaultMOMutableRow2PC;
 import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.Integer32;
@@ -48,6 +50,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	}*/
 	
 	private synchronized void  resetRCUAnalyzer(){
+		rcuAnalyzer.stop();
 		rcuAnalyzer = null;
 		rcuDev.resetRCUAnalyzer();
 		rcuAnalyzer = rcuDev.getRCUAnalyzer();
@@ -70,7 +73,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return vars;
 	}
 
-	private int[] getRCUPackStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException  {
+	private int[] getRCUPackStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException, SocketException  {
 		Runnable cooldowner = new CoolDown(renewDuration-1);
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
@@ -78,7 +81,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return rcuPack.getAllInteger();
 	}
 
-	private synchronized Variable[] getStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException {
+	private synchronized Variable[] getStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException, SocketException {
 		int counter = 3;
 		Variable[] rowValues = values;
 		int[] stats = getRCUPackStatsArray();
@@ -99,7 +102,12 @@ public class RCURow extends DefaultMOMutableRow2PC {
 			} catch (NullPointerException npe) {
 				System.err.println("Cannot update device table");
 				System.err.println(npe.getMessage());
-			} catch (ModbusInitException mie) {
+			} catch (SocketException se) {
+				System.err.println("Error: Socket error on " + rcuDev.getDescription());
+				System.err.println(se.getMessage());
+				resetRCUAnalyzer();
+			}
+			catch (ModbusInitException mie) {
 				System.err.println("Error: Could not initialize TCP Modbus Master Connection!");
 				System.err.println("This row has inactual data " + rcuDev.getDescription());
 			}
