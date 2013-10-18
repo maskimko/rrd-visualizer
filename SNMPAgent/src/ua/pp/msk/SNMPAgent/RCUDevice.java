@@ -1,11 +1,11 @@
 package ua.pp.msk.SNMPAgent;
 
-import com.serotonin.modbus4j.exception.ModbusInitException;
-import com.serotonin.modbus4j.exception.ModbusTransportException;
-
 import ua.pp.msk.ModbusAnalyzer.RCUAnalyzer;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketFloat;
 import ua.pp.msk.ModbusAnalyzer.RCUPacketGenerator;
+
+import com.serotonin.modbus4j.exception.ModbusInitException;
+import com.serotonin.modbus4j.exception.ModbusTransportException;
 
 public class RCUDevice {
 
@@ -97,16 +97,17 @@ public class RCUDevice {
 		return pack;
 	}
 
+	private  void describeDevice() {			
+		Thread descriptionThread = new Thread(new RCUDeviceDescriber(this), description);
+		descriptionThread.start();
+	}
+	
 	public static RCUDevice createBaseKyivRCUDevice(short modbusDeviceNumber) {
 
 		RCUDevice dev = new RCUDevice(RCUDevice.KYIV, "Kyiv power input RCU ",
 				"10.1.20.122", 502, modbusDeviceNumber,
 				RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
@@ -115,11 +116,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.DNIPROPETROVSK,
 				"Dnipropetrovsk power input RCU device", "10.144.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
@@ -127,11 +124,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.DONETSK,
 				"Donetsk power input RCU device", "10.176.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
@@ -139,11 +132,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.KHARKIV,
 				"Kharkiv power input RCU device", "10.160.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
@@ -151,11 +140,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.LVIV,
 				"Lviv power input RCU device", "10.224.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		
 		return dev;
 	}
 
@@ -164,11 +149,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.SIMFEROPOL,
 				"Simferopol power input RCU device", "10.192.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
@@ -176,14 +157,28 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.ODESA,
 				"Odesa power input RCU device", "10.208.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		dev.description += " (Modbus device "
-				+ modbusDeviceNumber
-				+ " Model: "
-				+ RCUAnalyzer.getDeviceTypeAsString(dev.getRCUAnalyzer()
-						.getDeviceType()) + ")";
+		dev.describeDevice();
 		return dev;
 	}
 
+	class RCUDeviceDescriber implements Runnable {
+
+		private RCUDevice rd = null;
+
+		public RCUDeviceDescriber(RCUDevice device) {
+			rd = device;
+		}
+
+		public void run() {
+			
+				rd.description += " (Modbus device "
+						+ modbusDeviceNumber
+						+ " Model: "
+						+ RCUAnalyzer.getDeviceTypeAsString(rd.getRCUAnalyzer()
+								.getDeviceType()) + ")";
+		}
+	}
+	
 	class RCUAnalyzerCreator implements Runnable {
 
 		private static final long below5Duration = 30000;
