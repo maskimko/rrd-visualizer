@@ -19,10 +19,26 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	protected short deviceType = -1;
 	protected TcpMaster tm = null;
 
+	/**
+	 * @param host Modbus Slave host ip address
+	 * @param port Modbus slave host tcp port
+	 * @param device Number of the device on modbus bus
+	 * @param type Type of the device (eg. PM500, PM700, PM 1200)
+	 */
 	public RCUAnalyzer(String host, int port, short device, short type) {
+		this(host, port, device, type, true);
+	}
+	//TODO Document this class
+	/**
+	 * @param host Modbus Slave host ip address
+	 * @param port Modbus slave host tcp port
+	 * @param device Number of the device on modbus bus
+	 * @param type Type of the device (eg. PM500, PM700, PM 1200)
+	 * @param keepAlive keep TCP connection alive
+	 */
+	public RCUAnalyzer(String host, int port, short device, short type, boolean keepAlive){
 		this.ip = host;
 		this.port = port;
-		boolean keepAlive = true;
 		IpParameters ipParam = new IpParameters();
 		ipParam.setHost(host);
 		ipParam.setPort(port);
@@ -32,6 +48,19 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		this.device = device;
 		this.deviceType = type;
 	}
+	
+	/**
+	 * @param tm TcpMaster object, which handles connection
+	 * @param device Number of the device on modbus bus
+	 * @param type Type of the device (eg. PM500, PM700, PM 1200)
+	 */
+	public RCUAnalyzer(TcpMaster tm, short device, short type){
+		this.tm = tm;
+		this.device= device;
+		this.deviceType = type;
+		
+	}
+	
 
 	public short getModbusDeviceNumber() {
 		return this.device;
@@ -67,11 +96,22 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		return dt;
 	}
 
+	/**
+	 * @param hostname Modbus Slave host ip address
+	 * @param port Modbus slave host tcp port
+	 * @param device Number of the device on modbus bus 
+	 * @param keepAlive keep TCP connection alive
+	 * @return Class RCUAnalyzer
+	 * @throws ModbusInitException Cannot init modbus section
+	 * @throws InterruptedException Modbus session was interrupted
+	 * @throws ModbusTransportException tcp errors
+	 * @throws NullPointerException Cannot create a RCUAnalyzer. Unknown type of device!
+	 */
 	public static RCUAnalyzer getRCUDevice(String hostname, int port,
-			short device) throws ModbusInitException, InterruptedException,
+			short device, boolean keepAlive) throws ModbusInitException, InterruptedException,
 			ModbusTransportException, NullPointerException {
 		RCUAnalyzer ra = null;
-		boolean keepAlive = true;
+		
 		IpParameters ipParm = new IpParameters();
 		ipParm.setHost(hostname);
 		ipParm.setPort(port);
@@ -89,6 +129,53 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			break;
 		case PM1200:
 			ra = new RCUPM1200Analyzer(hostname, port, device);
+			break;
+		default:
+			throw new NullPointerException(
+					"Error: Cannot create a RCUAnalyzer.\nUnknown type of device!");
+		}
+
+		return ra;
+	}
+	
+	/**
+	 * @param hostname Modbus Slave host ip address
+	 * @param port Modbus slave host tcp port
+	 * @param device Number of the device on modbus bus 
+	 * @return Class RCUAnalyzer
+	 * @throws ModbusInitException Cannot init modbus section
+	 * @throws InterruptedException Modbus session was interrupted
+	 * @throws ModbusTransportException tcp errors
+	 * @throws NullPointerException Cannot create a RCUAnalyzer. Unknown type of device!
+	 */
+	public static RCUAnalyzer getRCUDevice(String hostname, int port, short device) throws ModbusInitException, InterruptedException, ModbusTransportException, NullPointerException{
+		return getRCUDevice(hostname, port, device, true);
+	}
+	
+	
+	/**
+	 * @param tm TcpMaster object, which handles connection
+	 * @param device Number of the device on modbus bus 
+	 * @return
+	 * @throws ModbusTransportException tcp errors
+	 * @throws InterruptedException Modbus session was interrupted
+	 * @throws ModbusInitException Cannot init modbus section
+	 */
+	public static RCUAnalyzer getRCUDevice(TcpMaster tm, short device) throws ModbusTransportException, InterruptedException, ModbusInitException{
+		RCUAnalyzer ra = null;
+		
+
+		tm.init();
+		short type = determineRCUDeviceType(tm, device);
+		switch (type) {
+		case PM500:
+			ra = new RCUPM500Analyzer(tm, device);
+			break;
+		case PM700:
+			ra = new RCUPM700Analyzer(tm, device);
+			break;
+		case PM1200:
+			ra = new RCUPM1200Analyzer(tm, device);
 			break;
 		default:
 			throw new NullPointerException(

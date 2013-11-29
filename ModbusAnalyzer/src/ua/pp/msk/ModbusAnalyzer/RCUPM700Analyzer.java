@@ -40,7 +40,13 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 		super (host, port, device, PM700);
 	}
 	
+	public RCUPM700Analyzer(String host, int port, short device, boolean keepAlive){
+		super(host, port , device, PM700, keepAlive);
+	}
 	
+	public RCUPM700Analyzer(TcpMaster tm, short device){
+		super(tm, device, PM700);
+	}
 	
 	/*
 	public RCUPM700Analyzer(TcpMaster mtm, short device){

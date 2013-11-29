@@ -6,6 +6,7 @@ import ua.pp.msk.ModbusAnalyzer.RCUPacketGenerator;
 
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
+import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
 public class RCUDevice {
 
@@ -214,8 +215,8 @@ public class RCUDevice {
 		private void makeRCUAnalyzer() throws InterruptedException,
 				NullPointerException {
 			try {
-				rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
-						modbusDeviceNumber);
+				//rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,	modbusDeviceNumber);
+				rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port, modbusDeviceNumber, false);
 			} catch (ModbusInitException exc) {
 				System.err.println("Error: Cannot init Modbus TCP session\n"
 						+ exc.getMessage());
@@ -232,6 +233,28 @@ public class RCUDevice {
 			}
 		}
 
+		private void makeRCUAnalyzer(TcpMaster tm) throws InterruptedException,
+		NullPointerException {
+	try {
+		//rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,				modbusDeviceNumber);
+		rcuAnalyzer = RCUAnalyzer.getRCUDevice(tm, modbusDeviceNumber);
+	} catch (ModbusInitException exc) {
+		System.err.println("Error: Cannot init Modbus TCP session\n"
+				+ exc.getMessage());
+		System.err.println("Device " + ipAddress + ":" + port + "/"
+				+ modbusDeviceNumber);
+		rcuAnalyzer = null;
+	} catch (ModbusTransportException mte) {
+		System.err
+				.println("Error: Cannot create TCP session. Check you network connection\n"
+						+ mte.getMessage());
+		System.err.println("Device " + ipAddress + ":" + port + "/"
+				+ modbusDeviceNumber);
+		rcuAnalyzer = null;
+	}
+}
+
+		
 		public void run() {
 			try {
 				recreateRCUAnalyzer();
