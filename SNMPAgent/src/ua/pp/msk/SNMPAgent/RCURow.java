@@ -74,9 +74,24 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	}
 
 	private int[] getRCUPackStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException, SocketException  {
+		long waitingTime = 0;
 		Runnable cooldowner = new CoolDown(renewDuration-1);
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
+		while (rcuAnalyzer == null){
+			try {
+				Thread.sleep(100);
+				waitingTime += 100;
+				if (waitingTime == 60000){
+					System.out.println("1 minute waiting for RCUAnalyzer for " + rcuDev.getDescription());
+				} else if (waitingTime == 300000){
+					System.err.println(rcuDev.getDescription() + " is not responcing for at least 5 minutes");
+					waitingTime = 0;
+				}
+			} catch (InterruptedException ie){
+				System.err.println("Waiting for RCUAnalyzer for " + rcuDev.getDescription() + " has been interrupted");
+			}
+		}
 		RCUPacketFloat rcuPack = rcuAnalyzer.askDevice();
 		return rcuPack.getAllInteger();
 	}
@@ -100,8 +115,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 			try {
 				values = getStatsArray();
 			} catch (NullPointerException npe) {
-				System.err.println("Cannot update device table");
-				System.err.println(npe.getMessage());
+				System.err.println("Cannot update "+rcuDev.getDescription()+" table");
 			} catch (SocketException se) {
 				System.err.println("Error: Socket error on " + rcuDev.getDescription());
 				System.err.println(se.getMessage());

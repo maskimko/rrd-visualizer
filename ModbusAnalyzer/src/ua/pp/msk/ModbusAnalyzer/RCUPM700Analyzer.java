@@ -36,17 +36,15 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	int[] scaleFactor = new int[4]; 
 	
 	
-	public RCUPM700Analyzer(String host, int port, short device){
+	public RCUPM700Analyzer(String host, int port, short device) throws ModbusInitException{
 		super (host, port, device, PM700);
 	}
 	
-	public RCUPM700Analyzer(String host, int port, short device, boolean keepAlive){
+	public RCUPM700Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException{
 		super(host, port , device, PM700, keepAlive);
 	}
 	
-	public RCUPM700Analyzer(TcpMaster tm, short device){
-		super(tm, device, PM700);
-	}
+	
 	
 	/*
 	public RCUPM700Analyzer(TcpMaster mtm, short device){

@@ -37,16 +37,14 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 	// int[] scaleFactor = new int[4];
 
 	
-	public RCUPM1200Analyzer(String host, int port, short device, boolean keepAlive) {
+	public RCUPM1200Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException {
 		super(host, port, device, PM1200, keepAlive);
 	}
-	public RCUPM1200Analyzer(String host, int port, short device) {
+	public RCUPM1200Analyzer(String host, int port, short device) throws ModbusInitException {
 		super(host, port, device, PM1200);
 	}
 	
-	public RCUPM1200Analyzer(TcpMaster tm, short device){
-		super(tm, device, PM1200);
-	}
+
 
 	/*
 	 * public RCUPM700Analyzer(TcpMaster mtm, short device){ super(mtm, device,

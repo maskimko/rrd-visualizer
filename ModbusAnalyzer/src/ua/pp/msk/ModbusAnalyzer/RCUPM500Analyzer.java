@@ -32,17 +32,15 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 	private ModbusLocator voltageLocatorBN = null;
 	private ModbusLocator voltageLocatorCN = null;
 
-	public RCUPM500Analyzer(String host, int port, short device, boolean keepAlive) {
+	public RCUPM500Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException {
 		super(host, port, device, PM500, keepAlive);
 	}
 	
-	public RCUPM500Analyzer(String host, int port, short device) {
+	public RCUPM500Analyzer(String host, int port, short device) throws ModbusInitException {
 		super(host, port, device, PM500);
 	}
 
-	public RCUPM500Analyzer(TcpMaster tm, short device) {
-		super(tm, device, PM500);
-	}
+
 	/*
 	public RCUPM500Analyzer(TcpMaster tm, short device) {
 		super(tm, device, PM500);
