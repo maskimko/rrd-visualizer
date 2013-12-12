@@ -42,21 +42,35 @@ public class RCUDevice {
 		RCUAnalyzerCreator rcuac = new RCUAnalyzerCreator();
 		Thread creationOfRCU = new Thread(rcuac);
 		creationOfRCU.setName(description);
-		System.out.print("Starting of " + getDescription() + " RCUAnalyzer creation... ");
+		System.out.println("Starting of " + getDescription()
+				+ " RCUAnalyzer creation... ");
 		creationOfRCU.start();
 		try {
-			long timeWaiting = 0;
-			while (rcuAnalyzer == null){
-			Thread.sleep(10);
-			timeWaiting += 10;
+			Thread.sleep(1000);
+		} catch (InterruptedException ie) {
+			System.err
+					.println("Method create RCUAnalyzer has been interrupted!");
+			ie.printStackTrace();
 		}
-			System.out.println(" created in " + timeWaiting + " milliseconds");
-		creationOfRCU = null;
-		rcuac = null;
-		} catch (InterruptedException intre) {
-			System.err.println("Method create RCUAnalyzer has been interrupted!");
-			intre.printStackTrace();
-		}
+		Thread checkCreated = new Thread(new Runnable() {
+			public void run() {
+				long timeWaiting = 1000;
+				while (rcuAnalyzer == null) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						System.err
+								.println("Method checker of RCUAnalyzer creation has been interrupted!");
+						e.printStackTrace();
+					}
+					timeWaiting += 10;
+				}
+				System.out.println(getDescription()
+						+ " RCUAnalyzer created in " + timeWaiting
+						+ " milliseconds");
+			}
+		});
+		checkCreated.start();
 	}
 
 	synchronized void resetRCUAnalyzer() {
@@ -98,11 +112,12 @@ public class RCUDevice {
 		return pack;
 	}
 
-	private  void describeDevice() {			
-		Thread descriptionThread = new Thread(new RCUDeviceDescriber(this), description);
+	private void describeDevice() {
+		Thread descriptionThread = new Thread(new RCUDeviceDescriber(this),
+				description);
 		descriptionThread.start();
 	}
-	
+
 	public static RCUDevice createBaseKyivRCUDevice(short modbusDeviceNumber) {
 
 		RCUDevice dev = new RCUDevice(RCUDevice.KYIV, "Kyiv power input RCU ",
@@ -141,7 +156,7 @@ public class RCUDevice {
 		RCUDevice dev = new RCUDevice(RCUDevice.LVIV,
 				"Lviv power input RCU device", "10.224.20.122", 502,
 				modbusDeviceNumber, RCUPacketGenerator.getZeroPacket());
-		
+
 		return dev;
 	}
 
@@ -171,15 +186,15 @@ public class RCUDevice {
 		}
 
 		public void run() {
-			
-				rd.description += " (Modbus device "
-						+ modbusDeviceNumber
-						+ " Model: "
-						+ RCUAnalyzer.getDeviceTypeAsString(rd.getRCUAnalyzer()
-								.getDeviceType()) + ")";
+
+			rd.description += " (Modbus device "
+					+ modbusDeviceNumber
+					+ " Model: "
+					+ RCUAnalyzer.getDeviceTypeAsString(rd.getRCUAnalyzer()
+							.getDeviceType()) + ")";
 		}
 	}
-	
+
 	class RCUAnalyzerCreator implements Runnable {
 
 		private static final long below5Duration = 30000;
@@ -215,8 +230,10 @@ public class RCUDevice {
 		private void makeRCUAnalyzer() throws InterruptedException,
 				NullPointerException {
 			try {
-				//rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,	modbusDeviceNumber);
-				rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port, modbusDeviceNumber, false);
+				// rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
+				// modbusDeviceNumber);
+				rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
+						modbusDeviceNumber, false);
 			} catch (ModbusInitException exc) {
 				System.err.println("Error: Cannot init Modbus TCP session\n"
 						+ exc.getMessage());
@@ -234,27 +251,27 @@ public class RCUDevice {
 		}
 
 		private void makeRCUAnalyzer(TcpMaster tm) throws InterruptedException,
-		NullPointerException {
-	try {
-		//rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,				modbusDeviceNumber);
-		rcuAnalyzer = RCUAnalyzer.getRCUDevice(tm, modbusDeviceNumber);
-	} catch (ModbusInitException exc) {
-		System.err.println("Error: Cannot init Modbus TCP session\n"
-				+ exc.getMessage());
-		System.err.println("Device " + ipAddress + ":" + port + "/"
-				+ modbusDeviceNumber);
-		rcuAnalyzer = null;
-	} catch (ModbusTransportException mte) {
-		System.err
-				.println("Error: Cannot create TCP session. Check you network connection\n"
-						+ mte.getMessage());
-		System.err.println("Device " + ipAddress + ":" + port + "/"
-				+ modbusDeviceNumber);
-		rcuAnalyzer = null;
-	}
-}
+				NullPointerException {
+			try {
+				// rcuAnalyzer = RCUAnalyzer.getRCUDevice(ipAddress, port,
+				// modbusDeviceNumber);
+				rcuAnalyzer = RCUAnalyzer.getRCUDevice(tm, modbusDeviceNumber);
+			} catch (ModbusInitException exc) {
+				System.err.println("Error: Cannot init Modbus TCP session\n"
+						+ exc.getMessage());
+				System.err.println("Device " + ipAddress + ":" + port + "/"
+						+ modbusDeviceNumber);
+				rcuAnalyzer = null;
+			} catch (ModbusTransportException mte) {
+				System.err
+						.println("Error: Cannot create TCP session. Check you network connection\n"
+								+ mte.getMessage());
+				System.err.println("Device " + ipAddress + ":" + port + "/"
+						+ modbusDeviceNumber);
+				rcuAnalyzer = null;
+			}
+		}
 
-		
 		public void run() {
 			try {
 				recreateRCUAnalyzer();

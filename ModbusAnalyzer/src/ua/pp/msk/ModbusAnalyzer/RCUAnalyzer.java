@@ -26,7 +26,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 	 * @param type Type of the device (eg. PM500, PM700, PM 1200)
 	 */
 	public RCUAnalyzer(String host, int port, short device, short type) {
-		this(host, port, device, type, true);
+		this(host, port, device, type, false);
 	}
 	//TODO Document this class
 	/**
