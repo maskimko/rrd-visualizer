@@ -73,7 +73,7 @@ public class RCUDevice {
 	}
 
 	synchronized void resetRCUAnalyzer() {
-		rcuAnalyzer.stop();
+
 		rcuAnalyzer = null;
 		System.out.println("Try to recreate RCUAnalyzer");
 		createRCUAnalyzer();
@@ -216,7 +216,7 @@ public class RCUDevice {
 		private void recreateRCUAnalyzer() throws InterruptedException {
 
 			if (rcuAnalyzer != null) {
-				rcuAnalyzer.stop();
+	
 				reCounter = 0;
 			}
 			while (rcuAnalyzer == null) {
@@ -254,8 +254,8 @@ public class RCUDevice {
 				rcuAnalyzer = null;
 			} catch (ModbusTransportException mte) {
 				System.err
-						.println("Error: Cannot create TCP session. Check you network connection\n"
-								+ mte.getMessage());
+						.println("Error: Cannot create TCP session to " +getDescription()+ "\nCheck you network connection\n"
+								+ mte.getStackTrace());
 				System.err.println("Device " + ipAddress + ":" + port + "/"
 						+ modbusDeviceNumber);
 				rcuAnalyzer = null;

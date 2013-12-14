@@ -50,7 +50,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	}*/
 	
 	private synchronized void  resetRCUAnalyzer(){
-		rcuAnalyzer.stop();
+		
 		rcuAnalyzer = null;
 		rcuDev.resetRCUAnalyzer();
 		rcuAnalyzer = rcuDev.getRCUAnalyzer();

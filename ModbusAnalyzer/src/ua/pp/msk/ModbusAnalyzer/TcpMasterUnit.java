@@ -40,7 +40,7 @@ class TcpMasterUnit  implements Comparable<TcpMasterUnit>{
 
 	
 	
-	public TcpMasterUnit(String host, int port, boolean keepAlive, boolean initialize) throws ModbusInitException{
+	public TcpMasterUnit(String host, int port, boolean keepAlive, boolean initialize){
 		this.host = host;
 		this.port = port;
 		this.keepAlive = keepAlive;
@@ -49,9 +49,7 @@ class TcpMasterUnit  implements Comparable<TcpMasterUnit>{
 		ipP.setPort(port);
 		TcpMaster tm = new TcpMaster(ipP, keepAlive);
 		tm.setTimeout(60);
-		if (!tm.isInitialized() && initialize) {
-			tm.init();
-		}
+		
 		this.tcpM = tm;
 	}
 	

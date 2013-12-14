@@ -198,12 +198,14 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		
 		TcpMaster tm = null;
 		
-		
+		System.out.println("Trying to get TcpMaster to detemine rcu device type");
 		if (TcpMasterModel.containsConnection(host, port, true)){
 			tm = TcpMasterModel.getConnection(host);
+			System.out.println("Aquiered TcpMaster connection");
 		} else {
 			TcpMasterModel.setConnection(host, port, true);
 			tm = TcpMasterModel.getConnection(host);
+			System.out.println("Created Tcp Master connection");
 		}
 		
 		
@@ -224,6 +226,9 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 7003,
 					DataType.TWO_BYTE_INT_UNSIGNED);
+			if (!tm.isInitialized()) {
+				tm.init();
+			}
 			tm.getValue(devTypePM700Locator);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
@@ -237,7 +242,9 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 3914,
 					DataType.FOUR_BYTE_FLOAT_SWAPPED);
-
+			if (!tm.isInitialized()) {
+				tm.init();
+			}
 			float idPM1200 = (float) tm.getValue(devTypePM1200Locator);
 			// System.out.println("PM1200 id " + idPM1200);
 			isPM1200 = true;
@@ -372,12 +379,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			throws ModbusInitException, ErrorResponseException,
 			ModbusTransportException, SocketException;
 
-	public void stop() {
-		if (tm != null) {
-			tm.destroy();
-			tm = null;
-		}
-	}
+	
 
 	// TODO
 	// Rewrite main method !
@@ -471,9 +473,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 				e.printStackTrace();
 				System.err.println("from host " + hostname + ":" + port
 						+ " device " + dev);
-			} finally {
-				rcuan.stop();
-			}
+			} 
 		}
 	}
 }

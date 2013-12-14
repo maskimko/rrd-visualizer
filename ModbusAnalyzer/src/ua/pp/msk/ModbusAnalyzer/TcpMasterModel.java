@@ -10,10 +10,10 @@ public class TcpMasterModel {
 
 	private final static HashSet<TcpMasterUnit> connections = new HashSet<TcpMasterUnit>();
 	
-	public static TcpMaster getConnection(String host){
+	public static synchronized TcpMaster getConnection(String host){
 		TcpMaster tm = null;
 		TcpMasterUnit tmu = null;
-		try {
+	
 			if (connections.contains(new TcpMasterUnit(host, 502, false, false))){
 				Iterator<TcpMasterUnit> tmuIterator = connections.iterator();
 				while (tmuIterator.hasNext()){
@@ -23,17 +23,16 @@ public class TcpMasterModel {
 					}
 				}
 			}
-		} catch (ModbusInitException e) {
-		}
+	
 		return tm;
 	}
 	
-	public static void setConnection(String host, int port, boolean keepAlive) throws ModbusInitException{
+	public static synchronized void setConnection(String host, int port, boolean keepAlive) {
 		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true);
 		connections.add(tmu);
 	}
 	
-	public static void replaceConnection(String host, int port, boolean keepAlive) throws ModbusInitException{
+	public static synchronized void replaceConnection(String host, int port, boolean keepAlive) {
 		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true);
 		connections.remove(tmu);
 		connections.add(tmu);
@@ -41,12 +40,9 @@ public class TcpMasterModel {
 	
 	public static boolean containsConnection(String host, int port, boolean keepAlive){
 		boolean exists = false;
-		try {
+		
 		 exists= connections.contains(new TcpMasterUnit(host,port, keepAlive, false));
-		} catch (ModbusInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
 		return exists;
 	}
 }
