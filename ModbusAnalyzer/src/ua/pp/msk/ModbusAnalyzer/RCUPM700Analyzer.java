@@ -38,10 +38,12 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	
 	public RCUPM700Analyzer(String host, int port, short device) throws ModbusInitException{
 		super (host, port, device, PM700);
+		setUpLocators();
 	}
 	
 	public RCUPM700Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException{
 		super(host, port , device, PM700, keepAlive);
+		setUpLocators();
 	}
 	
 	
@@ -130,13 +132,11 @@ public class RCUPM700Analyzer extends RCUAnalyzer  {
 	 */
 	public RCUPacketFloat askDevice(TcpMaster mtm)
 			throws ModbusInitException, ErrorResponseException, ModbusTransportException {
-		setUpLocators();
-		if (!tm.isInitialized()) {
-			tm.init();
-		}
-		short powerScale = (short) tm.getValue(powerScaleLocator);
-		short currentScale = (short) tm.getValue(currentScaleLocator);
-		short voltageScale = (short) tm.getValue(voltageScaleLocator);
+		
+	
+		short powerScale = (short) mtm.getValue(powerScaleLocator);
+		short currentScale = (short) mtm.getValue(currentScaleLocator);
+		short voltageScale = (short) mtm.getValue(voltageScaleLocator);
 		int realPowerValue = (int) mtm.getValue(realPowerLocator);
 		int apparentPowerValue = (int) mtm.getValue(apparentPowerLocator);
 		int reactivePowerValue = (int) mtm.getValue(reactivePowerLocator);

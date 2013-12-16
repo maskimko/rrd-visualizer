@@ -34,10 +34,12 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 
 	public RCUPM500Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException {
 		super(host, port, device, PM500, keepAlive);
+		setUpLocators();
 	}
 	
 	public RCUPM500Analyzer(String host, int port, short device) throws ModbusInitException {
 		super(host, port, device, PM500);
+		setUpLocators();
 	}
 
 
@@ -119,7 +121,7 @@ public class RCUPM500Analyzer extends RCUAnalyzer {
 		if (!tm.isInitialized()) {
 			tm.init();
 		}
-		setUpLocators();
+	
 		long realPowerValue = (long) mtm.getValue(realPowerLocator);
 		long apparentPowerValue = (long) mtm.getValue(apparentPowerLocator);
 		long reactivePowerValue = (int) mtm.getValue(reactivePowerLocator);

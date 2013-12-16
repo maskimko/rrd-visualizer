@@ -57,9 +57,10 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		} else {
 			TcpMasterModel.setConnection(host, port, keepAlive);
 			this.tm = TcpMasterModel.getConnection(host);
+		}
 			this.device = device;
 			this.deviceType = type;
-		}
+		
 	}
 
 	/**
@@ -142,7 +143,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			System.out.println(" .created.");
 		}
 		
-		if (!mtm.isInitialized()) mtm.init();
+		
 		
 		short type = determineRCUDeviceType(hostname, port, device);
 		switch (type) {
@@ -253,8 +254,8 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 		} else if (isPM1200) {
 			dt = PM1200;
 		}
-		Thread.sleep(10);
-		tm.destroy();
+		
+		
 		return dt;
 	}
 

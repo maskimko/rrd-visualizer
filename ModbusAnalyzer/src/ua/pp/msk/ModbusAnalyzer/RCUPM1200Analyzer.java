@@ -39,9 +39,11 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 	
 	public RCUPM1200Analyzer(String host, int port, short device, boolean keepAlive) throws ModbusInitException {
 		super(host, port, device, PM1200, keepAlive);
+		setUpLocators();
 	}
 	public RCUPM1200Analyzer(String host, int port, short device) throws ModbusInitException {
 		super(host, port, device, PM1200);
+		setUpLocators();
 	}
 	
 
@@ -127,10 +129,7 @@ public class RCUPM1200Analyzer extends RCUAnalyzer {
 	 */
 	public RCUPacketFloat askDevice(TcpMaster mtm) throws ModbusInitException,
 			ErrorResponseException, ModbusTransportException, SocketException {
-		setUpLocators();
-		if (!tm.isInitialized()) {
-			tm.init();
-		}
+	
 		//short powerScale = (short) tm.getValue(powerScaleLocator);
 		//short currentScale = (short) tm.getValue(currentScaleLocator);
 		//short voltageScale = (short) tm.getValue(voltageScaleLocator);

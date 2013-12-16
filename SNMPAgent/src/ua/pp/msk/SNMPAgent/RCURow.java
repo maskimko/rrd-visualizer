@@ -91,7 +91,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 			}
 		}
 		//TODO add askdevice method to RCUDevice
-		RCUPacketFloat rcuPack = rcuDev.getRCUAnalyzer().askDevice();
+		RCUPacketFloat rcuPack = rcuDev.askDevice();
 		return rcuPack.getAllInteger();
 	}
 
@@ -110,7 +110,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return rowValues;
 	}
 
-	private synchronized void renewValues() {
+	private void renewValues() {
 		if (canUpdate) {
 			try {
 				values = getStatsArray();
@@ -135,8 +135,9 @@ public class RCURow extends DefaultMOMutableRow2PC {
 			} catch (ErrorResponseException ere) {
 				System.err
 						.println("Got an error response! Somethin is going wrong! Trying to reconnect!");
+				ere.printStackTrace();
 				rcuDev.resetRCUAnalyzer();
-				System.out.println(ere.getMessage());
+				
 			}
 		} /*
 		 * else { System.out.println("Skipping updating this row"); }

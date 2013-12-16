@@ -81,34 +81,34 @@ public class RCUTable extends DefaultMOTable {
 				indexDef, columns);
 		MOMutableTableModel model = (MOMutableTableModel) deviceStats
 				.getModel();
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKyivRCUDevice((short) 5));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKyivRCUDevice((short) 4));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKyivRCUDevice((short) 3));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKyivRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseDnipropetrovskRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseDnipropetrovskRCUDevice((short) 3));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseDonetskRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseDonetskRCUDevice((short) 3));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKharkivRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseKharkivRCUDevice((short) 3));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseLvivRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseLvivRCUDevice((short) 3));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseSimferopolRCUDevice((short) 2));
-//		RCUModelFactory.addRCUDeviceToModel(model,
-//				RCUDevice.createBaseSimferopolRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKyivRCUDevice((short) 5));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKyivRCUDevice((short) 4));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKyivRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKyivRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseDnipropetrovskRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseDnipropetrovskRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseDonetskRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseDonetskRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKharkivRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseKharkivRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseLvivRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseLvivRCUDevice((short) 3));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseSimferopolRCUDevice((short) 2));
+		RCUModelFactory.addRCUDeviceToModel(model,
+				RCUDevice.createBaseSimferopolRCUDevice((short) 3));
 		RCUModelFactory.addRCUDeviceToModel(model,
 				RCUDevice.createBaseOdesaRCUDevice((short) 2));
 		

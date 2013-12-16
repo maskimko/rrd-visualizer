@@ -63,7 +63,7 @@ public class ConnectionTest4 {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		boolean keepAlive = true; // We don't keep alive TCP connection
-		int devNum = 2;
+		int devNum = 2, devNum2 = 3;
 		IpParameters ipParm = new IpParameters();
 		ipParm.setHost("10.192.20.122");
 		ipParm.setPort(502);
@@ -118,6 +118,12 @@ public class ConnectionTest4 {
 		ModbusLocator voltageLocatorCN = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 786,
 				DataType.FOUR_BYTE_INT_UNSIGNED);
+		
+		
+	
+		
+		
+		
 		try {
 			tm.init();
 		} catch (ModbusInitException mbie) {

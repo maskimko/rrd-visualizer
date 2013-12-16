@@ -54,7 +54,7 @@ class TcpMasterUnit implements Comparable<TcpMasterUnit> {
 		ipP.setPort(port);
 		ipP.setEncapsulated(isEncapsulated);
 		TcpMaster tm = new TcpMaster(ipP, keepAlive);
-		tm.setTimeout(60);
+		tm.setTimeout(10000);
 		if (initialize) {
 			try {
 				tm.init();
