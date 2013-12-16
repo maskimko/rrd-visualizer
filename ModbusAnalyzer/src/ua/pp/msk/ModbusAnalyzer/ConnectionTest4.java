@@ -64,7 +64,6 @@ public class ConnectionTest4 {
 		// TODO Auto-generated method stub
 		boolean keepAlive = true; // We don't keep alive TCP connection
 		int devNum = 2;
-		ModbusFactory factory = new ModbusFactory();
 		IpParameters ipParm = new IpParameters();
 		ipParm.setHost("10.192.20.122");
 		ipParm.setPort(502);

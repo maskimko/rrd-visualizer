@@ -21,7 +21,7 @@ public class RCURow extends DefaultMOMutableRow2PC {
 
 	private static int index4OID = 1;
 	private boolean canUpdate = true;
-	private RCUAnalyzer rcuAnalyzer = null;
+
 	private RCUDevice rcuDev = null;
 	private String ipAddress = null;
 	private int port = 0;
@@ -30,33 +30,27 @@ public class RCURow extends DefaultMOMutableRow2PC {
 
 	public RCURow(RCUDevice rcudev) {
 		super(makeOID(), makeStatsArray(rcudev));
-		//super(makeOID(rcudev), makeStatsArray(rcudev));
+		// super(makeOID(rcudev), makeStatsArray(rcudev));
 		rcuDev = rcudev;
 		values = makeStatsArray(rcuDev);
 		ipAddress = rcuDev.getIpAddress();
 		port = rcuDev.getPort();
 		modbusDevice = (short) rcuDev.getModbusDeviceNumber();
-		rcuAnalyzer = rcuDev.getRCUAnalyzer();
+		
 		AutoUpdater autoRenew = new AutoUpdater(renewDuration);
 		Thread willBeUpdated = new Thread(autoRenew);
 		willBeUpdated.start();
 	}
 
 	/*
-	private static OID makeOID(RCUDevice rcud) {
-		String oid = "" + rcud.getCity();
-		OID rowOID = new OID(oid).append(rcud.getModbusDeviceNumber());
-		return rowOID;
-	}*/
+	 * private static OID makeOID(RCUDevice rcud) { String oid = "" +
+	 * rcud.getCity(); OID rowOID = new
+	 * OID(oid).append(rcud.getModbusDeviceNumber()); return rowOID; }
+	 */
+
 	
-	private synchronized void  resetRCUAnalyzer(){
-		
-		rcuAnalyzer = null;
-		rcuDev.resetRCUAnalyzer();
-		rcuAnalyzer = rcuDev.getRCUAnalyzer();
-	}
-	
-	private static OID makeOID(){
+
+	private static OID makeOID() {
 		return new OID().append(index4OID++);
 	}
 
@@ -73,30 +67,37 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		return vars;
 	}
 
-	private int[] getRCUPackStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException, SocketException  {
+	private int[] getRCUPackStatsArray() throws ModbusTransportException,
+			ErrorResponseException, ModbusInitException, SocketException {
 		long waitingTime = 0;
-		Runnable cooldowner = new CoolDown(renewDuration-1);
+		Runnable cooldowner = new CoolDown(renewDuration - 1);
 		Thread willWait = new Thread(cooldowner);
 		willWait.start();
-		while (rcuAnalyzer == null){
+		while (rcuDev.getRCUAnalyzer() == null) {
 			try {
 				Thread.sleep(100);
 				waitingTime += 100;
-				if (waitingTime == 60000){
-					System.out.println("1 minute waiting for RCUAnalyzer for " + rcuDev.getDescription());
-				} else if (waitingTime == 300000){
-					System.err.println(rcuDev.getDescription() + " is not responcing for at least 5 minutes");
+				if (waitingTime == 60000) {
+					System.out.println("1 minute waiting for RCUAnalyzer for "
+							+ rcuDev.getDescription());
+				} else if (waitingTime == 300000) {
+					System.err.println(rcuDev.getDescription()
+							+ " is not responcing for at least 5 minutes");
 					waitingTime = 0;
 				}
-			} catch (InterruptedException ie){
-				System.err.println("Waiting for RCUAnalyzer for " + rcuDev.getDescription() + " has been interrupted");
+			} catch (InterruptedException ie) {
+				System.err.println("Waiting for RCUAnalyzer for "
+						+ rcuDev.getDescription() + " has been interrupted");
 			}
 		}
-		RCUPacketFloat rcuPack = rcuAnalyzer.askDevice();
+		//TODO add askdevice method to RCUDevice
+		RCUPacketFloat rcuPack = rcuDev.getRCUAnalyzer().askDevice();
 		return rcuPack.getAllInteger();
 	}
 
-	private synchronized Variable[] getStatsArray() throws ModbusTransportException, ErrorResponseException, ModbusInitException, SocketException {
+	private synchronized Variable[] getStatsArray()
+			throws ModbusTransportException, ErrorResponseException,
+			ModbusInitException, SocketException {
 		int counter = 3;
 		Variable[] rowValues = values;
 		int[] stats = getRCUPackStatsArray();
@@ -108,40 +109,43 @@ public class RCURow extends DefaultMOMutableRow2PC {
 		}
 		return rowValues;
 	}
-	
-	
+
 	private synchronized void renewValues() {
 		if (canUpdate) {
 			try {
 				values = getStatsArray();
 			} catch (NullPointerException npe) {
-				System.err.println("Cannot update "+rcuDev.getDescription()+" table");
+				System.err.println("Cannot update " + rcuDev.getDescription()
+						+ " table");
 			} catch (SocketException se) {
-				System.err.println("Error: Socket error on " + rcuDev.getDescription());
+				System.err.println("Error: Socket error on "
+						+ rcuDev.getDescription());
 				System.err.println(se.getMessage());
-				resetRCUAnalyzer();
-			}
-			catch (ModbusInitException mie) {
-				System.err.println("Error: Could not initialize TCP Modbus Master Connection!");
-				System.err.println("This row has inactual data " + rcuDev.getDescription());
-			}
-			catch (ModbusTransportException e) {
-				System.out.println("Failed to handle modbus transport. Trying to reinitialize RCU Analyzer");
-				resetRCUAnalyzer();
+				rcuDev.resetRCUAnalyzer();
+			} catch (ModbusInitException mie) {
+				System.err
+						.println("Error: Could not initialize TCP Modbus Master Connection!");
+				System.err.println("This row has inactual data "
+						+ rcuDev.getDescription());
+			} catch (ModbusTransportException e) {
+				System.out
+						.println("Failed to handle modbus transport. Trying to reinitialize RCU Analyzer");
+				rcuDev.resetRCUAnalyzer();
 				System.out.println(e.getMessage());
 			} catch (ErrorResponseException ere) {
-				System.err.println("Got an error response! Somethin is going wrong! Trying to reconnect!");
-				resetRCUAnalyzer();
+				System.err
+						.println("Got an error response! Somethin is going wrong! Trying to reconnect!");
+				rcuDev.resetRCUAnalyzer();
 				System.out.println(ere.getMessage());
 			}
-		} /*else {
-			System.out.println("Skipping updating this row");
-		}*/
+		} /*
+		 * else { System.out.println("Skipping updating this row"); }
+		 */
 	}
 
 	@Override
 	public Variable getValue(int column) {
-		//renewValues();
+		// renewValues();
 		return super.getValue(column);
 	}
 
@@ -174,32 +178,36 @@ public class RCURow extends DefaultMOMutableRow2PC {
 	}
 
 	class AutoUpdater implements Runnable {
-		
+
 		private long duration = 150000;
-		
-		public AutoUpdater(long time){
-			duration  = time;
+
+		public AutoUpdater(long time) {
+			duration = time;
 		}
-		
-		public void setDuration(long time){
-			duration  = time;
+
+		public void setDuration(long time) {
+			duration = time;
 		}
-		
-		private void makeUpdate(){
-			try {
+
+		private void makeUpdate() throws InterruptedException {
+
 			while (true) {
 				canUpdate = true;
 				renewValues();
-				
+
 				Thread.sleep(duration);
 			}
-		} catch (InterruptedException ie) {
-			System.err.println(rcuDev.getDescription() + "stops auto renewing");
+
 		}
-		}
-		
-		public void run(){
-			makeUpdate();
+
+		public void run() {
+			try {
+				Thread.sleep(5000);
+				makeUpdate();
+			} catch (InterruptedException ie) {
+				System.err.println(rcuDev.getDescription()
+						+ "stops auto renewing");
+			}
 		}
 	}
 }

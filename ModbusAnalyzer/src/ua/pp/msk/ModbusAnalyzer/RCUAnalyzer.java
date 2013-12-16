@@ -213,9 +213,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM500Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 64647,
 					DataType.TWO_BYTE_INT_UNSIGNED);
-			if (!tm.isInitialized()) {
-				tm.init();
-			}
+		
 
 			tm.getValue(devTypePM500Locator);
 			isPM500 = true;
@@ -226,9 +224,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM700Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 7003,
 					DataType.TWO_BYTE_INT_UNSIGNED);
-			if (!tm.isInitialized()) {
-				tm.init();
-			}
+		
 			tm.getValue(devTypePM700Locator);
 			isPM700 = true;
 		} catch (ErrorResponseException erePM700) {
@@ -242,9 +238,7 @@ public abstract class RCUAnalyzer implements RCUAnalyzerInterface {
 			ModbusLocator devTypePM1200Locator = new ModbusLocator(devnum,
 					RegisterRange.HOLDING_REGISTER, 3914,
 					DataType.FOUR_BYTE_FLOAT_SWAPPED);
-			if (!tm.isInitialized()) {
-				tm.init();
-			}
+	
 			float idPM1200 = (float) tm.getValue(devTypePM1200Locator);
 			// System.out.println("PM1200 id " + idPM1200);
 			isPM1200 = true;

@@ -28,12 +28,12 @@ public class TcpMasterModel {
 	}
 	
 	public static synchronized void setConnection(String host, int port, boolean keepAlive) {
-		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true);
+		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true, false);
 		connections.add(tmu);
 	}
 	
 	public static synchronized void replaceConnection(String host, int port, boolean keepAlive) {
-		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true);
+		TcpMasterUnit tmu = new TcpMasterUnit(host, port, keepAlive, true, false);
 		connections.remove(tmu);
 		connections.add(tmu);
 	}

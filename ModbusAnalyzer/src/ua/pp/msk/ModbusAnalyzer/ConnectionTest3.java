@@ -13,7 +13,7 @@ import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 public class ConnectionTest3 {
 
 
-	
+	private  static TcpMaster tm = null;
 	
 	/**
 	 * @param args
@@ -22,14 +22,18 @@ public class ConnectionTest3 {
 		// TODO Auto-generated method stub
 		boolean keepAlive = false; // We don't keep alive TCP connection
 		int devNum = 2;
-		ModbusFactory factory = new ModbusFactory();
-		IpParameters ipParm = new IpParameters();
-		ipParm.setHost("10.208.20.122");
-		ipParm.setPort(502);
-		ipParm.setEncapsulated(false);
-
-		TcpMaster tm = new TcpMaster(ipParm, keepAlive);
-		tm.setTimeout(500);
+		
+		long slp = 500;
+//		IpParameters ipParm = new IpParameters();
+//		ipParm.setHost("10.208.20.122");
+//		ipParm.setPort(502);
+//		ipParm.setEncapsulated(false);
+//
+//		TcpMaster tm = new TcpMaster(ipParm, keepAlive);
+//		tm.setTimeout(500);
+		TcpMasterModel.setConnection("10.208.20.122", 502, keepAlive);
+		tm = TcpMasterModel.getConnection("10.208.20.122");
+		
 		
 		ModbusLocator currentScaleLocator = new ModbusLocator(devNum,
 				RegisterRange.HOLDING_REGISTER, 4104,
@@ -86,22 +90,41 @@ public class ConnectionTest3 {
 				RegisterRange.HOLDING_REGISTER, 4034,
 				DataType.TWO_BYTE_INT_UNSIGNED);
 		try {
+			if (tm.isInitialized()) {
+				System.out.println("tcpMaster has already been initialized.");
+			} else {
+			System.out.println("Trying to initialize connection");
 			tm.init();
+			}
 		} catch (ModbusInitException mbie) {
 			mbie.printStackTrace();
 			return;
 		}
 		try {
-			short dt = ConnectionTest4.determineRCUDeviceType(tm, (short) 2);
-			System.out.println("Device type is " + dt);
+			//short dt = ConnectionTest4.determineRCUDeviceType(tm, (short) 2);
+			//System.out.println("Device type is " + dt);
 			for (int i = 0; i < 10; i++) {
 				int realPowerValue = (int) tm.getValue(realPowerLocator);
+				System.out.println("got realPowervalue");
+				Thread.sleep(slp);
 				int powerFactorValue = (int) tm.getValue(powerFactorLocator);
+				System.out.println("got powerFactor");
+				Thread.sleep(slp);
 				short powerScale = (short) tm.getValue(powerScaleLocator);
+				System.out.println("got powerScale");
+				Thread.sleep(slp);
 				int voltageABValue = (int) tm.getValue(voltageLocatorAB);
+				System.out.println("got ABValue");
+				Thread.sleep(slp);
 				short voltageScale = (short) tm.getValue(voltageScaleLocator);
+				System.out.println("got voltageScale");
+				Thread.sleep(slp);
 				int currentAValue = (int) tm.getValue(currentLocatorA);
+				System.out.println("got AValue");
+				Thread.sleep(slp);
 				short currentScale = (short) tm.getValue(currentScaleLocator);
+				System.out.println("got currentScale");
+				Thread.sleep(slp);
 				float realPower = (float) (realPowerValue * Math.pow(10,
 						powerScale));
 				float voltageAB = (float) (voltageABValue * Math.pow(10,

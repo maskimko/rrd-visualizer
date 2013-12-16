@@ -4,57 +4,71 @@ import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.ip.tcp.TcpMaster;
 
-class TcpMasterUnit  implements Comparable<TcpMasterUnit>{
+class TcpMasterUnit implements Comparable<TcpMasterUnit> {
 
 	private TcpMaster tcpM = null;
 	private IpParameters ipP = null;
 	private String host;
-	private int port; 
+	private int port;
 	private boolean keepAlive = true;
-	
-	
-	
+
 	public TcpMaster getTcpMaster() {
 		return tcpM;
 	}
-
 
 	public IpParameters getIpPapameters() {
 		return ipP;
 	}
 
-
 	public String getHost() {
 		return host;
 	}
-
 
 	public int getPort() {
 		return port;
 	}
 
-
 	public boolean isKeepAlive() {
 		return keepAlive;
 	}
 
-	
-	
-	public TcpMasterUnit(String host, int port, boolean keepAlive, boolean initialize){
+	/**
+	 * @param host
+	 *            Host to make tcp connection
+	 * @param port
+	 *            TCP port to connect
+	 * @param keepAlive
+	 *            do not close connection between requests
+	 * @param initialize
+	 *            initialize connection fist
+	 * @param isEncapsulated
+	 *            use encapsulated protocol (ASTELIT does not use it)
+	 */
+	public TcpMasterUnit(String host, int port, boolean keepAlive,
+			boolean initialize, boolean isEncapsulated) {
 		this.host = host;
 		this.port = port;
 		this.keepAlive = keepAlive;
 		ipP = new IpParameters();
 		ipP.setHost(host);
 		ipP.setPort(port);
+		ipP.setEncapsulated(isEncapsulated);
 		TcpMaster tm = new TcpMaster(ipP, keepAlive);
 		tm.setTimeout(60);
-		
+		if (initialize) {
+			try {
+				tm.init();
+			} catch (ModbusInitException mie) {
+				mie.printStackTrace();
+			}
+		}
 		this.tcpM = tm;
 	}
-	
-	
-	
+
+	public TcpMasterUnit(String host, int port, boolean keepAlive,
+			boolean initialize) {
+		this(host, port, keepAlive, initialize, false);
+	}
 
 	@Override
 	public int hashCode() {
@@ -63,7 +77,6 @@ class TcpMasterUnit  implements Comparable<TcpMasterUnit>{
 		result = prime * result + ((host == null) ? 0 : host.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -82,17 +95,9 @@ class TcpMasterUnit  implements Comparable<TcpMasterUnit>{
 		return true;
 	}
 
-
 	@Override
 	public int compareTo(TcpMasterUnit o) {
 		return host.compareTo(o.getHost());
 	}
 
-
-
-
-	
-
-	
-	
 }
